@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Popover } from '@headlessui/react'
-import { ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0';
 import { PrimaryButton, SecondaryButton } from './Buttons'
@@ -11,7 +10,7 @@ export default function Navigation() {
     const path = router.pathname
 
     return (
-        <Popover className="relative bg-white">
+        <Popover className="relative bg-white z-10">
             {/* Desktop Navbar */}
             <div className="flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10 border border-gray-300">
                 {/* Logo */}
@@ -26,7 +25,7 @@ export default function Navigation() {
                         />
                         <Link href = 'https://hobble.notion.site/Kinship-Canada-Alpha-6bb80cea62754c62a8c87e34b13347db'>
                             <span className="flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
-                                Beta V0.2.8
+                                Beta V1.0.0
                             </span>
                         </Link>
                     </a>
@@ -68,7 +67,6 @@ export default function Navigation() {
                     <PrimaryButton
                         link = "/donate"
                         text = "Donate"
-                        iconRight = {ArrowRightCircleIcon}
                     />
                 </div>
 

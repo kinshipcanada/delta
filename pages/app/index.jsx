@@ -3,7 +3,7 @@ import AppLayout from "../../components/core/AppLayout";
 
 export default function Index({ user }) {
     return (
-        <AppLayout>
+        <AppLayout user = {user}>
             <div>Hello, {user.email} - {user.name}</div>
         </AppLayout>
     )
