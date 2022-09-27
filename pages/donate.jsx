@@ -1,8 +1,7 @@
-import { RadioGroup } from "@headlessui/react";
 import { ChevronRightIcon, LockClosedIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import { PrimaryButton } from "../components/core/Buttons";
 import Loading from "../components/core/Loading";
+import { Tab } from '@headlessui/react'
 
 const causes = [
     {
@@ -353,6 +352,10 @@ const canadian_states = [
 	}
 ]
 
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+}
+
 export default function Donate() {
 
     const [active_step, set_active_step] = useState(0)
@@ -360,7 +363,6 @@ export default function Donate() {
     const [stepError, setStepError] = useState(null)
 
     const [amount, set_amount] = useState(0.00)
-    const [amountError, setAmountError] = useState(null)
 
     const [email, set_email] = useState(null)
     const [name_on_card, set_name_on_card] = useState(null)
@@ -368,7 +370,8 @@ export default function Donate() {
     const [suite, set_suite] = useState(null)
     const [country, set_country] = useState(countries[0])
     const [city, set_city] = useState(null)
-    const [state_or_province, set_state_or_province] = useState(canadian_states[6])
+    const [state_or_province, set_state_or_province] = useState(canadian_states[6].name)
+    const [postal_code, set_postal_code] = useState(null)
 
     const [selected_causes, set_selected_causes] = useState([causes[0]])
 
@@ -496,17 +499,37 @@ export default function Donate() {
                     {
                         active_step == 0 ?
 
-                        <AmountStep set_amount = {set_amount} amountError={amountError} setAmountError={setAmountError} selected_causes={selected_causes} set_selected_causes={set_selected_causes} />
+                        <AmountStep 
+                            set_amount = {set_amount} 
+                            selected_causes={selected_causes} 
+                            set_selected_causes={set_selected_causes} 
+                        />
 
                         : active_step == 1 ?
                         
-                        <BillingStep country={country} set_country={set_country} email={email} set_email={set_email} state_or_province={state_or_province} set_state_or_province={set_state_or_province} />
+                        <BillingStep 
+                            country={country} 
+                            set_country={set_country} 
+                            email={email} 
+                            set_email={set_email} 
+                            state_or_province={state_or_province} 
+                            set_state_or_province={set_state_or_province} 
+                            city = {city}
+                            set_city = {set_city}
+                            name_on_card = {name_on_card}
+                            set_name_on_card = {set_name_on_card}
+                            address = {address}
+                            set_address = {set_address}
+                            suite = {suite}
+                            set_suite = {set_suite}
+                            postal_code = {postal_code}
+                            set_postal_code = {set_postal_code}
+                        />
 
                         :
 
                         null
                     }
-    
 
                     <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">
                         <div>
@@ -552,8 +575,9 @@ export default function Donate() {
     )
 }
 
-export function AmountStep({ set_amount, amountError, setAmountError, selected_causes, set_selected_causes }) {
+export function AmountStep({ set_amount, selected_causes, set_selected_causes }) {
 
+    const [amountError, setAmountError] = useState(null)
 
     function validate_amount_input(event) {
         const target = parseFloat(event.target.value).toFixed(2)
@@ -669,103 +693,79 @@ export function PreferredCauseCheckbox({ cause_object, selected_causes, set_sele
     )
 }
 
-function BillingStep({ country, set_country, state_or_province, set_state_or_province }) {
+function BillingStep({ country, set_country, state_or_province, set_state_or_province, email, set_email, set_city, name_on_card, set_name_on_card, address, set_address, suite, set_suite, postal_code, set_postal_code }) {
     return (
         <div>
-            <section aria-labelledby="contact-info-heading">
-              <h2 id="contact-info-heading" className="text-lg font-medium text-gray-900">
-                Contact information
-              </h2>
-
-              <div className="mt-6">
-                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="email"
-                    id="email-address"
-                    name="email-address"
-                    autoComplete="email"
-                    required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
+            {/** Contact Info Section */}
+            <section>
+              <SectionHeader text = "Contact Information" />
+              <div className="mt-5" />
+              <TextInput label={"Email Address"} type={"email"} required={true} defaultValue={null} setter = {set_email} />
             </section>
 
-            <section aria-labelledby="payment-heading" className="mt-10">
-              <h2 id="payment-heading" className="text-lg font-medium text-gray-900">
-                Payment details
-              </h2>
+            {/** Contact Info Section */}
+            <section className="mt-10">
+              <SectionHeader text = "Payment Details" />
 
               <div className="mt-6 grid grid-cols-3 gap-y-6 gap-x-4 sm:grid-cols-4">
-                <div className="col-span-3 sm:col-span-4">
-                  <label htmlFor="name-on-card" className="block text-sm font-medium text-gray-700">
-                    Name on card
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="name-on-card"
-                      name="name-on-card"
-                      autoComplete="cc-name"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
+                
 
-                <div className="col-span-3 sm:col-span-4">
-                  <label htmlFor="card-number" className="block text-sm font-medium text-gray-700 flex items-center ">
-                    Card number 
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="card-number"
-                      name="card-number"
-                      autoComplete="cc-number"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
+                <Tab.Group>
+                    <Tab.List className="flex col-span-4">
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                'w-full rounded py-2 text-sm font-medium leading-5 text-gray-700',
+                                'ring-offset-blue-400 focus:outline-none',
+                                selected
+                                    ? 'hover:bg-gray-100 shadow border border-gray-300 border-1'
+                                    : 'text-gray-700 hover:bg-white/[0.12]'
+                                )
+                            }
+                            >
+                                Pay By Card
+                        </Tab>
+                        <div className="m-1" />
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                'w-full rounded py-2 text-sm font-medium leading-5 text-gray-700',
+                                'ring-offset-blue-400 focus:outline-none',
+                                selected
+                                    ? 'hover:bg-gray-100 shadow border border-gray-300 border-1'
+                                    : 'text-gray-700 hover:bg-white/[0.12]'
+                                )
+                            }
+                            >
+                                Pay By Bank/Wire Transfer
+                        </Tab>
+                    </Tab.List>
+                    <Tab.Panels className="">
+                        <Tab.Panel
+                            className={'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'}
+                        >
+                            <div className="col-span-3 sm:col-span-4 w-full">
+                                <TextInput label = "Name on card" type = {"text"} required = {true} defaultValue = {null} setter = {set_name_on_card} />
+                            </div>
+                        </Tab.Panel>
+                    </Tab.Panels>
+                </Tab.Group>
 
               </div>
             </section>
 
-            <section aria-labelledby="shipping-heading" className="mt-10">
-              <h2 id="shipping-heading" className="text-lg font-medium text-gray-900">
+            <section className="mt-10">
+              <h2 className="text-lg font-medium text-gray-900">
                 Billing Address
               </h2>
 
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
                 <div className="sm:col-span-3">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                    Address
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      autoComplete="street-address"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+                  <TextInput label = "Address" type={"text"} required={true} defaultValue={null} setter = {set_address} />
                 </div>
 
                 <div className="sm:col-span-1">
-                  <label htmlFor="apartment" className="block text-sm font-medium text-gray-700">
-                    Apartment, suite, etc.
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="apartment"
-                      name="apartment"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+                  <TextInput label = "Apartment, suite, etc." type={"text"} required={false} defaultValue={null} setter = {set_suite} />
                 </div>
 
                 <div className="sm:col-span-2">
@@ -791,84 +791,72 @@ function BillingStep({ country, set_country, state_or_province, set_state_or_pro
                 </div>
 
                 <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                    City
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      autoComplete="address-level2"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+                    <TextInput label = "City" type={"text"} required={true} defaultValue={null} setter = {set_city} />
                 </div>
 
                 <div>
-                  <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                    State / Province
-                  </label>
+                 
                   <div className="mt-1">
                     { country.code == "CA" ?
 
-                      <select
-                        id="state"
-                        name="state"
-                        className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                        defaultValue={state_or_province}
-                        >
-                          {canadian_states.map((state)=>(
-                            <option>{state.name}</option>
-                          ))}
-                      </select>
+                        <div>
+                            <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                            State / Province
+                            </label>
+                            <select
+                            id="state"
+                            name="state"
+                            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            defaultValue={state_or_province}
+                            onChange={(e)=>{set_state_or_province(e.target.value)}}
+                            >
+                                {canadian_states.map((state)=>(
+                                    <option value = {state.name}>{state.name}</option>
+                                ))}
+                            </select>
+                        </div>
 
-                      : 
+                        : 
 
-                      <input
-                        type="text"
-                        id="region"
-                        name="region"
-                        autoComplete="address-level1"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
+                        <TextInput label = "State / Province" type={"text"} required={true} defaultValue={null} setter = {set_state_or_province} />
                     }
                   </div>
                 </div>
-
                 <div>
-                  <label htmlFor="postal-code" className="block text-sm font-medium text-gray-700">
-                    Postal code
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="postal-code"
-                      name="postal-code"
-                      autoComplete="postal-code"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+                  <TextInput label={"Postal Code"} type={"text"} required={true} defaultValue={null} setter={set_postal_code} />
                 </div>
               </div>
             </section>
 
-            <section aria-labelledby="billing-heading" className="mt-10">
-              <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
-                Receipt Information
-              </h2>
+            {country == countries[0] ?
+            
+            <TaxReceiptDetails />
 
+            :
+
+            null
+
+            }
+
+
+            <section aria-labelledby="cover-fees" className="mt-10">
+              <h2 id="billing-heading" className="text-lg font-medium text-gray-900">
+                Optional: Cover Processing Fees
+              </h2>
+              <p htmlFor="cover-fees-check" className="mt-2 text-sm font-regular text-gray-900">
+                Kinsip Canada sends 100% of what you donate to the recipient, and we personally cover administrative fees. If you would like to help us by covering credit card processing fees (tax deductible), we would greatly appreciate it.
+              </p>
               <div className="mt-6 flex items-center">
                 <input
-                  id="same-as-shipping"
-                  name="same-as-shipping"
+                  id="cover-fees-check"
+                  name="cover-fees-check"
                   type="checkbox"
                   defaultChecked
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="ml-2">
-                  <label htmlFor="same-as-shipping" className="text-sm font-medium text-gray-900">
-                    Same as shipping information
+                  <label htmlFor="cover-fees-check" className="text-sm font-medium text-gray-900">
+                    Cover credit card processing fees
                   </label>
                 </div>
               </div>
@@ -877,10 +865,29 @@ function BillingStep({ country, set_country, state_or_province, set_state_or_pro
     )
 }
 
+function SectionHeader({ text }) {
+    return (
+        <h2 className="text-lg font-medium text-gray-900">
+            { text }
+        </h2>
+    )
+}
+
+function TaxReceiptDetails() {
+    return (
+        <section aria-labelledby="billing-heading" className="mt-10">
+            <SectionHeader text = "Tax Receipt Information" />
+
+            <div className="mt-6 flex items-center">
+            
+            </div>
+        </section>
+    )
+}
 function TextInput({ label, type, required, defaultValue, setter }) {
   return (
-    <div className="mt-6">
-      <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+    <div className="mt-1">
+      <label htmlFor={label} className="block text-sm font-medium text-gray-700">
         { label }
       </label>
       <div className="mt-1">
@@ -892,6 +899,7 @@ function TextInput({ label, type, required, defaultValue, setter }) {
             name={ label }
             autoComplete={ type }
             required
+            onChange={(e)=>{setter(e.target.value)}}
             defaultValue={defaultValue}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
@@ -902,6 +910,7 @@ function TextInput({ label, type, required, defaultValue, setter }) {
             type={ type }
             id={ label }
             name={ label }
+            onChange={(e)=>{setter(e.target.value)}}
             autoComplete={ type }
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
