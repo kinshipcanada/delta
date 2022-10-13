@@ -16,13 +16,15 @@
     "module": "esnext",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "moduleResolution": "node"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "components/NavBar.jsx"  ],
+    "**/*.tsx",
+    "components/NavBar.jsx"
+  ],
   "exclude": [
     "node_modules"
   ]
