@@ -1,5 +1,5 @@
 import { ChevronRightIcon, LockClosedIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Loading from "../components/core/Loading";
 import { Tab } from '@headlessui/react'
 
@@ -711,7 +711,7 @@ function BillingStep({ country, set_country, state_or_province, set_state_or_pro
                 
 
                 <Tab.Group>
-                    <Tab.List className="flex col-span-4">
+                    <Tab.List className="flex col-span-4 p-1 shadow-sm rounded-lg border mb-4 flex col-span-4">
                         <Tab
                             className={({ selected }) =>
                                 classNames(
@@ -737,7 +737,7 @@ function BillingStep({ country, set_country, state_or_province, set_state_or_pro
                                 )
                             }
                             >
-                                Pay By Bank/Wire Transfer
+                              Pay By eTransfer
                         </Tab>
                     </Tab.List>
                     <Tab.Panels className="">
