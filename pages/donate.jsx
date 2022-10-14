@@ -12,6 +12,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { countries, canadian_states, causes } from "../lib/constants";
 import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
+import { supabase } from "../lib/supabaseClient";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -35,7 +36,7 @@ export default function Donate() {
     const [city, set_city] = useState(null)
     const [state_or_province, set_state_or_province] = useState(canadian_states[6].name)
     const [postal_code, set_postal_code] = useState(null)
-
+    const [user, setUser] = useState(null)
     const [selected_causes, set_selected_causes] = useState([causes[0]])
 
     const [clientSecret, setClientSecret] = useState("");
@@ -150,11 +151,12 @@ export default function Donate() {
                             options={options}
                             setOptions={setOptions}
                             set_active_step={set_active_step}
+                            setUser={setUser}
                         />
 
                         : active_step == 1 ?
                         
-                        <Elements options={options} stripe={stripePromise}>
+                        <Elements options={options} stripe={stripePromise} className="focus:outline-none">
                             <BillingStep 
                                 amount={amount}
                                 first_name={first_name}
@@ -179,6 +181,7 @@ export default function Donate() {
                                 set_postal_code = {set_postal_code}
                                 stripeOptions={options}
                                 passedClientSecret={clientSecret}
+                                user={user}
                             />
                         </Elements>
 
@@ -206,7 +209,7 @@ export default function Donate() {
     )
 }
 
-export function AmountStep({ set_active_step, options, setOptions, setClientSecret, amount, set_amount, selected_causes, set_selected_causes, global_loading, set_global_loading }) {
+export function AmountStep({ set_active_step, options, setOptions, setClientSecret, amount, set_amount, selected_causes, set_selected_causes, global_loading, set_global_loading, setUser }) {
 
     const [amountError, setAmountError] = useState(null)
     const [stepError, setStepError] = useState(null)
@@ -218,6 +221,22 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
         if (selected_causes.length > 0 && amount > 0) {
 
             try {
+
+                const loggedInUser = await supabase.auth.getUser()
+
+                if (loggedInUser.data.user != null) {
+                    const { data, error } = await supabase
+                        .from('donor_profiles')
+                        .select()
+                        .eq('id', loggedInUser.data.user.id)
+
+                    if (data && data.length > 0) {
+                        setUser(data[0])
+                    } else {
+                        setUser(null)
+                    }
+                }
+
                 await fetch("/api/payment-intent", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -386,47 +405,58 @@ function BillingStep({
     set_suite, 
     postal_code, 
     set_postal_code, 
-    passedClientSecret
+    passedClientSecret,
+    user
 }) {
     const stripe = useStripe();
     const elements = useElements();
   
     const [message, setMessage] = useState(null);
-    
     const [stepError, setStepError] = useState(null)
-
     const [selectedIndex, setSelectedIndex] = useState(0)
 
-
     useEffect(() => {
-      if (!stripe) {
-        return;
-      }
-  
-      const clientSecret = new URLSearchParams(window.location.search).get(
-        "payment_intent_client_secret"
-      );
-  
-      if (!clientSecret) {
-        return;
-      }
-  
-      stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
 
-        switch (paymentIntent.status) {
-          case "succeeded":
-            setMessage("Payment succeeded!");
-            break;
-          case "processing":
-            setMessage("Your payment is processing.");
-            break;
-          case "requires_payment_method":
-            setMessage("Your payment was not successful, please try again.");
-            break;
-          default:
-            setMessage("Something went wrong.");
-            break;
+        if (user) {
+            set_first_name(user.first_name)
+            set_last_name(user.last_name)
+            set_email(user.email)
+            set_address(user.address_line_address)
+            set_suite(user.address_suite)
+            set_city(user.address_city)
+            set_state_or_province(user.address_state)
+            set_country(user.address_country)
+            set_postal_code(user.address_postal_code)
         }
+
+        if (!stripe) {
+            return;
+        }
+  
+        const clientSecret = new URLSearchParams(window.location.search).get(
+            "payment_intent_client_secret"
+        );
+    
+        if (!clientSecret) {
+            return;
+        }
+  
+        stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+
+            switch (paymentIntent.status) {
+                case "succeeded":
+                    setMessage("Payment succeeded!");
+                    break;
+                case "processing":
+                    setMessage("Your payment is processing.");
+                    break;
+                case "requires_payment_method":
+                    setMessage("Your payment was not successful, please try again.");
+                    break;
+                default:
+                    setMessage("Something went wrong.");
+                    break;
+            }
       });
     }, [stripe]);
 
@@ -501,10 +531,10 @@ function BillingStep({
               <SectionHeader text = "Your Information" />
               <div className="mt-5" />
               <div className="mb-4 grid grid-cols-2 gap-4">
-                <TextInput label={"First Name"} type={"text"} required={true} defaultValue={null} setter = {set_first_name} />
-                <TextInput label={"Last Name"} type={"text"} required={true} defaultValue={null} setter = {set_last_name} />
+                <TextInput label={"First Name"} type={"text"} required={true} defaultValue={user ? user.first_name : null} setter = {set_first_name} />
+                <TextInput label={"Last Name"} type={"text"} required={true} defaultValue={user ? user.last_name : null} setter = {set_last_name} />
               </div>
-              <TextInput label={"Email Address"} type={"email"} required={true} defaultValue={null} setter = {set_email} />
+              <TextInput label={"Email Address"} type={"email"} required={true} defaultValue={user ? user.email : null} setter = {set_email} />
             </section>
 
             <section className="mt-10">
@@ -514,11 +544,11 @@ function BillingStep({
 
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
                 <div className="sm:col-span-3">
-                  <TextInput label = "Address" type={"text"} required={true} defaultValue={null} setter = {set_address} />
+                  <TextInput label = "Address" type={"text"} required={true} defaultValue={user ? user.address_line_address : null} setter = {set_address} />
                 </div>
 
                 <div className="sm:col-span-1">
-                  <TextInput label = "Apartment, suite, etc." type={"text"} required={false} defaultValue={null} setter = {set_suite} />
+                  <TextInput label = "Apartment, suite, etc." type={"text"} required={false} defaultValue={user ? user.address_suite : null} setter = {set_suite} />
                 </div>
 
                 <div className="sm:col-span-2">
@@ -544,7 +574,7 @@ function BillingStep({
                 </div>
 
                 <div>
-                    <TextInput label = "City" type={"text"} required={true} defaultValue={null} setter = {set_city} />
+                    <TextInput label = "City" type={"text"} required={true} defaultValue={user ? user.address_city : null} setter = {set_city} />
                 </div>
 
                 <div>
@@ -576,7 +606,7 @@ function BillingStep({
                   </div>
                 </div>
                 <div>
-                  <TextInput label={"Postal Code"} type={"text"} required={true} defaultValue={null} setter={set_postal_code} />
+                  <TextInput label={"Postal Code"} type={"text"} required={true} defaultValue={user ? user.address_postal_code : null}  setter={set_postal_code} />
                 </div>
               </div>
             </section>
@@ -613,7 +643,7 @@ function BillingStep({
                 
 
                 <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                    <Tab.List className="flex col-span-full p-1 shadow-sm rounded-lg border mb-4">
+                    <Tab.List className="flex col-span-full p-1 shadow-sm rounded-lg border">
                         <Tab
                             className={({ selected }) =>
                                 classNames(

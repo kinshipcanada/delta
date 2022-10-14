@@ -3,11 +3,28 @@ import { Popover } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0';
 import { PrimaryButton, SecondaryButton } from './Buttons'
+import { supabase } from '../../lib/supabaseClient';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Navigation() {
     const router = useRouter()
-    const { user, isLoading } = useUser();
-    const path = router.pathname
+
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(async () => {
+        const loggedInUser = await supabase.auth.getUser()
+
+        if (loggedInUser) {
+            setUser(loggedInUser.data.user)
+            setLoading(false)
+            return
+        } else {
+            setLoading(false)
+            return
+        }
+    }, [])
 
     return (
         <Popover className="relative bg-white z-10">
@@ -50,19 +67,32 @@ export default function Navigation() {
                 </div>
 
                 <div className="flex items-center md:ml-12">
-                    {!isLoading && user && (
+
+                    {
+                        loading ? null :
+
+                        user ?
+
                         <SecondaryButton 
                             link = "/app"
                             text = "Dashboard"
                         />
-                    )}
 
-                    {!isLoading && !user && (
+                        : !user ?
+
                         <SecondaryButton 
-                            link = "/api/auth/login"
+                            link = "/auth/login"
                             text = "Login"
                         />
-                    )}
+
+                        : 
+                        
+                        <SecondaryButton 
+                            link = "/auth/login"
+                            text = "Login"
+                        />
+                    }
+
                     <div className='m-1' />
                     <PrimaryButton
                         link = "/donate"

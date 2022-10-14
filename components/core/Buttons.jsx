@@ -4,6 +4,7 @@ export function PrimaryButton(props) {
     return (
         <Link href = { props.link }>
             <button
+                disabled = { props.disabled }
                 type={props.type ? props.type : "button"}
                 className={
                     props.centerText ?
@@ -17,7 +18,7 @@ export function PrimaryButton(props) {
             >
                 { props.iconLeft ? <props.iconLeft className = "h-4 w-4 mr-2" /> : null }
                 { props.text }
-                { props.iconRight ? <props.iconRight className = "h-4 w-4 ml-2" /> : null }
+                { (props.iconRight && !props.loading) ? <props.iconRight className = "h-4 w-4 ml-2" /> : (props.iconRight && props.loading) ? <p>LOADING...</p> : null }
             </button>
         </Link>
     )
