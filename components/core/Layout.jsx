@@ -7,9 +7,9 @@ const Layout = ({ children }) => (
     <Head>
       <title>Kinship Canada</title>
     </Head>
-    <main id="app" className="d-flex flex-column h-100" data-testid="layout">
+    <main id="app" className="min-h-screen">
       <Navigation />
-      { children }
+        { children }
       <Footer />
     </main>
   </>

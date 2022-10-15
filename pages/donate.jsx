@@ -13,6 +13,7 @@ import { countries, canadian_states, causes } from "../lib/constants";
 import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase } from "../lib/supabaseClient";
+import TextInput from "../components/core/TextInput";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -488,6 +489,7 @@ function BillingStep({
             },
             body: JSON.stringify({
                 payment_intent_id: payment_intent_id,
+                stripe_customer_id: user ? user.stripe_customer_ids[0] : null,
                 first_name: first_name,
                 last_name: last_name,
                 email: email,
@@ -716,40 +718,4 @@ function SectionHeader({ text }) {
             { text }
         </h2>
     )
-}
-
-function TextInput({ label, type, required, defaultValue, setter }) {
-  return (
-    <div className="mt-1">
-      <label htmlFor={label} className="block text-sm font-medium text-gray-700">
-        { label }
-      </label>
-      <div className="mt-1">
-        { required ?
-        
-          <input
-            type={ type }
-            id={ label }
-            name={ label }
-            autoComplete={ type }
-            required
-            onChange={(e)=>{setter(e.target.value)}}
-            defaultValue={defaultValue}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          />
-
-          :
-
-          <input
-            type={ type }
-            id={ label }
-            name={ label }
-            onChange={(e)=>{setter(e.target.value)}}
-            autoComplete={ type }
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          />
-        }
-      </div>
-    </div>
-  )
 }

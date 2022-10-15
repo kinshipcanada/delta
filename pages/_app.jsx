@@ -1,6 +1,4 @@
 import React from 'react';
-import { UserProvider } from '@auth0/nextjs-auth0';
-
 import Layout from '../components/core/Layout';
 
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -11,10 +9,8 @@ initFontAwesome();
 
 export default function App({ Component, pageProps }) {
   return (
-    <UserProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </UserProvider>
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
   );
 }

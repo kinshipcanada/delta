@@ -15,7 +15,27 @@ export default async function handler(req, res) {
         state_or_province,
         postal_code,
         country,
+        stripe_customer_id
     } = req.body
+
+    let customer_id = stripe_customer_id
+
+    if (customer_id === null) {
+        const customer = await stripe.customers.create({
+            name: first_name + ' ' + last_name,
+            email: email,
+            address: {
+                line1: address,
+                line2: suite,
+                city: city,
+                state: state_or_province,
+                postal_code: postal_code,
+                country: country
+            }
+        });
+
+        customer_id = customer.id
+    }
 
 
     // Create a PaymentIntent with the order amount and currency
@@ -32,6 +52,7 @@ export default async function handler(req, res) {
                 last_name: last_name,
                 email: email,
             },
+            customer: customer_id
         }
     );
 
