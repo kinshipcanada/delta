@@ -197,7 +197,7 @@ export function UserSetup({ setUserConfigured }) {
       first_name: firstName,
       last_name: lastName,
       name: name,
-      email: user.email,
+      email: user.data.user.email,
       user_id: user.data.user.id,
       address: {
         city: city,
