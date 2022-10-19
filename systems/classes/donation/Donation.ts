@@ -71,6 +71,7 @@ export class Donation {
         /**
          * logs donation in database
          */
+        return null
     }
 
     format_donation_for_upload() : DatabaseDonation {
