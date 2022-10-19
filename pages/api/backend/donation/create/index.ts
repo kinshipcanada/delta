@@ -1,14 +1,13 @@
 import { SimpleMessageResponse } from "../../../../../systems/classes/interfaces";
+import create_donation from "../../../../../systems/functions/create_donation";
 
 export default async function handler(req, res) {
     try {
-        const api_response: SimpleMessageResponse = {
-            status: 200,
-            endpoint_called: "/api/backend/donation/create",
-            message: "Please provide a donation id to create a donation. The correct path is /api/backend/donation/create/[donation_id]."
-        }
-        
-        res.status(200).send(api_response);
+
+        const { donation_id } = req.data.object.id
+        const donation = await create_donation(donation_id)
+        res.status(200).send({ "status": 200, donation: donation });
+
     } catch (e) {
         res.status(500).send(e.message);
     }
