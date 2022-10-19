@@ -11,23 +11,26 @@ import { DeliveryMethod } from "../classes/notifications/delivery_methods";
 export default async function create_donation( donation_id : string ) : Promise<Donation> {
     
    if (donation_id.substring(0, 3) == "ch_") {
-
+        console.log("charge ID")
         try {
             const tags: StripeTags = {
                 charge_id: donation_id
             }
             const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
             const donation = build_donation_from_raw_stripe_data(raw_stripe_data[1])
+            console.log("Built donation from raw stripe data")
 
             await upload_donation_to_database(donation.format_donation_for_upload())
+            console.log("Uploaded donation to database")
             const notification =  new KinshipNotification(NotificationType.DONATION_MADE, donation, donation.donor)
 
             await notification.send(DeliveryMethod.EMAIL)
+            console.log("Sent notification to donor")
             return donation
 
         } catch (error) {
             new KinshipError(error, "/api/functions/create_donation", "create_donation")
-            throw new Error("Invalid payment intent id")
+            throw new Error("Invalid charge id")
         }
 
     } else if (donation_id.substring(0, 9) == "donation_") {
