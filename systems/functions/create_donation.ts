@@ -8,10 +8,11 @@ import { KinshipNotification } from "../classes/notifications/Notification";
 import { NotificationType } from "../classes/notifications/notification_types";
 import { DeliveryMethod } from "../classes/notifications/delivery_methods";
 
-export default async function create_donation( donation_id : string ) : Promise<Donation> {
-    
-   if (donation_id.substring(0, 3) == "ch_") {
+export default async function create_donation( donation_id ) : Promise<Donation> {
+    console.log("CREATE DONATION", donation_id)
+    if (donation_id.substring(0, 3) == "ch_") {
         console.log("charge ID")
+        console.log(process.env.POSTMARK_API_KEY)
         try {
             const tags: StripeTags = {
                 charge_id: donation_id

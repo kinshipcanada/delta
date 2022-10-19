@@ -2,8 +2,7 @@ import create_donation from "../../../../../systems/functions/create_donation";
 
 export default async function handler(req, res) {
     try {
-        console.log(req.body.data.object.id)
-        const { donation_id } = req.body.data.object.id
+        const donation_id = req.body.data.object.id
         const donation = await create_donation(donation_id)
         console.log("donation")
         res.status(200).send({ "status": 200, donation: donation });
