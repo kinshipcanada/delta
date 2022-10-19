@@ -1,6 +1,6 @@
 import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 
 export default function Index() {

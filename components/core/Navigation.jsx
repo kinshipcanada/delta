@@ -3,7 +3,7 @@ import { Popover } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0';
 import { PrimaryButton, SecondaryButton } from './Buttons'
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../systems/helpers//supabaseClient';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
@@ -24,7 +24,7 @@ export default function Navigation() {
             setLoading(false)
             return
         }
-    }, [])
+    }, [supabase])
 
     return (
         <Popover className="relative bg-white z-10">

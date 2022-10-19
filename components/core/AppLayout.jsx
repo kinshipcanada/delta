@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { supabase } from '../../lib/supabaseClient'
+import { supabase } from '../../systems/helpers/supabaseClient'
 import { PrimaryButton } from './Buttons'
-import { countries } from '../../lib/constants'
-import { fetchPostJSON } from '../../lib/apiHelpers'
+import { countries } from '../../systems/helpers/constants'
+import { fetchPostJSON } from '../../systems/helpers/apiHelpers'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -208,7 +208,7 @@ export function UserSetup({ setUserConfigured }) {
       }
     }
 
-    const response = await fetchPostJSON('/api/setup', {
+    const response = await fetchPostJSON('/api/frontend/setup', {
       user: user_stripe_profile,
     });
   

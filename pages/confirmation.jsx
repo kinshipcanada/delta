@@ -9,10 +9,10 @@ import {
     useElements
   } from "@stripe/react-stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { countries, canadian_states, causes } from "../lib/constants";
+import { countries, canadian_states, causes } from "../systems/helpers/constants";
 import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../systems/helpers/supabaseClient";
 import TextInput from "../components/core/TextInput";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -176,7 +176,7 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
                     }
                 }
 
-                await fetch("/api/payment-intent", {
+                await fetch("/api/frontend/payment-intent", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ causes: selected_causes, amount: amount*100 }),
@@ -420,7 +420,7 @@ function BillingStep({
         const payment_intent_id = payment_intent_object.paymentIntent.id
 
         // Update the payment intent with the full details
-        const update_payment_intent_response = await fetch('/api/update_payment_intent', {
+        const update_payment_intent_response = await fetch('/api/frontend/update_payment_intent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
