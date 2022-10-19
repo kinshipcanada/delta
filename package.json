@@ -1,25 +1,15 @@
 {
-  "name": "auth0-nextjs-sample",
-  "version": "0.1.0",
+  "name": "kinship-canada",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev\" \"node api-server\"",
     "dev:api": "nodemon api-server",
     "build": "next build",
     "start": "concurrently \"next start\" \"node api-server\"",
-    "start:api": "node api-server",
-    "test": "jest tests --coverage --maxWorkers=10",
-    "test:watch": "jest --coverage --watch",
-    "test:integration": "start-server-and-test start http-get://localhost:3000 cypress:run",
-    "test:integration:watch": "start-server-and-test start http-get://localhost:3000 cypress:open",
-    "cypress:run": "cypress run",
-    "cypress:open": "cypress open"
+    "start:api": "node api-server"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^1.9.1",
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
-    "@fortawesome/free-solid-svg-icons": "^5.15.1",
-    "@fortawesome/react-fontawesome": "^0.2.0",
     "@headlessui/react": "^1.6.6",
     "@heroicons/react": "^2.0.10",
     "@stripe/react-stripe-js": "^1.13.0",

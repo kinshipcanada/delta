@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Popover } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import { useUser } from '@auth0/nextjs-auth0';
 import { PrimaryButton, SecondaryButton } from './Buttons'
 import { supabase } from '../../systems/helpers//supabaseClient';
 import { useEffect } from 'react';
