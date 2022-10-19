@@ -9,9 +9,7 @@ import { NotificationType } from "../classes/notifications/notification_types";
 import { DeliveryMethod } from "../classes/notifications/delivery_methods";
 
 export default async function create_donation( donation_id ) : Promise<Donation> {
-    console.log("CREATE DONATION", donation_id)
     if (donation_id.substring(0, 3) == "ch_") {
-        console.log("charge ID")
         console.log(process.env.POSTMARK_API_KEY)
         try {
             const tags: StripeTags = {
@@ -19,14 +17,11 @@ export default async function create_donation( donation_id ) : Promise<Donation>
             }
             const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
             const donation = build_donation_from_raw_stripe_data(raw_stripe_data[1])
-            console.log("Built donation from raw stripe data")
 
             await upload_donation_to_database(donation.format_donation_for_upload())
-            console.log("Uploaded donation to database")
             const notification =  new KinshipNotification(NotificationType.DONATION_MADE, donation, donation.donor)
 
             await notification.send(DeliveryMethod.EMAIL)
-            console.log("Sent notification to donor")
             return donation
 
         } catch (error) {
