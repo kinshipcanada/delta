@@ -3,6 +3,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, SuccessAlert } from "../../components/core/Alerts";
+import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 
 export default function Index() {
 
@@ -70,7 +71,7 @@ function ResendReceipt() {
     const [success, setSuccess] = useState(null)
     const [successMessage, setSuccessMessage] = useState(null)
 
-    function handleResendReceipt(e) {
+    async function handleResendReceipt(e) {
         e.preventDefault()
 
         setError(null)
@@ -84,10 +85,22 @@ function ResendReceipt() {
             return
         }
 
-        console.log("Resend Receipt")
-        setSuccess("Successfully sent receipt to XYZ")
-        setSuccessMessage("Receipt XYZ already existed in the database, and the receipt was resent to the donor.")
-        setLoading(false)
+        const response = await fetchPostJSON('/api/backend/admin/resend', {
+            donation_id: donationId,
+        });
+    
+        if (response.status === 500) {
+            setError("Error resending receipt.");
+            setErrorMessage(response.message);
+            setLoading(false)
+            return;
+        } else {
+            console.log(response)
+            setSuccess("Receipt resent successfully!");
+            setSuccessMessage(response.message);
+            setLoading(false)
+            return;
+        }
     }
 
     return (

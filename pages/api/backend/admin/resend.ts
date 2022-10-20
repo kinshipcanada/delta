@@ -1,4 +1,5 @@
-import resend_receipt from "../../../../systems/functions/resend_receipt";
+import { SimpleMessageResponse } from "../../../../systems/classes/interfaces";
+import resend_receipt, { ResendReceiptResponse } from "../../../../systems/functions/resend_receipt";
 
 export default async function handler(req, res) {
     try {
@@ -9,12 +10,20 @@ export default async function handler(req, res) {
             return
         }
 
-        await resend_receipt(donation_id)
-        
-        res.status(200).send(
-            { "status": 200, donation_id: donation_id }
-        );
+        const resend_response: ResendReceiptResponse = await resend_receipt(donation_id)
+
+        const response: SimpleMessageResponse = {
+            status: 200,
+            endpoint_called: `/backend/admin/resend`,
+            message: resend_response.already_existed ? `Receipt already existed, resent to ${resend_response.donation.donor.email}` : "Receipt generated and sent"
+        }
+
+        res.status(200).send(response);
     } catch (e) {
-        res.status(500).send(e.message);
+        res.status(500).send({
+            status: 500,
+            endpoint_called: `/backend/admin/resend`,
+            message: e.message
+        });
     }
 };
