@@ -80,11 +80,35 @@ export default function AppLayout({ children }) {
   }
 
   return (
-    <div>
+    <div className='p-10 grid grid-cols-4 gap-12'>
+      <nav className="space-y-1 col-span-1" aria-label="Sidebar">
+        {navigation.map((item) => (
+          <AppLink
+            key={item.name}
+            name={item.name}
+            link={item.link}
+            current={item.current}
+            icon={item.icon}
+          />
+        ))}
+        <a
+          onClick={() => {
+            supabase.auth.signOut()
+            router.push('/')
+          }}
+          className="cursor-pointer text-gray-600 hover:bg-slate-50 hover:text-gray-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md"
+        >
+          <ArrowLeftOnRectangleIcon
+            className='text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 h-6 w-6'
+            aria-hidden="true"
+          />
+          <span className="truncate">Logout</span>
+        </a>
+      </nav>
       {
         loading ?
 
-        <div>Loading...</div>
+        <div className='col-span-3'>Loading...</div>
 
         : loginRequired ?
 
@@ -92,35 +116,10 @@ export default function AppLayout({ children }) {
 
         : userConfigured ?
   
-        <div className='p-10 grid grid-cols-4 gap-12'>
-          <nav className="space-y-1 col-span-1" aria-label="Sidebar">
-            {navigation.map((item) => (
-              <AppLink
-                key={item.name}
-                name={item.name}
-                link={item.link}
-                current={item.current}
-                icon={item.icon}
-              />
-            ))}
-            <a
-              onClick={() => {
-                supabase.auth.signOut()
-                router.push('/')
-              }}
-              className="cursor-pointer text-gray-600 hover:bg-slate-50 hover:text-gray-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md"
-            >
-              <ArrowLeftOnRectangleIcon
-                className='text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 h-6 w-6'
-                aria-hidden="true"
-              />
-              <span className="truncate">Logout</span>
-            </a>
-          </nav>
+        
           <div className='col-span-3'>
             { children }
           </div>
-        </div>
 
         :
 
