@@ -3,7 +3,7 @@ import { DonationResponse, SimpleMessageResponse } from "../../../../../systems/
 import fetch_donation from "../../../../../systems/functions/fetch_donation";
 
 export default async function handler(req, res) {
-    const { donation_id } = req.query
+    const donation_id = req.body.donation_id
 
     try {
         fetch_donation(donation_id).then((donation_object)=>{

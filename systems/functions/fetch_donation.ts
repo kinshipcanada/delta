@@ -3,21 +3,29 @@ import { KinshipError } from "../classes/errors/KinshipError";
 import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../stripe";
 import { StripeTags } from "../stripe/interfaces";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
-import { upload_donation_to_database } from "../database";
+import { fetch_receipt_from_database, upload_donation_to_database } from "../database";
+import { generate_donation_from_database } from "../classes/donation/donation_generators";
 
 export default async function fetch_donation( donation_id : string ) : Promise<Donation> {
     
     if (donation_id.substring(0, 3) == "pi_") {
 
         try {
-            const tags: StripeTags = {
-                payment_intent_id: donation_id
-            }
-            const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
-            const donation = build_donation_from_raw_stripe_data(raw_stripe_data[1])
+            // See if the donation exists in the database
+            const donation_from_database = await fetch_receipt_from_database(null, donation_id, null)
 
-            await upload_donation_to_database(donation.format_donation_for_upload())
-            return donation
+            if (donation_from_database.length > 0) {
+                const donation = await generate_donation_from_database(donation_from_database[0])
+                return donation
+            } else {
+                const tags: StripeTags = {
+                    payment_intent_id: donation_id
+                }
+                const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
+                const donation = build_donation_from_raw_stripe_data(raw_stripe_data[1])
+    
+                return donation
+            }
 
         } catch (error) {
             new KinshipError(error, "/api/functions/fetch_donation", "fetch_donation")

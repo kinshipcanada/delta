@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
-import { ErrorAlert, SuccessAlert } from "../../components/core/Alerts";
+import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
 import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 
 export default function Index() {
@@ -127,6 +127,7 @@ function ResendReceipt() {
                     Generate & Receipt
                 </button>
                 </form>
+                { loading ? <div className="mt-4"><LoadingAlert title = {"Generating and sending receipt"} message={"Kinship is crawling the database, building the donation, and sending it to the donor."} /></div> : null }
                 { error ? <div className="mt-4" ><ErrorAlert title={error} message={errorMessage} /></div> : null }
                 { success ? <div className="mt-4" ><SuccessAlert title={success} message={successMessage} /></div>  : null }
             </div>

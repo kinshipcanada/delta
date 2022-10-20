@@ -1,5 +1,6 @@
 import { XCircleIcon } from '@heroicons/react/20/solid'
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { BlueLoading } from './Loaders'
 
 export function ErrorAlert({ title, message }) {
   return (
@@ -36,3 +37,22 @@ export function SuccessAlert({ title, message }) {
     </div>
   )
 }
+
+export function LoadingAlert({ title, message }) {
+  return (
+    <div className="rounded-md bg-blue-50 p-4">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <BlueLoading show={true} />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-medium text-blue-700">{ title }</p>
+          <div className="mt-2 text-sm text-blue-700">
+            <p>{ message ? message : null }</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
