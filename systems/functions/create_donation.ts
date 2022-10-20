@@ -10,7 +10,6 @@ import { DeliveryMethod } from "../classes/notifications/delivery_methods";
 
 export default async function create_donation( donation_id ) : Promise<Donation> {
     if (donation_id.substring(0, 3) == "ch_") {
-        console.log(process.env.POSTMARK_API_KEY)
         try {
             const tags: StripeTags = {
                 charge_id: donation_id

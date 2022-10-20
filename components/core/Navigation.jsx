@@ -3,8 +3,7 @@ import { Popover } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { PrimaryButton, SecondaryButton } from './Buttons'
 import { supabase } from '../../systems/helpers//supabaseClient';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState} from 'react';
 
 export default function Navigation() {
     const router = useRouter()
