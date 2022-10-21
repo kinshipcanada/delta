@@ -26,6 +26,9 @@ function classNames(...classes) {
 }
 
 function DonationList() {
+
+  const [loading, setLoading] = useState(false)
+  
   return (
     <div>
       <div className="mt-8 flex flex-col">
