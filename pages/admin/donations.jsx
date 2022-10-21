@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
+import TextInput from '../../components/core/TextInput';
 
 const locations = [
   {
@@ -28,7 +29,7 @@ function classNames(...classes) {
 function DonationList() {
 
   const [loading, setLoading] = useState(false)
-  
+
   return (
     <div>
       <div className="mt-8 flex flex-col">
@@ -105,6 +106,25 @@ export default function Donations() {
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true)
 
+    const [donationId, setDonationId] = useState('')
+    const [dateStart, setDateStart] = useState('')
+    const [dateEnd, setDateEnd] = useState('')
+    const [donorId, setDonorId] = useState('')
+    const [donorEmail, setDonorEmail] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [amountMinInCents, setAmountMinInCents] = useState('')
+    const [amountMaxInCents, setAmountMaxInCents] = useState('')
+    const [feesCovered, setFeesCovered] = useState(0)
+    const [stripePaymentIntentId, setStripePaymentIntentId] = useState('')
+    const [stripeChargeId, setStripeChargeId] = useState('')
+    const [stripeBalanceTransactionId, setStripeBalanceTransactionId] = useState('')
+    const [addressCountry, setAddressCountry] = useState('')
+    const [addressLineAddress, setAddressLineAddress] = useState('')
+    const [addressState, setAddressState] = useState('')
+    const [addressCity, setAddressCity] = useState('')
+    const [addressPostalCode, setAddressPostalCode] = useState('')
+
     useEffect(async ()=>{
         setLoading(true)
 
@@ -133,13 +153,65 @@ export default function Donations() {
 
     }, [])
 
+    async function lookupDonation(e) {
+      e.preventDefault()
+
+      return []
+    }
+
     return (
         <AdminLayout>
             {(user && profile) ? 
             
                 <div>
-                    <PageHeader text={`Kinship Canada Admin Panel`} description={"View and manage donations, resend receipts, and more."} secondaryLinkHref={"#"} secondaryLinkText={"Lookup donation"} primaryLinkText="Resend Receipt" primaryLinkHref={"#"} />
-                    <DonationList />
+                  <PageHeader text={`Donation Lookup`} description={"View and manage donations, resend receipts, and more."}  />
+                  <form>
+                    <TextInput
+                      label={"Donation ID (Stripe or Kinship)"}
+                      type={'text'}
+                      setter={setDonationId}
+                      placeholder={"pi_2786pdha62ns7"}
+                    />
+                    {/** Date pickers for start/end */}
+                    <TextInput
+                      label={"Donor ID (Stripe or Kinship)"}
+                      type={'text'}
+                      setter={setDonorId}
+                      placeholder={"cus_8ahsdjc"}
+                    />
+                    <TextInput
+                      label={"Donor Email"}
+                      type={'email'}
+                      setter={setDonorEmail}
+                      placeholder={"hobbleabbas@gmail.com"}
+                    />
+                    <TextInput
+                      label={"Donor First Name"}
+                      type={'text'}
+                      setter={setFirstName}
+                      placeholder={"Shakeel-Abbas"}
+                    />
+                    <TextInput
+                      label={"Donor Last Name"}
+                      type={'text'}
+                      setter={setLastName}
+                      placeholder={"Hussein"}
+                    />
+                    <TextInput
+                      label={"Minimum Amount in CAD"}
+                      type={'number'}
+                      setter={setAmountMinInCents}
+                      defaultValue={0}
+                    />
+                    <TextInput
+                      label={"Maximum Amount in CAD"}
+                      type={'number'}
+                      setter={setAmountMaxInCents}
+                      defaultValue={100.00}
+                    />
+                    {/** Fee covered select menu */}
+                    
+                  </form>
                 </div>
 
                 : loading ?

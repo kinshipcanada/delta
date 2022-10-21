@@ -47,6 +47,7 @@ export default function Index() {
                     <PageHeader text={`Kinship Canada Admin Panel`} description={"View and manage donations, resend receipts, and more."} secondaryLinkHref={"#"} secondaryLinkText={"Lookup donation"} primaryLinkText="Resend Receipt" primaryLinkHref={"#"} />
                     <div className="mt-4" />
                     <ResendReceipt />
+                    
                     <div className="mt-4" />
                     <ManuallyGenerateAndSend />
                 </div>
