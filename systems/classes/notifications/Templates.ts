@@ -17,9 +17,12 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you for your donation of ${donation.native_amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
+                Thank you very much for your donation of ${donation.native_amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. We'll ensure that this is processed and sent to those who need it most as soon as we can.
 
-                TBD
+                ${donation.donor.address.country == CountryList.CANADA ? `You can access your CRA-eligible tax receipt here: https://receipts.kinshipcanada.com/${donation.stripe_tags.charge_id}` : null}
+
+                Kind regards,
+                The Team At Kinship Canada
                 `, 
                 email_subject: "Thank you for your donation.",
                 sms_friendly_message: "Thank you fr your donatoon"
@@ -33,7 +36,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 
                 Thank you for your donation of ${donation.native_amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
 
-                TBD
+                
                 `, 
                 email_subject: "Thank you for your donation.",
                 sms_friendly_message: "Thank you fr your donatoon"
@@ -51,20 +54,6 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 `, 
                 email_subject: "PROOF_AVAILABLE you for your donation.",
                 sms_friendly_message: "PROOF_AVAILABLE you fr your donatoon"
-            }
-        }
-
-        case NotificationType.RECEIPT_AVAILABLE: {
-            return {
-                email_body: `
-                Dear ${donor.first_name},
-                
-                Thank you for your donation of ${donation.native_amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
-
-                RECEIPT_AVAILABLE
-                `, 
-                email_subject: "RECEIPT_AVAILABLE you for your donation.",
-                sms_friendly_message: "RECEIPT_AVAILABLE you fr your donatoon"
             }
         }
 

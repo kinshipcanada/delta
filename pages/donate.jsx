@@ -39,6 +39,7 @@ export default function Donate() {
     const [postal_code, set_postal_code] = useState(null)
     const [user, setUser] = useState(null)
     const [selected_causes, set_selected_causes] = useState([causes[0]])
+    const [coverFees, setCoverFees] = useState(true)
 
     const [clientSecret, setClientSecret] = useState("");
 
@@ -117,17 +118,17 @@ export default function Donate() {
 
                     <div className="flex items-center justify-between">
                     <dt>Eligible For Tax Receipt</dt>
-                    <dd>{ amount ? <>${amount}</> : "$0.00" }</dd>
+                    <dd>{ amount && coverFees && country == 'ca' ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees && country == 'ca'  ? <>${amount}</> : "$0.00" }</dd>
                     </div>
     
                     <div className="flex items-center justify-between">
                     <dt>Fees Covered</dt>
-                    <dd>$0.00</dd>
+                    <dd>{ coverFees ? `$${(parseFloat(amount) * 0.029).toFixed(2)}` : "$0.00" }</dd>
                     </div>
     
                     <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
-                        <dt className="text-base">Total</dt>
-                        <dd className="text-base">{ amount ? <>${amount}</> : "$0.00" }</dd>
+                        <dt className="text-base">Total {country == 'ca' ? <>(Fully Tax Receipt Eligible)</> : null}</dt>
+                        <dd className="text-base">{ amount && coverFees ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees ? <>${amount}</> : "$0.00" }</dd>
                     </div>
                 </dl>
                 </div>
@@ -182,6 +183,8 @@ export default function Donate() {
                                 set_postal_code = {set_postal_code}
                                 stripeOptions={options}
                                 passedClientSecret={clientSecret}
+                                coverFees={coverFees}
+                                setCoverFees={setCoverFees}
                                 user={user}
                             />
                         </Elements>
@@ -407,6 +410,8 @@ function BillingStep({
     postal_code, 
     set_postal_code, 
     passedClientSecret,
+    coverFees,
+    setCoverFees,
     user
 }) {
     const stripe = useStripe();
@@ -569,7 +574,7 @@ function BillingStep({
                       }}
                     >
                       {countries.map((country, countryIdx)=>(
-                        <option key={countryIdx} value={countryIdx}>{country.name}</option>
+                        <option key={countryIdx} value={countries[countryIdx].code.toLowerCase()}>{country.name}</option>
                       ))}
                     </select>
                   </div>
@@ -627,6 +632,7 @@ function BillingStep({
                   name="cover-fees-check"
                   type="checkbox"
                   defaultChecked
+                  onClick={()=>{setCoverFees(!coverFees)}}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="ml-2">
@@ -683,9 +689,38 @@ function BillingStep({
                                     {message && <div id="payment-message">{message}</div>}
                                 </div>
                             )}
+
+                            <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">
+                                <div>
+                                    { stepError ? <p className="text-sm font-semibold text-red-600">{ stepError }</p> : null}
+                                </div>
+                                <button
+                                    id="submit"
+                                    disabled={global_loading || !stripe || !elements}
+                                    onClick={handleSubmit}
+                                    className="flex items-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none "
+                                >
+                                    <>Donate ${amount} CAD { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
+                                </button>
+                            </div>
                         </Tab.Panel>
                         <Tab.Panel>
-                            ETransfer {selectedIndex}
+                            <div className="w-full">
+                                <div>yo yo yo yo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yo</div>
+                                <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">
+                                    <div>
+                                        { stepError ? <p className="text-sm font-semibold text-red-600">{ stepError }</p> : null}
+                                    </div>
+                                    <button
+                                        id="submit"
+                                        disabled={global_loading || !stripe || !elements}
+                                        onClick={handleSubmit}
+                                        className="flex items-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none "
+                                    >
+                                        <>Initate ${amount} CAD Donation { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
+                                    </button>
+                                </div>
+                            </div>
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
@@ -694,19 +729,7 @@ function BillingStep({
               </div>
             </section>
 
-            <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">
-                <div>
-                    { stepError ? <p className="text-sm font-semibold text-red-600">{ stepError }</p> : null}
-                </div>
-                <button
-                    id="submit"
-                    disabled={global_loading || !stripe || !elements}
-                    onClick={handleSubmit}
-                    className="flex items-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none "
-                >
-                    <>Donate ${amount} CAD { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
-                </button>
-            </div>
+            
             
         </div>
     )

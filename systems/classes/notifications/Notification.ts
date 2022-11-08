@@ -39,11 +39,6 @@ export class KinshipNotification extends KinshipEvent {
          * @description Sends notification out, by either phone or email.
          */
         
-        if (this.notification_type == NotificationType.RECEIPT_AVAILABLE && this.donor.address.country != CountryList.CANADA) {
-            new KinshipError("Can only issue receipts to Canadians", "/src/classes/notifications", "send", true)
-            return
-        }
-
         const template = Templates(this.notification_type, this.donor, this.donation)
 
         if (method == DeliveryMethod.PHONE) {
@@ -62,14 +57,6 @@ export class KinshipNotification extends KinshipEvent {
 
             const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
-            console.log("SENDING TO: ", this.donor.email)
-            // const message = await sendgrid.send({
-            //     to: this.donor.email,
-            //     from: process.env.SENDGRID_FROM_EMAIL,
-            //     subject: template.email_subject,
-            //     text: template.email_body
-            // })
-
             await client.sendEmail({
                 "From": process.env.FROM_EMAIL,
                 "To": this.donor.email,
@@ -78,6 +65,7 @@ export class KinshipNotification extends KinshipEvent {
             });
 
             this.log_event("Sent email to " + this.donor.email);
+            
             return
 
         }

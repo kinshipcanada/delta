@@ -165,38 +165,74 @@ export default function Donations() {
             
                 <div>
                   <PageHeader text={`Donation Lookup`} description={"View and manage donations, resend receipts, and more."}  />
-                  <form>
-                    <TextInput
-                      label={"Donation ID (Stripe or Kinship)"}
-                      type={'text'}
-                      setter={setDonationId}
-                      placeholder={"pi_2786pdha62ns7"}
-                    />
-                    {/** Date pickers for start/end */}
-                    <TextInput
-                      label={"Donor ID (Stripe or Kinship)"}
-                      type={'text'}
-                      setter={setDonorId}
-                      placeholder={"cus_8ahsdjc"}
-                    />
-                    <TextInput
-                      label={"Donor Email"}
-                      type={'email'}
-                      setter={setDonorEmail}
-                      placeholder={"hobbleabbas@gmail.com"}
-                    />
-                    <TextInput
-                      label={"Donor First Name"}
-                      type={'text'}
-                      setter={setFirstName}
-                      placeholder={"Shakeel-Abbas"}
-                    />
-                    <TextInput
-                      label={"Donor Last Name"}
-                      type={'text'}
-                      setter={setLastName}
-                      placeholder={"Hussein"}
-                    />
+                  <div className='mt-3' />
+                  <form className=''>
+                    <h3 className="text-lg font-medium leading-6 text-gray-900 mb-2">Filter With Donor Details</h3>
+                    <div className='grid grid-cols-2 gap-4'>
+                      <TextInput
+                        label={"Donation ID (Stripe or Kinship)"}
+                        type={'text'}
+                        setter={setDonationId}
+                        placeholder={"pi_2786pdha62ns7"}
+                      />
+                      {/** Date pickers for start/end */}
+                      <TextInput
+                        label={"Donor ID (Stripe or Kinship)"}
+                        type={'text'}
+                        setter={setDonorId}
+                        placeholder={"cus_8ahsdjc"}
+                      />
+                      <TextInput
+                        label={"Donor Email"}
+                        type={'email'}
+                        setter={setDonorEmail}
+                        placeholder={"hobbleabbas@gmail.com"}
+                      />
+                      <TextInput
+                        label={"Donor First Name"}
+                        type={'text'}
+                        setter={setFirstName}
+                        placeholder={"Shakeel-Abbas"}
+                      />
+                      <TextInput
+                        label={"Donor Last Name"}
+                        type={'text'}
+                        setter={setLastName}
+                        placeholder={"Hussein"}
+                      />
+                      <TextInput
+                        label={"Donor Address"}
+                        type={'text'}
+                        setter={setAddressLineAddress}
+                        placeholder={"2145 N Sheridan Way"}
+                      />
+                      <TextInput
+                        label={"Billing State"}
+                        type={'text'}
+                        setter={setAddressState}
+                        placeholder={"ON"}
+                      />
+                      <TextInput
+                        label={"Billing Postal Code"}
+                        type={'text'}
+                        setter={setAddressPostalCode}
+                        placeholder={"L5W1C8"}
+                      />
+                      <TextInput
+                        label={"Billing City"}
+                        type={'text'}
+                        setter={setAddressCity}
+                        placeholder={"Mississauga"}
+                      />
+                      <TextInput
+                        label={"Billing Country"}
+                        type={'text'}
+                        setter={setAddressCountry}
+                        placeholder={"Canada"}
+                      />
+                    </div>
+                    
+                    <h3 className="text-lg font-medium leading-6 text-gray-900 mb-2">Filter With Donation Details</h3>
                     <TextInput
                       label={"Minimum Amount in CAD"}
                       type={'number'}
@@ -210,7 +246,7 @@ export default function Donations() {
                       defaultValue={100.00}
                     />
                     {/** Fee covered select menu */}
-                    
+
                   </form>
                 </div>
 

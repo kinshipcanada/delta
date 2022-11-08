@@ -7,8 +7,12 @@ import { Donor } from "../donors/Donor";
 import { CountryList } from "../utility_classes/country_list";
 import { CurrencyList } from "../utility_classes/currency_list";
 import { KinshipPaymentMethod } from "../utility_classes/payment_method";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Donation {
+
+    donation_id: string;
+
     donor: Donor;
 
     amount_in_cents: number;
@@ -47,6 +51,7 @@ export class Donation {
         stripe_balance_transaction_id?: string,
         stripe_customer_id?: string,
     ) {
+        this.donation_id = new uuidv4()
         this.donor = donor;
         this.amount_in_cents = amount_in_cents;
         this.native_currency = native_currency;
