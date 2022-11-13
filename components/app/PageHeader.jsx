@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function PageHeader({ text, description, primaryLinkText, primaryLinkHref, secondaryLinkText, secondaryLinkHref }) {
+export default function PageHeader({ text, description, primaryLinkText, primaryLinkHref, secondaryLinkText, secondaryLinkHref, customPrimaryButton, customSecondaryButton }) {
     return (
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
@@ -10,6 +10,9 @@ export default function PageHeader({ text, description, primaryLinkText, primary
           </p>
         </div>
         <div className="mt-4 flex md:mt-0 md:ml-4">
+            {(customSecondaryButton) && (
+                customSecondaryButton
+            )}
             {(secondaryLinkText && secondaryLinkHref) && (
                 <Link href={secondaryLinkHref}>
                     <button
@@ -19,6 +22,9 @@ export default function PageHeader({ text, description, primaryLinkText, primary
                         { secondaryLinkText }
                     </button> 
                 </Link>
+            )}
+            {(customPrimaryButton) && (
+                customPrimaryButton
             )}
             {(primaryLinkText && primaryLinkHref) && (
                 <Link href={primaryLinkHref}>

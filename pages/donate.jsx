@@ -60,7 +60,7 @@ export default function Donate() {
 
     return (
         <div className="bg-white">
-            <header className="relative border-b border-gray-200 bg-white text-sm font-medium text-gray-700 z-10">
+            <header className="relative border-b border-gray-200 bg-white text-sm font-medium text-gray-700 z-[9]">
                 <div className="mx-auto max-w-7xl py-4 px-4 sm:px-6 lg:px-8">
                 <div className="relative flex justify-end sm:justify-center">
                     <nav aria-label="Progress" className="hidden sm:block">
@@ -89,52 +89,48 @@ export default function Donate() {
             <div className="fixed left-0 hidden h-full w-1/2 bg-white lg:block" aria-hidden="true" />
             <div className="fixed right-0 top-0 z-5 hidden h-full w-1/2 bg-blue-900 lg:block" aria-hidden="true" />
     
-            <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16">
-            <h1 className="sr-only">Donate</h1>
+            <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16 z-[8]">
+                <section
+                    aria-labelledby="summary-heading"
+                    className="bg-blue-900 z-8 py-12 text-blue-300 md:px-10 lg:col-start-2 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:bg-transparent lg:px-0 lg:pt-0"
+                >
+                    <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
+                    <dl>
+                        <dt className="text-sm font-medium">Your Donation</dt>
+                        <dd className="mt-1 text-3xl font-bold tracking-tight text-white">{ amount ? <>${amount}</> : "$0.00" }</dd>
+                        <dd className="flex text-white text-base font-medium my-4">Donating:
+                        <p className="text-blue-300 flex">
+                            {selected_causes.map((cause, cause_index)=>(<p key={cause.name}>{cause_index === 0 ? <span className="ml-2">{cause.name}</span> : <span>, {cause.name}</span> }</p>))}
+                        </p>
+                        </dd>
+                    </dl>
 
-            
 
-            <section
-                aria-labelledby="summary-heading"
-                className="bg-blue-900 py-12 text-blue-300 md:px-10 lg:col-start-2 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:bg-transparent lg:px-0 lg:pt-0"
-            >
-                <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-                <dl>
-                    <dt className="text-sm font-medium">Your Donation</dt>
-                    <dd className="mt-1 text-3xl font-bold tracking-tight text-white">{ amount ? <>${amount}</> : "$0.00" }</dd>
-                    <dd className="flex text-white text-base font-medium my-4">Donating:
-                    <p className="text-blue-300 flex">
-                        {selected_causes.map((cause, cause_index)=>(<p key={cause.name}>{cause_index === 0 ? <span className="ml-2">{cause.name}</span> : <span>, {cause.name}</span> }</p>))}
-                    </p>
-                    </dd>
-                </dl>
-    
+                    <dl className="space-y-6 border-t border-white border-opacity-10 pt-6 text-sm font-medium">
+                        <div className="flex items-center justify-between">
+                        <dt>Subtotal</dt>
+                        <dd>{ amount ? <>${amount}</> : "$0.00" }</dd>
+                        </div>
 
-                <dl className="space-y-6 border-t border-white border-opacity-10 pt-6 text-sm font-medium">
-                    <div className="flex items-center justify-between">
-                    <dt>Subtotal</dt>
-                    <dd>{ amount ? <>${amount}</> : "$0.00" }</dd>
-                    </div>
+                        <div className="flex items-center justify-between">
+                        <dt>Eligible For Tax Receipt</dt>
+                        <dd>{ amount && coverFees && country == 'ca' ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees && country == 'ca'  ? <>${amount}</> : "$0.00" }</dd>
+                        </div>
 
-                    <div className="flex items-center justify-between">
-                    <dt>Eligible For Tax Receipt</dt>
-                    <dd>{ amount && coverFees && country == 'ca' ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees && country == 'ca'  ? <>${amount}</> : "$0.00" }</dd>
+                        <div className="flex items-center justify-between">
+                        <dt>Fees Covered</dt>
+                        <dd>{ coverFees ? `$${(parseFloat(amount) * 0.029).toFixed(2)}` : "$0.00" }</dd>
+                        </div>
+
+                        <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
+                            <dt className="text-base">Total {country == 'ca' ? <>(Fully Tax Receipt Eligible)</> : null}</dt>
+                            <dd className="text-base">{ amount && coverFees ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees ? <>${amount}</> : "$0.00" }</dd>
+                        </div>
+                    </dl>
                     </div>
-    
-                    <div className="flex items-center justify-between">
-                    <dt>Fees Covered</dt>
-                    <dd>{ coverFees ? `$${(parseFloat(amount) * 0.029).toFixed(2)}` : "$0.00" }</dd>
-                    </div>
-    
-                    <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
-                        <dt className="text-base">Total {country == 'ca' ? <>(Fully Tax Receipt Eligible)</> : null}</dt>
-                        <dd className="text-base">{ amount && coverFees ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees ? <>${amount}</> : "$0.00" }</dd>
-                    </div>
-                </dl>
-                </div>
-            </section>
-    
-            <section
+                </section>
+
+                <section
                 className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pt-0 "
             >
                 <div>
@@ -206,7 +202,7 @@ export default function Donate() {
                     </div>
                     </div>
                 </div>
-            </section>
+                </section>
             </div>
         </div>
         

@@ -34,6 +34,10 @@ export function SecondaryButton (props) {
 
                     "border border-slate-300 inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 
+                    : props.size == "sm" ? 
+
+                    "flex justify-center transition delay-50 border border-slate-300 inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    
                     :
 
                     "flex justify-center transition delay-50 border border-slate-300 inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

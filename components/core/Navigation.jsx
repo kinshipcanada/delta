@@ -13,6 +13,11 @@ export default function Navigation() {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
 
+    const pages = [
+      { name: "Home", link: "/", current: router.asPath == "/" },
+      { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" }
+    ]
+
     useEffect(async () => {
         const loggedInUser = await supabase.auth.getUser()
 
@@ -40,7 +45,7 @@ export default function Navigation() {
                         src="/logo.png"
                         alt=""
                         />
-                        <Link href = 'https://hobble.notion.site/Kinship-Canada-Alpha-6bb80cea62754c62a8c87e34b13347db'>
+                        <Link href = '#'>
                             <span className="flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
                                 Beta V1.0.0
                             </span>
@@ -59,8 +64,9 @@ export default function Navigation() {
                 {/* Menu */}
                 <div className="hidden md:flex-1 md:flex md:items-center md:justify-between">
                     <Popover.Group as="nav" className="flex space-x-10">
-                        <MenuLink text = {"Home"} link= {"/"} />
-                        <MenuLink text = {"Make A Donation"} link= {"/donate"} />
+                        {pages.map((page)=>(
+                          <MenuLink text={page.name} link={page.link} current={page.current} />
+                        ))}
                         <Support />
                     </Popover.Group>
 
@@ -107,10 +113,10 @@ export default function Navigation() {
     )
 }
 
-export function MenuLink({ text, link }) {
+export function MenuLink({ text, link, current }) {
     return (
         <Link href={link}>
-            <a className="text-base font-medium text-slate-500 hover:text-slate-900">
+            <a className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}>
                 { text }
             </a>
         </Link>
@@ -143,7 +149,7 @@ function Support() {
     ]
     
     return (
-      <Popover className="relative">
+      <Popover className="relative z-40">
         {({ open }) => (
           <>
             <Popover.Button
@@ -154,7 +160,7 @@ function Support() {
             >
               <span>Get Support</span>
               <ChevronDownIcon
-                className={classNames(open ? 'text-gray-600' : 'text-gray-400', 'ml-2 h-6 w-6 group-hover:text-slate-600')}
+                className={classNames(open ? 'text-gray-600' : 'text-gray-600', 'ml-2 h-5 w-5 group-hover:text-slate-900')}
                 aria-hidden="true"
               />
             </Popover.Button>
@@ -168,38 +174,38 @@ function Support() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 left-1/2 transform -translate-x-1/2 mt-3 px-2 w-screen max-w-md sm:px-0">
-                <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-                  <div className="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
-                    {solutions.map((item) => (
-                      <Link href = {item.href} key={item.name}>
-                        <a
-                          href={item.href}
-                          className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                        >
-                          <item.icon className="flex-shrink-0 h-6 w-6 text-blue-600" aria-hidden="true" />
-                          <div className="ml-4">
-                            <p className="text-base font-medium text-gray-900">{item.name}</p>
-                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
-                          </div>
-                        </a>
-                      </Link>
-                    ))}
+              <Popover.Panel className="absolute left-1/2 transform -translate-x-1/2 mt-3 px-2 w-screen max-w-md sm:px-0">
+                <div className="z-20 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+                    <div className="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
+                      {solutions.map((item) => (
+                        <Link href = {item.href} key={item.name}>
+                          <a
+                            href={item.href}
+                            className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                          >
+                            <item.icon className="flex-shrink-0 h-6 w-6 text-blue-600" aria-hidden="true" />
+                            <div className="ml-4">
+                              <p className="text-base font-medium text-gray-900">{item.name}</p>
+                              <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                            </div>
+                          </a>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="px-5 py-5 bg-gray-50 space-y-6 sm:flex sm:space-y-0 sm:space-x-10 sm:px-8">
+                      {callsToAction.map((item) => (
+                        <div key={item.name} className="flow-root">
+                          <a
+                            href={item.href}
+                            className="-m-3 p-3 flex items-center rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 transition ease-in-out duration-150"
+                          >
+                            <item.icon className="flex-shrink-0 h-6 w-6 text-gray-400" aria-hidden="true" />
+                            <span className="ml-3">{item.name}</span>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="px-5 py-5 bg-gray-50 space-y-6 sm:flex sm:space-y-0 sm:space-x-10 sm:px-8">
-                    {callsToAction.map((item) => (
-                      <div key={item.name} className="flow-root">
-                        <a
-                          href={item.href}
-                          className="-m-3 p-3 flex items-center rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 transition ease-in-out duration-150"
-                        >
-                          <item.icon className="flex-shrink-0 h-6 w-6 text-gray-400" aria-hidden="true" />
-                          <span className="ml-3">{item.name}</span>
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </Popover.Panel>
             </Transition>
           </>
