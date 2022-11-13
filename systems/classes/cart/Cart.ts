@@ -133,7 +133,7 @@ export class Cart {
         }
     }
 
-    public format_cart_for_upload(): CartInterface {
+    format_cart_for_upload(): CartInterface {
         return {
             causes: [],
             regions: []

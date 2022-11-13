@@ -1,12 +1,10 @@
-import { CalendarIcon, ChartBarIcon, FolderIcon, HomeIcon, InboxIcon, DocumentDuplicateIcon, UserCircleIcon, PaperAirplaneIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, DocumentDuplicateIcon, UserCircleIcon, PaperAirplaneIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline'
 import { ArrowPathIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { supabase } from '../../systems/helpers/supabaseClient'
-import { PrimaryButton } from './Buttons'
-import { countries } from '../../systems/helpers/constants'
 import { fetchPostJSON } from '../../systems/helpers/apiHelpers'
 
 function classNames(...classes) {
@@ -25,9 +23,8 @@ export default function AppLayout({ children }) {
 
   const navigation = [
     { name: 'Dashboard Home', link: '/app', icon: HomeIcon, current: (path == "/app") },
-    { name: 'Tax Receipts', link: '/app/receipts', icon: DocumentDuplicateIcon, current: (path == "/app/receipts") },
+    { name: 'Your Donations', link: '/app/donations', icon: DocumentDuplicateIcon, current: (path == "/app/donations") },
     { name: 'Proof Of Donation', link: '/app/proof', icon: PaperAirplaneIcon, current: (path == "/app/proof") },
-    { name: 'Donation History', link: '/app/donations', icon: FolderIcon, current: (path == "/app/donations") },
     { name: 'Recurring Donations', link: '/app/recurring', icon: ArrowPathIcon, current: (path == "/app/recurring") },
     { name: 'Account & Billing', link: '/app/account', icon: UserCircleIcon, current: (path == "/app/account") },
   ]

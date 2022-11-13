@@ -125,4 +125,31 @@ export class Donation {
 
         return formatted_donation
     }
+
+    format_donation_for_user() {
+        const formatted_donation: any = {
+            donation_created: new Date().toDateString(),
+            // Update this
+            donor: this.donor.donor_id,
+            email: this.donor.email,
+            phone_number: this.donor.phone_number ? this.donor.phone_number : null,
+            amount_in_cents: parseInt(this.amount_in_cents.toString()),
+            native_currency: this.native_currency == CountryList.CANADA ? CurrencyList.CANADIAN_DOLLAR : CountryList.UNITED_STATES ? CurrencyList.UNITED_STATES_DOLLAR : null,
+            native_amount_in_cents: this.native_currency != CountryList.CANADA ? this.native_amount_in_cents : null,
+            fees_covered: this.fees_covered,
+            fees_covered_in_cents: parseInt(this.fees_paid_in_cents.toString()),
+            fees_charged_by_stripe: this.fees_charged_by_stripe,
+            // Hardcoding true for now, later we will log attempted txns too
+            transaction_successful: true,
+            // Need to add this
+            transaction_refunded: false,
+            address_line_address: this.donor.address.line_address,
+            address_country: this.donor.address.country,
+            address_postal_code: this.donor.address.postal_code,
+            address_city: this.donor.address.city,
+            address_state: this.donor.address.state
+        }
+
+        return formatted_donation
+    }
 }

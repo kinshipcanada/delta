@@ -16,3 +16,7 @@ export interface DonationResponse extends BaseApiResponse {
 export interface BatchedDonationResponse extends BaseApiResponse {
     donations: Donation[]
 }
+
+export interface BatchedSimpleDonationResponse extends BaseApiResponse {
+    donations: any[]
+}

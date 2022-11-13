@@ -2,12 +2,36 @@ import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
+import { ArrowDownCircleIcon, PaperClipIcon } from "@heroicons/react/24/solid";
+import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
+import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 
 export default function Index() {
 
     const [user, setUser] = useState(null)
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true)
+
+    const [error, setError] = useState(null)
+    const [donations, setDonations] = useState(null)
+
+    async function fetchDonationsForUser(user_email) {
+
+        const response = await fetchPostJSON('/api/backend/donation/fetch/all_donations', {
+            user_email: "hobbleabbas@gmail.com",
+        });
+    
+        if (response.status === 500) {
+            setError('Something went wrong. Please try again later')
+            return;
+        }
+    
+        if (response.status == 200) {
+            console.log(donations)
+            setDonations(response.donations)
+            return;
+        }
+    }
 
     useEffect(async ()=>{
         setLoading(true)
@@ -28,6 +52,8 @@ export default function Index() {
             }
 
             setUser(loggedInUser.data.user)
+
+            await fetchDonationsForUser(loggedInUser.data.user.email)
             setLoading(false)
             return
         } else {
@@ -42,7 +68,16 @@ export default function Index() {
             {(user && profile) ? 
             
                 <div>
-                    <PageHeader text={`Welcome, ${profile.first_name}`} primaryLinkText="Support" primaryLinkHref={"/support"} />
+                    <PageHeader text={`Welcome, ${profile.first_name}`} description={"You can download any tax receipts you are eligible for."} customSecondaryButton = {<SecondaryButton link = "/support" text = "Download Donation Summary" />} customPrimaryButton={<DownloadAllReceipts />} />
+                    <div className="my-6 sm:my-8" />
+                    <ul role="list" className="space-y-4">
+                        {(donations != null && donations != undefined) ? donations.map((donation) =>(
+                            <Receipt donation={donation} />
+                        ))
+                        
+                        : null
+                        }
+                    </ul>
                 </div>
 
                 : loading ?
@@ -53,5 +88,93 @@ export default function Index() {
 
             }
         </AppLayout>
+    )
+}
+
+export function DownloadAllReceipts() {
+    return (
+        <button
+            type="button"
+            className="ml-3 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+            Download All Receipts
+            <ArrowDownCircleIcon className="ml-2 w-5 h-5" />
+        </button>
+    )
+}
+
+function Receipt({ donation }) {
+    return (
+        <div className="overflow-hidden rounded-lg bg-white shadow-sm border">
+            <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+                <div className="px-4 py-5 sm:px-6 flex justify-between">
+                    <div>
+                        <h3 className="text-lg font-medium leading-6 text-gray-900">{donation.donation_created}</h3>
+                        <p className="mt-1 max-w-2xl text-sm text-gray-500">You donated {(parseFloat(donation.amount_in_cents)/100).toFixed(2)} on {donation.donation_created} using Visa ending in 4242</p>
+                    </div>
+                    <div>
+                        {donation.address_country == "ca" ?
+                        
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
+                            <svg className="-ml-1 mr-1.5 h-2 w-2 text-green-600" fill="currentColor" viewBox="0 0 8 8">
+                            <circle cx={4} cy={4} r={3} />
+                            </svg>
+                            Tax Receipt Eligible
+                        </span>
+                        
+                        : null
+                        }
+                    </div>
+                </div>
+                <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+                    <dl className="sm:divide-y sm:divide-gray-200">
+                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Receipt Issued To</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">Shakeel-Abbas Hussein</dd>
+                    </div>
+                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2)}</dd>
+                    </div>
+                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Proof Available</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-200">
+                            <li className="flex items-center justify-between py-3 pl-3 pr-4 text-sm">
+                            <div className="flex w-0 flex-1 items-center">
+                                <PaperClipIcon className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                                <span className="ml-2 w-0 flex-1 truncate">house_built_in_africa.pdf</span>
+                            </div>
+                            <div className="ml-4 flex-shrink-0">
+                                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                                Download
+                                </a>
+                            </div>
+                            </li>
+                            <li className="flex items-center justify-between py-3 pl-3 pr-4 text-sm">
+                            <div className="flex w-0 flex-1 items-center">
+                                <PaperClipIcon className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                                <span className="ml-2 w-0 flex-1 truncate">diploma_india_husse303.pdf</span>
+                            </div>
+                            <div className="ml-4 flex-shrink-0">
+                                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                                Download
+                                </a>
+                            </div>
+                            </li>
+                        </ul>
+                        </dd>
+                    </div>
+                    </dl>
+                </div>
+                </div>
+            <div className="bg-gray-50 px-4 py-4 sm:px-6">
+                <div className="w-full flex justify-end">
+                    <SecondaryButton link = "/" text = "Download"  />
+                    <div className="m-1" />
+                    <PrimaryButton link = {"https://receipts.kinshipcanada.com/" + donation.id} text = {<>View Receipt &rarr;</>} />
+                </div>
+            </div>
+        </div>
     )
 }

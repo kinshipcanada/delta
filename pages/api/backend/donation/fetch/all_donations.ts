@@ -1,0 +1,30 @@
+import { KinshipError } from "../../../../../systems/classes/errors/KinshipError";
+import { BatchedSimpleDonationResponse, SimpleMessageResponse } from "../../../../../systems/classes/interfaces";
+import fetch_donations_from_params from "../../../../../systems/functions/fetch_donations_from_params";
+
+export default async function handler(req, res) {
+
+    const user_email = req.body.user_email
+
+    try {
+
+        fetch_donations_from_params(null, null, null, null, user_email).then((donations)=>{
+            const successful_response: BatchedSimpleDonationResponse = {
+                status: 200,
+                endpoint_called: `/backend/donation/fetch/all_donations`,
+                donations: donations
+            }
+            return res.status(200).send(successful_response);
+        }).catch((error)=>{
+            const error_response: SimpleMessageResponse = {
+                status: 500,
+                endpoint_called: `/backend/donation/fetch/all_donations`,
+                message: error.message
+            }
+            return res.status(500).send(error_response);
+        })
+    } catch (error) {
+        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/src/api/router", "api_router.get('/fetch_donation')", true)
+        res.status(500).send(error.message);
+    }
+};
