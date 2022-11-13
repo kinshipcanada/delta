@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { Popover } from '@headlessui/react'
+import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { PrimaryButton, SecondaryButton } from './Buttons'
 import { supabase } from '../../systems/helpers//supabaseClient';
-import { useEffect, useState} from 'react';
+import { Fragment, useEffect, useState} from 'react';
+import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 
 export default function Navigation() {
     const router = useRouter()
@@ -59,6 +61,7 @@ export default function Navigation() {
                     <Popover.Group as="nav" className="flex space-x-10">
                         <MenuLink text = {"Home"} link= {"/"} />
                         <MenuLink text = {"Make A Donation"} link= {"/donate"} />
+                        <Support />
                     </Popover.Group>
 
 
@@ -111,5 +114,96 @@ export function MenuLink({ text, link }) {
                 { text }
             </a>
         </Link>
+    )
+}
+
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+  }  
+
+function Support() {
+
+    const solutions = [
+        {
+        name: 'Send A Support Ticket',
+        description: 'Get support from the Kinship team. We try to respond within 24 hours',
+        href: '/support',
+        icon: TicketIcon,
+        },
+        {
+        name: 'Frequently Asked Questions',
+        description: 'Questions we frequently get. If you have other questions, please send us a support ticket',
+        href: '/support/faq',
+        icon: LifebuoyIcon,
+        }
+    ]
+    const callsToAction = [
+        { name: 'Demo Coming Soon...', href: '#', icon: PlayIcon },
+        { name: 'Email Kinship', href: 'mailto:info@kinshipcanada.com', icon: EnvelopeIcon },
+    ]
+    
+    return (
+      <Popover className="relative">
+        {({ open }) => (
+          <>
+            <Popover.Button
+              className={classNames(
+                open ? 'text-gray-900' : 'text-gray-500',
+                'group bg-white rounded-md inline-flex items-center text-base font-medium hover:text-gray-900 focus:outline-none '
+              )}
+            >
+              <span>Get Support</span>
+              <ChevronDownIcon
+                className={classNames(open ? 'text-gray-600' : 'text-gray-400', 'ml-2 h-6 w-6 group-hover:text-slate-600')}
+                aria-hidden="true"
+              />
+            </Popover.Button>
+  
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <Popover.Panel className="absolute z-10 left-1/2 transform -translate-x-1/2 mt-3 px-2 w-screen max-w-md sm:px-0">
+                <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+                  <div className="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
+                    {solutions.map((item) => (
+                      <Link href = {item.href} key={item.name}>
+                        <a
+                          href={item.href}
+                          className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                        >
+                          <item.icon className="flex-shrink-0 h-6 w-6 text-blue-600" aria-hidden="true" />
+                          <div className="ml-4">
+                            <p className="text-base font-medium text-gray-900">{item.name}</p>
+                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                          </div>
+                        </a>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="px-5 py-5 bg-gray-50 space-y-6 sm:flex sm:space-y-0 sm:space-x-10 sm:px-8">
+                    {callsToAction.map((item) => (
+                      <div key={item.name} className="flow-root">
+                        <a
+                          href={item.href}
+                          className="-m-3 p-3 flex items-center rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 transition ease-in-out duration-150"
+                        >
+                          <item.icon className="flex-shrink-0 h-6 w-6 text-gray-400" aria-hidden="true" />
+                          <span className="ml-3">{item.name}</span>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        )}
+      </Popover>
     )
 }

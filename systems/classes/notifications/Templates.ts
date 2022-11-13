@@ -25,7 +25,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 The Team At Kinship Canada
                 `, 
                 email_subject: "Thank you for your donation.",
-                sms_friendly_message: "Thank you fr your donatoon"
+                sms_friendly_message: "Thank you for your donatoon"
             }
         }
 
