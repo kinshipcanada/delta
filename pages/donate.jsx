@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase } from "../systems/helpers/supabaseClient";
 import TextInput from "../components/core/TextInput";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -678,6 +679,10 @@ function BillingStep({
                     </Tab.List>
                     <Tab.Panels className="flex col-span-full">
                         <Tab.Panel className="w-full col-span-full">
+                            <span className="mb-4 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-sm font-medium text-yellow-800">
+                                <InformationCircleIcon className="w-5 h-5" />
+                                <span className="ml-2">You are on test mode - your card won&apos;t be charged.</span>
+                            </span>
                             {stripeOptions.clientSecret && (
                                 <div>
                                     <PaymentElement id="payment-element" />

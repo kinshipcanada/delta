@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import { supabase } from '../../systems/helpers/supabaseClient'
 import { fetchPostJSON } from '../../systems/helpers/apiHelpers'
+import { BlueLoading } from './Loaders'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -105,7 +106,11 @@ export default function AppLayout({ children }) {
       {
         loading ?
 
-        <div className='col-span-3'>Loading...</div>
+        <div className='col-span-3'>
+          <div className='w-full h-full flex justify-center items-center'>
+            <BlueLoading show = {true} />
+          </div>
+        </div>
 
         : loginRequired ?
 

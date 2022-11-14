@@ -5,6 +5,7 @@ import PageHeader from "../../components/app/PageHeader";
 import { ArrowDownCircleIcon, PaperClipIcon } from "@heroicons/react/24/solid";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
 import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
+import { BlueLoading } from "../../components/core/Loaders";
 
 export default function Index() {
 
@@ -71,18 +72,29 @@ export default function Index() {
                     <PageHeader text={`Welcome, ${profile.first_name}`} description={"You can download any tax receipts you are eligible for."} customSecondaryButton = {<SecondaryButton link = "/support" text = "Download Donation Summary" />} customPrimaryButton={<DownloadAllReceipts />} />
                     <div className="my-6 sm:my-8" />
                     <ul role="list" className="space-y-4">
-                        {(donations != null && donations != undefined) ? donations.map((donation) =>(
-                            <Receipt donation={donation} />
-                        ))
-                        
-                        : null
+                        {(donations == null || donations == undefined) ? 
+                            
+                            <div className="flex justify-center">
+                                <div className="flex flex-row items-center">
+                                    <BlueLoading show = {true} /> 
+                                    <p className="ml-4 text-lg font-medium leading-6 text-gray-900">Loading your donations</p>
+                                </div>
+                            </div>
+
+                            : donations.length == 0 ?
+
+                            <p className="text-center">You have no donations to download.</p>
+
+                            : donations.map((donation) => (
+                                <Receipt key={donation.id} donation={donation} />
+                            ))
                         }
                     </ul>
                 </div>
 
                 : loading ?
 
-                <div>Loading...</div>
+                <BlueLoading show = {true} />
 
                 : null
 
