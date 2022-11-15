@@ -14,7 +14,8 @@ import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase } from "../systems/helpers/supabaseClient";
 import TextInput from "../components/core/TextInput";
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
+import { InformationCircleIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -463,7 +464,16 @@ function BillingStep({
       });
     }, [stripe]);
 
-    const handleSubmit = async () => {
+    const handleETransferSubmit = async () => {
+        set_global_loading(true)
+
+        // Create a cart object
+        const { data, error } = await supabase.from('carts').insert({})
+
+        return
+    }
+
+    const handleCCSubmit = async () => {
     
         if (!stripe || !elements) {
             // Stripe.js has not yet loaded.
@@ -621,7 +631,7 @@ function BillingStep({
                 Optional: Cover Processing Fees
               </h2>
               <p htmlFor="cover-fees-check" className="mt-2 text-sm font-regular text-gray-900">
-                Kinsip Canada sends 100% of what you donate to the recipient, and we personally cover administrative fees. If you would like to help us by covering credit card processing fees (tax deductible), we would greatly appreciate it.
+                Kinship Canada sends 100% of what you donate to the recipient, and we personally cover administrative fees. If you would like to help us by covering credit card processing fees (tax deductible), we would greatly appreciate it.
               </p>
               <div className="mt-6 flex items-center">
                 <input
@@ -678,7 +688,7 @@ function BillingStep({
                         </Tab>
                     </Tab.List>
                     <Tab.Panels className="flex col-span-full">
-                        <Tab.Panel className="w-full col-span-full">
+                        <Tab.Panel className="w-full col-span-full focus:outline-none">
                             <span className="mb-4 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-sm font-medium text-yellow-800">
                                 <InformationCircleIcon className="w-5 h-5" />
                                 <span className="ml-2">You are on test mode - your card won&apos;t be charged.</span>
@@ -698,16 +708,22 @@ function BillingStep({
                                 <button
                                     id="submit"
                                     disabled={global_loading || !stripe || !elements}
-                                    onClick={handleSubmit}
+                                    onClick={handleCCSubmit}
                                     className="flex items-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none "
                                 >
                                     <>Donate ${amount} CAD { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
                                 </button>
                             </div>
                         </Tab.Panel>
-                        <Tab.Panel>
+                        <Tab.Panel className="focus:outline-none">
                             <div className="w-full">
-                                <div>yo yo yo yo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yoyo yo yo</div>
+                                <div>
+                                    <span className="mb-4 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-sm font-medium text-yellow-800">
+                                        <InformationCircleIcon className="w-5 h-5" />
+                                        <span className="ml-2">You are on test mode - your card won&apos;t be charged.</span>
+                                    </span>
+                                    <p className="text-sm font-slate-600">Kinship accepts eTransfer donations. Click initiate donation, and you will receive instructions on where to send funds as well as details required.</p>
+                                </div>
                                 <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">
                                     <div>
                                         { stepError ? <p className="text-sm font-semibold text-red-600">{ stepError }</p> : null}
@@ -715,10 +731,10 @@ function BillingStep({
                                     <button
                                         id="submit"
                                         disabled={global_loading || !stripe || !elements}
-                                        onClick={handleSubmit}
+                                        onClick={handleETransferSubmit}
                                         className="flex items-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none "
                                     >
-                                        <>Initate ${amount} CAD Donation { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
+                                        <>Initiate ${amount} CAD Donation { global_loading ? <><Loading show = {global_loading} /> </>: <>&rarr;</> }</>
                                     </button>
                                 </div>
                             </div>
@@ -735,6 +751,57 @@ function BillingStep({
         </div>
     )
 }
+
+const CopyableElement = ({ content }) => {
+
+    const [copied, setCopied] = useState(false)
+  
+    return (
+      <div className = "mt-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          {content.label}
+        </label>
+        <div className="mt-1 flex rounded-md shadow-sm">
+          <div className="relative flex items-stretch flex-grow focus-within:z-10">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <ShoppingBagIcon className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            </div>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
+              value={content.value}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setCopied(true)
+              navigator.clipboard.writeText(content.value);
+  
+              setTimeout(() => {
+                setCopied(false)
+              }, 3000)
+            }}
+            className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            {
+              copied ?
+  
+              <CheckCircleIcon className="h-5 w-5 text-green-600" />
+  
+              :
+  
+              <DocumentDuplicateIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            }
+            <span>{copied ? <>Copied!</> : <>Copy</>}</span>
+          </button>
+        </div>
+      </div>
+    )
+    
+  }
 
 function SectionHeader({ text }) {
     return (
