@@ -45,11 +45,11 @@ export default function Navigation() {
                         src="/logo.png"
                         alt=""
                         />
-                        <Link href = '#'>
+                        <a target="_blank" href = 'https://documentation-5v9j7ekpv-kinshipcanada.vercel.app'>
                             <span className="flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
                                 Beta V1.0.0
                             </span>
-                        </Link>
+                        </a>
                     </a>
                 </div>
 
