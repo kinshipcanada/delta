@@ -1,16 +1,22 @@
 import Link from 'next/link'
-import { ChevronRightIcon, ArrowRightIcon, CheckBadgeIcon } from "@heroicons/react/20/solid"
+import { ArrowRightIcon } from "@heroicons/react/20/solid"
 import { PrimaryButton, SecondaryButton } from '../components/core/Buttons';
 import {
   AcademicCapIcon,
-  BriefcaseIcon,
   BuildingLibraryIcon,
   CalendarIcon,
-  GlobeEuropeAfricaIcon,
   HeartIcon,
   HomeModernIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline'
+import * as React from "react";
+
+import { Fragment } from 'react'
+import { Popover, Transition } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+
+let Globe = () => null;
+if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
 
 export default function Index() {
   return (
@@ -19,12 +25,23 @@ export default function Index() {
       <Incentives />
       <Causes />
       <Partners />
-      {/* <CTA /> */}
+      <CTA />
     </div>
   );
 }
 
 export function Hero() {
+
+  const [imageUrl, setImageUrl] = React.useState("/images/texture.png");
+  const globeRef = React.useRef(null);
+  const arcsData = [1, 2, 3, 4, 5, 6].map(() => ({
+    startLat: (Math.random() - 0.5) * 180,
+    startLng: (Math.random() - 0.5) * 360,
+    endLat: (Math.random() - 0.5) * 180,
+    endLng: (Math.random() - 0.5) * 360,
+    color: [["#000000"][0], ["#000000"][0]],
+  }));
+  
   return (
       <div className="relative bg-white overflow-hidden">
       <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
@@ -50,23 +67,13 @@ export function Hero() {
           <rect width={364} height={384} fill="url(#eab71dd9-9d7a-47bd-8044-256344ee00d0)" />
         </svg>
       </div>
-      <div className="relative pt-6 pb-16 sm:pb-24">
-        
-
-        <main className="mt-16 sm:mt-24">
+      <div className="relative pt-6">
+        <main className="">
           <div className="mx-auto max-w-7xl">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8">
               <div className="px-4 sm:px-6 sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
                 <div>
-                  {/* <div
-                    className="inline-flex pr-4 pl-1 items-center text-gray-800 bg-white rounded-full p-1 pr-2 sm:text-base lg:text-sm xl:text-base hover:text-gray-900 border transition duration-200"
-                  >
-                    <span className="px-0.5 py-0.5 text-white text-xs font-semibold leading-5 uppercase tracking-wide bg-green-600 rounded-full">
-                      <CheckBadgeIcon className='w-5 h-5 text-white' />
-                    </span>
-                    <span className="ml-2 text-sm font-medium">Tax Receipt Eligible</span>
-                  </div> */}
-
+                      
                   <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                     <span className="md:block">Charity in its purest essence</span>
                   </h1>
@@ -81,22 +88,21 @@ export function Hero() {
                   </div>
                 </div>
               </div>
-              <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
-                <div className="border bg-white sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden">
-                  <div className="px-4 py-8 sm:px-10">
-                    <div>
-                      <h2 className="text-lg font-medium text-gray-700">Quick General Donation</h2>
-                      <p className = 'text-sm font-medium mt-3'>Use this form to make a quick general donation. If you have a specific cause you&apos;d like to contribute to, click <Link href = '/donate'><a className = 'text-blue-600'>here</a></Link>.</p>
-                    </div>
-
-                    
-
-                    
-                  </div>
-                  <div className="px-4 py-6 bg-gray-50 border-t-2 border-gray-200 sm:px-10">
-                    d
-                  </div>
-                </div>
+              <div className=" lg:mt-0 col-span-6 lg:col-span-6">
+                <Globe
+                  //@ts-ignore
+                  ref={globeRef}
+                  width={780}
+                  height={780}
+                  backgroundColor={"rgba(0,0,0,0)"}
+                  globeImageUrl={imageUrl}
+                  arcColor={"white"}
+                  arcsData={arcsData}
+                  arcDashGap={0.6}
+                  arcDashLength={0.3}
+                  arcDashAnimateTime={4000 + 500}
+                  rendererConfig={{ preserveDrawingBuffer: true }}
+              />
               </div>
             </div>
           </div>
@@ -151,43 +157,33 @@ export function Incentives () {
 
 const features = [
   {
-    name: 'Orphans',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
-    icon: UserGroupIcon,
-  },
-  {
     name: 'Education',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
+    description: 'Help the next generation get on their feet. Break the cycle of poverty through education.',
     icon: AcademicCapIcon,
   },
   {
-    name: 'Medical Aid',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
-    icon: BuildingLibraryIcon,
+    name: 'Orphans',
+    description: 'Cover an orphans basic housing, food, educational, and clothing needs.',
+    icon: UserGroupIcon,
   },
   {
     name: 'Housing',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
+    description: 'Provide a roof over the heads of those who need it most. Help them get back on their feet by providing a reliable place to stay.',
     icon: HomeModernIcon,
   },
   {
+    name: 'Medical Aid',
+    description: 'Contribute to much needed medical aid, including life-saving operations and medication.',
+    icon: BuildingLibraryIcon,
+  },
+  {
     name: 'Poverty Relief',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
+    description: 'Covers general needs of those in poverty or in extreme situation of needs, such as emergency medical relief, food & water, and more.',
     icon: HeartIcon,
   },
   {
-    name: 'Food & Water',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
-    icon: GlobeEuropeAfricaIcon,
-  },
-  {
-    name: 'Widows',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
-    icon: BriefcaseIcon,
-  },
-  {
     name: 'Khums Donations',
-    description: 'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.',
+    description: 'Kinship is registered to recieve and distribute Khums donations, also eligible for a tax receipt.',
     icon: CalendarIcon,
   },
 ]
@@ -200,7 +196,7 @@ export function Causes() {
         <p className="mt-4 max-w-3xl text-lg text-slate-600">
           Kinship can help direct your donations to those most in need. With your help, we can lift the next generation out of poverty and give them the education, funding, and tools needed to stand on their own feet.
         </p>
-        <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-16">
+        <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
           {features.map((feature) => (
             <div key={feature.name}>
               <div>
@@ -265,26 +261,18 @@ function CTA () {
     <div className="bg-gray-50">
       <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:flex lg:items-center lg:justify-between lg:py-16 lg:px-8">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          <span className="block">Want to donate?</span>
-          <span className="block text-blue-600">Start your free trial today.</span>
+          <span className="block">Ready to contribute?</span>
+          <span className="block text-blue-600">Make a donation & receive a tax receipt today.</span>
         </h2>
         <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-          <div className="inline-flex rounded-md shadow">
+          <div className="px-5 py-2">
             <a
               href="#"
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-5 py-3 text-base font-medium text-white hover:bg-indigo-700"
+              className="inline-flex"
             >
-              Get started
             </a>
           </div>
-          <div className="ml-3 inline-flex rounded-md shadow">
-            <a
-              href="#"
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50"
-            >
-              Learn more
-            </a>
-          </div>
+          <PrimaryButton link = "/donate" text = {<>Donate Now &rarr;</>} />
         </div>
       </div>
     </div>
