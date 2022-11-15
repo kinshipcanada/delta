@@ -46,7 +46,7 @@ export function Hero() {
       <div className="relative bg-white overflow-hidden">
       <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
         <svg
-          className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mt-28 lg:mb-0 xl:transform-none xl:translate-x-0"
+          className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mb-0 xl:transform-none xl:translate-x-0"
           width={364}
           height={384}
           viewBox="0 0 364 384"
@@ -67,14 +67,14 @@ export function Hero() {
           <rect width={364} height={384} fill="url(#eab71dd9-9d7a-47bd-8044-256344ee00d0)" />
         </svg>
       </div>
-      <div className="relative pt-6">
+      <div className="relative">
         <main className="">
           <div className="mx-auto max-w-7xl">
             <div className="lg:grid lg:grid-cols-12 lg:gap-8">
               <div className="px-4 sm:px-6 sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
                 <div>
                       
-                  <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
+                  <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:text-5xl xl:text-6xl">
                     <span className="md:block">Charity in its purest essence</span>
                   </h1>
                   <p className="mt-3 text-base text-gray-800 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
@@ -92,7 +92,7 @@ export function Hero() {
                 <Globe
                   //@ts-ignore
                   ref={globeRef}
-                  width={780}
+                  width={800}
                   height={780}
                   backgroundColor={"rgba(0,0,0,0)"}
                   globeImageUrl={imageUrl}

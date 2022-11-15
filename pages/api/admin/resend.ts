@@ -1,5 +1,5 @@
-import { SimpleMessageResponse } from "../../../../systems/classes/interfaces";
-import resend_receipt, { ResendReceiptResponse } from "../../../../systems/functions/resend_receipt";
+import { SimpleMessageResponse } from "../../../systems/classes/interfaces";
+import resend_receipt, { ResendReceiptResponse } from "../../../systems/functions/resend_receipt";
 
 export default async function handler(req, res) {
     try {

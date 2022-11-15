@@ -138,7 +138,7 @@ export default function Register() {
 					</div>
 					</form>
 
-					{error ? <p className='text-md font-semibold text-red-600'>{error}</p> : ''}
+					{error ? <div className='w-full flex justify-center mt-4 -mb-4'><p className='text-md font-semibold text-red-600'>{error}</p></div> : ''}
 
 					<div className="mt-6">
 					{/* <div className="relative">
