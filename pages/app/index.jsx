@@ -64,6 +64,12 @@ export default function Index() {
 
     }, [])
 
+    const stats = [
+        { name: 'Total Donated', stat: '$71,897' },
+        { name: 'Number Of Donations', stat: '5' },
+        { name: 'Total Tax Deduction', stat: '$48,556' },
+    ]
+
     return (
         <AppLayout>
             {(user && profile) ? 
@@ -72,23 +78,52 @@ export default function Index() {
                     <PageHeader text={`Welcome, ${profile.first_name}`} customPrimaryButton={<PrimaryButton text="Support" link="/support" />} />
                     <div className="my-4 sm:my-6" />
                     <ul role="list" className="space-y-4">
-                        {(donations == null || donations == undefined) ? 
+                    
+                    {(donations == null || donations == undefined) ? 
                             
-                            <div className="flex justify-center">
-                                <div className="flex flex-row items-center">
-                                    <BlueLoading show = {true} /> 
-                                    <p className="ml-4 text-lg font-medium leading-6 text-gray-900">Loading your donations</p>
-                                </div>
+                        <div className="flex justify-center">
+                            <div className="flex flex-row items-center">
+                                <BlueLoading show = {true} /> 
+                                <p className="ml-4 text-lg font-medium leading-6 text-gray-900">Loading your donations</p>
+                            </div>
+                        </div>
+
+                        : donations.length == 0 ?
+
+                        <p className="text-center">You have no donations to download.</p>
+
+                        : 
+                        <div>
+                            <div>
+                                <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                                    {stats.map((item) => (
+                                    <div key={item.name} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm border sm:p-6">
+                                        <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
+                                        <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.stat}</dd>
+                                    </div>
+                                    ))}
+                                </dl>
                             </div>
 
-                            : donations.length == 0 ?
+                            <div className="my-4" />
 
-                            <p className="text-center">You have no donations to download.</p>
-
-                            : donations.map((donation) => (
-                                <Receipt key={donation.id} donation={donation} />
-                            ))
-                        }
+                            <div className="bg-gray-50 sm:rounded-lg border">
+                                <div className="px-4 py-5 sm:p-6">
+                                    <h3 className="text-lg font-medium leading-6 text-gray-900">Your 2022 CRA tax package is available.</h3>
+                                    <div className="mt-2  text-sm text-gray-500">
+                                    <p>For your convenience, a tax package has been prepared for you with a spreadsheet containing your donations, as well as all of your tax receipts. This package is available to download right now, or can be emailed to you if you prefer.</p>
+                                    </div>
+                                    <div className="mt-5 flex w-full justify-end items-center">
+                                        <a href="#" className="text-sm font-medium text-slate-600 hover:text-slate-800">
+                                            Email It To Me
+                                        </a>
+                                        <div className="ml-4" />
+                                        <SecondaryButton link = "/email" text = "Download Package" iconRight = {ArrowDownCircleIcon} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
                     </ul>
                 </div>
 

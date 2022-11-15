@@ -2,6 +2,7 @@ import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export default function Index() {
 
@@ -42,7 +43,12 @@ export default function Index() {
             {(user && profile) ? 
             
                 <div>
-                    <PageHeader text={`Welcome, ${profile.first_name}`} primaryLinkText="Support" primaryLinkHref={"/support"} />
+                    <PageHeader text={`Your Recurring Donations`} primaryLinkText="Support" primaryLinkHref={"/support"} />
+                    <div className="text-center">
+                        <ArrowPathIcon className="mx-auto h-8 w-8 text-gray-400" aria-hidden="true" />
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No recurring donations</h3>
+                        <p className="mt-1 text-sm text-gray-500">You currently don&apos;t have any recurring donations available.</p>
+                    </div>
                 </div>
 
                 : loading ?

@@ -118,7 +118,7 @@ export function DownloadAllReceipts() {
 function Receipt({ donation }) {
     return (
         <div className="overflow-hidden rounded-lg bg-white shadow-sm border">
-            <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+            <div className="overflow-hidden bg-white sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6 flex justify-between">
                     <div>
                         <h3 className="text-lg font-medium leading-6 text-gray-900">{donation.donation_created}</h3>

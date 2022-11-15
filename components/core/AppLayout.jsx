@@ -25,7 +25,6 @@ export default function AppLayout({ children }) {
   const navigation = [
     { name: 'Dashboard Home', link: '/app', icon: HomeIcon, current: (path == "/app") },
     { name: 'Your Donations', link: '/app/donations', icon: DocumentDuplicateIcon, current: (path == "/app/donations") },
-    { name: 'Proof Of Donation', link: '/app/proof', icon: PaperAirplaneIcon, current: (path == "/app/proof") },
     { name: 'Recurring Donations', link: '/app/recurring', icon: ArrowPathIcon, current: (path == "/app/recurring") },
     { name: 'Account & Billing', link: '/app/account', icon: UserCircleIcon, current: (path == "/app/account") },
   ]
