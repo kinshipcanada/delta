@@ -1,6 +1,6 @@
-import { Cart } from "../classes/cart/Cart";
 import { CartInterface } from "../classes/cart/CartInterface";
 import { DonorAddress } from "../classes/utility_classes/address";
+import { CountryList } from "../classes/utility_classes/country_list";
 import { CurrencyList } from "../classes/utility_classes/currency_list";
 import { KinshipPaymentMethod } from "../classes/utility_classes/payment_method";
 
@@ -28,4 +28,28 @@ export interface DatabaseDonation {
     address_postal_code: DonorAddress["postal_code"],
     address_city: DonorAddress["city"],
     address_state: DonorAddress["state"]
+}
+
+export interface UserFormattedDonation {
+    donation_created: string,
+    // Update this
+    donor: string | null,
+    email: string,
+    phone_number: number,
+    amount_in_cents: number,
+    native_currency: CurrencyList,
+    native_amount_in_cents: number,
+    fees_covered: boolean,
+    fees_covered_in_cents: number,
+    fees_charged_by_stripe: number,
+    // Hardcoding true for now, later we will log attempted txns too
+    transaction_successful: true,
+    // Need to add this
+    transaction_refunded: false,
+    address_line_address: string,
+    address_country: CountryList,
+    address_postal_code: string,
+    address_city: string,
+    address_state: string,
+    proof_available: boolean
 }

@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { DatabaseDonation } from "../../database/interfaces";
+import { DatabaseDonation, UserFormattedDonation } from "../../database/interfaces";
 import { PaymentMethods } from "../../stripe/enums";
 import { StripeTags } from "../../stripe/interfaces";
 import { Cart } from "../cart/Cart";
@@ -131,8 +131,8 @@ export class Donation {
         return formatted_donation
     }
 
-    format_donation_for_user() {
-        const formatted_donation: any = {
+    format_donation_for_user() : UserFormattedDonation {
+        const formatted_donation: UserFormattedDonation = {
             donation_created: this.created_at.toDateString(),
             // Update this
             donor: this.donor.donor_id,

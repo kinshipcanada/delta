@@ -7,8 +7,7 @@ export default async function handler(req, res) {
     const user_email = req.body.user_email
 
     try {
-
-        fetch_donations_from_params(null, null, null, null, user_email).then((donations)=>{
+        fetch_donations_from_params(true, null, null, null, null, user_email).then((donations)=>{
             const successful_response: BatchedSimpleDonationResponse = {
                 status: 200,
                 endpoint_called: `/donor/donations/fetch`,
