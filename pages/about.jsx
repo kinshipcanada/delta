@@ -169,7 +169,7 @@ export default function About() {
                         <div className="relative rounded-full border-2 border-white sm:absolute sm:top-0 sm:transform sm:-translate-y-1/2">
                             <img
                             className="w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-blue-300"
-                            src="/quran.jpeg"
+                            src="/images/quran.jpeg"
                             alt=""
                             />
                         </div>

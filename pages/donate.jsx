@@ -512,7 +512,7 @@ function BillingStep({
                 city: city,
                 state_or_province: state_or_province,
                 postal_code: postal_code,
-                country: country ? country : "ca",
+                country: country ? country.code : "ca",
             })
         })
 
@@ -583,7 +583,7 @@ function BillingStep({
                       }}
                     >
                       {countries.map((country, countryIdx)=>(
-                        <option key={countryIdx} value={countries[countryIdx].code.toLowerCase()}>{country.name}</option>
+                        <option key={countryIdx} value={countryIdx}>{country.name}</option>
                       ))}
                     </select>
                   </div>
@@ -596,18 +596,18 @@ function BillingStep({
                 <div>
                  
                   <div className="mt-1">
-                    { country.code == "CA" ?
+                    { country.code == "ca" ?
 
                         <div>
                             <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                            State / Province
+                                State / Province
                             </label>
                             <select
-                            id="state"
-                            name="state"
-                            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                            defaultValue={state_or_province}
-                            onChange={(e)=>{set_state_or_province(e.target.value)}}
+                                id="state"
+                                name="state"
+                                className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                                defaultValue={state_or_province}
+                                onChange={(e)=>{set_state_or_province(e.target.value)}}
                             >
                                 {canadian_states.map((state)=>(
                                     <option key={state.name} value = {state.name}>{state.name}</option>
@@ -617,7 +617,7 @@ function BillingStep({
 
                         : 
 
-                        <TextInput label = "State / Province" type={"text"} required={true} defaultValue={null} setter = {set_state_or_province} />
+                        <TextInput label = {`State / Province`} type={"text"} required={true} defaultValue={null} setter = {set_state_or_province} />
                     }
                   </div>
                 </div>

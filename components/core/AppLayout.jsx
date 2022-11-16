@@ -1,12 +1,13 @@
 import { HomeIcon, DocumentDuplicateIcon, UserCircleIcon, ArrowLeftOnRectangleIcon, ChatBubbleOvalLeftIcon } from '@heroicons/react/24/outline'
 import { ArrowPathIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { supabase } from '../../systems/helpers/supabaseClient'
 import { fetchPostJSON } from '../../systems/helpers/apiHelpers'
 import { BlueLoading } from './Loaders'
+import { countries, canadian_states } from '../../systems/helpers/constants'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -92,7 +93,7 @@ export default function AppLayout({ children }) {
         <a
           onClick={() => {
             supabase.auth.signOut()
-            router.push('/')
+            router.push('/');
           }}
           className="cursor-pointer text-gray-600 hover:bg-slate-50 hover:text-gray-900 group flex items-center px-3 py-2 text-sm font-medium rounded-md"
         >
@@ -166,9 +167,9 @@ export function UserSetup({ setUserConfigured }) {
   const [lastName, setLastName] = useState('')
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
-  const [state, setState] = useState('')
+  const [state, setState] = useState(canadian_states[6].name)
   const [postalCode, setPostalCode] = useState('')
-  const [country, setCountry] = useState('ca')
+  const [country, setCountry] = useState(countries[0])
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -186,7 +187,7 @@ export function UserSetup({ setUserConfigured }) {
     }
 
     if (!firstName || !lastName || !address || !city || !state || !postalCode) {
-      setError('Please fill out all fields.')
+      setError('Please fill out all required fields.')
       setLoading(false)
       return
     }
@@ -202,7 +203,7 @@ export function UserSetup({ setUserConfigured }) {
       user_id: user.data.user.id,
       address: {
         city: city,
-        country: country,
+        country: country.code,
         line1: address,
         postal_code: postalCode,
         state: state,
@@ -300,13 +301,36 @@ export function UserSetup({ setUserConfigured }) {
             required={true}
           />
 
-          <Input
-            label={"State of Province"}
-            type={"text"}
-            placeholder={"State of Province"}
-            setValue={setState}
-            required={true}
-          />
+          { country.code == "ca" ?
+
+          <div>
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                  State / Province
+              </label>
+              <select
+                  id="state"
+                  name="state"
+                  className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                  defaultValue={state}
+                  onChange={(e)=>{setState(e.target.value)}}
+              >
+                  {canadian_states.map((state)=>(
+                      <option key={state.name} value = {state.name}>{state.name}</option>
+                  ))}
+              </select>
+          </div>
+
+          : 
+
+            <Input
+              label={"State of Province"}
+              type={"text"}
+              placeholder={"State of Province"}
+              setValue={setState}
+              required={true}
+            />
+          }
+         
         </div>
 
         <div className='m-4' />
@@ -328,17 +352,17 @@ export function UserSetup({ setUserConfigured }) {
               id="country"
               name="country"
               className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-              defaultValue="Canada"
-              onChange={(e) => {setCountry(e.target.value)}}
+              defaultValue={0}
+              onChange={(e) => {setCountry(countries[e.target.value])}}
             >
-              <option value = "ca">Canada</option>
-              <option value = "us">United States</option>
-              <option value = "other">Other</option>
+              {countries.map((country, countryIdx)=>(
+                  <option key={countryIdx} value={countryIdx}>{country.name}</option>
+              ))}
             </select>
           </div>
         </div>
       </div>
-      <div className="px-4 py-4 sm:px-6">
+      <div className="px-4 py-4 sm:px-6 flex w-full justify-between">
           <button
             disabled = { loading }
             type="submit"
