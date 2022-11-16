@@ -21,7 +21,7 @@ export default function create_summary_statement(donations: Donation[]) : Summar
     // Iterate through the donations and add them to the summary object
     for (const donation of donations) {
         summary.donations.push(donation.format_donation_for_user())
-        summary.total_donated += parseInt(donation.amount_in_cents)
+        summary.total_donated += donation.amount_in_cents
     }
 
     // Calculate the total eligible estimate
