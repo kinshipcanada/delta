@@ -2,10 +2,11 @@ import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
-import { ArrowDownCircleIcon, PaperClipIcon } from "@heroicons/react/24/solid";
+import { ArrowDownCircleIcon, PaperClipIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
 import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 import { BlueLoading } from "../../components/core/Loaders";
+import ReactTooltip from 'react-tooltip';
 
 export default function Index() {
 
@@ -15,6 +16,10 @@ export default function Index() {
 
     const [error, setError] = useState(null)
     const [donations, setDonations] = useState(null)
+
+    const [statTotalDonated, setStatTotalDonated] = useState(0)
+    const [statTotalDonations, setStatTotalDonations] = useState(0)
+    const [statTotalDeductible, setStatTotalDeductible] = useState(0)
 
     async function fetchDonationsForUser(user_email) {
 
@@ -30,6 +35,15 @@ export default function Index() {
         if (response.status == 200) {
             console.log(donations)
             setDonations(response.donations)
+
+            let totalDonated = 0
+
+            for (let i = 0; i < response.donations.length; i++) {
+                totalDonated += (parseFloat(response.donations[i].amount_in_cents))
+            }
+            
+            setStatTotalDonated((totalDonated/100).toFixed(2))
+            setStatTotalDonations(response.donations.length)
             return;
         }
     }
@@ -65,9 +79,9 @@ export default function Index() {
     }, [])
 
     const stats = [
-        { name: 'Total Donated', stat: '$71,897' },
-        { name: 'Number Of Donations', stat: '5' },
-        { name: 'Total Tax Deduction', stat: '$48,556' },
+        { name: 'Total Donated', stat: `$${statTotalDonated}`, warning: false },
+        { name: 'Number Of Donations', stat: statTotalDonations, warning: false },
+        { name: 'Total Tax Deduction', stat: '$48,556', warning: true },
     ]
 
     return (
@@ -98,7 +112,9 @@ export default function Index() {
                                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                                     {stats.map((item) => (
                                     <div key={item.name} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm border sm:p-6">
-                                        <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
+                                        <dt className="truncate text-sm font-medium text-gray-500 flex items-center">{item.name}
+                                            {item.warning ? <p data-tip="This is an estimate, the final calculation also considers your income."><QuestionMarkCircleIcon className="ml-2 w-4 h-4" /></p> : null}
+                                        </dt>
                                         <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.stat}</dd>
                                     </div>
                                     ))}
@@ -134,6 +150,7 @@ export default function Index() {
                 : null
 
             }
+            <ReactTooltip />
         </AppLayout>
     )
 }
