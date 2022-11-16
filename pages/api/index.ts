@@ -1,4 +1,3 @@
-import { SimpleMessageResponse } from "../../systems/classes/interfaces";
 import { SimpleMessageResponse } from "../../systems/classes/utility_classes";
 export default async function handler(req, res) {
     try {
