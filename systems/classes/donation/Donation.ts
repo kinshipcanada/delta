@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { DatabaseDonation } from "../../database/interfaces";
+import { DatabaseDonation, UserFormattedDonation } from "../../database/interfaces";
 import { PaymentMethods } from "../../stripe/enums";
 import { StripeTags } from "../../stripe/interfaces";
 import { Cart } from "../cart/Cart";
@@ -15,6 +15,7 @@ export class Donation {
 
     donor: Donor;
 
+    created_at: Date;
     amount_in_cents: number;
     native_currency: CountryList;
     native_amount_in_cents: number;
@@ -31,6 +32,7 @@ export class Donation {
 
     stripe_tags: StripeTags;
     recurring_donation: boolean;
+    proof_available: boolean;
 
     payment_method: Stripe.PaymentMethod
 
@@ -38,6 +40,7 @@ export class Donation {
 
     constructor ( 
         donor: Donor,
+        created_at: Date,
         amount_in_cents: number,
         native_currency: CountryList,
         native_amount_in_cents: number,
@@ -50,9 +53,11 @@ export class Donation {
         stripe_charge_id?: string,
         stripe_balance_transaction_id?: string,
         stripe_customer_id?: string,
+        proof_available?: boolean,
     ) {
         this.donation_id = new uuidv4()
         this.donor = donor;
+        this.created_at = created_at;
         this.amount_in_cents = amount_in_cents;
         this.native_currency = native_currency;
         this.native_amount_in_cents = native_amount_in_cents;
@@ -69,7 +74,7 @@ export class Donation {
         }
 
         this.date_donated = Date.now()
-
+        this.proof_available = proof_available ? proof_available : false
     }
 
     async store_donation() {
@@ -126,9 +131,9 @@ export class Donation {
         return formatted_donation
     }
 
-    format_donation_for_user() {
-        const formatted_donation: any = {
-            donation_created: new Date().toDateString(),
+    format_donation_for_user() : UserFormattedDonation {
+        const formatted_donation: UserFormattedDonation = {
+            donation_created: this.created_at.toDateString(),
             // Update this
             donor: this.donor.donor_id,
             email: this.donor.email,
@@ -147,7 +152,8 @@ export class Donation {
             address_country: this.donor.address.country,
             address_postal_code: this.donor.address.postal_code,
             address_city: this.donor.address.city,
-            address_state: this.donor.address.state
+            address_state: this.donor.address.state,
+            proof_available: this.proof_available
         }
 
         return formatted_donation

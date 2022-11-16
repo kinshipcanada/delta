@@ -1,22 +1,37 @@
+import { Donor } from "../../../../systems/classes/donors/Donor";
 import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/interfaces";
-import fetch_donation from "../../../../systems/functions/fetch_donation";
+import { DonationSummaryResponse, SimpleMessageResponse } from "../../../../systems/classes/interfaces";
+import { KinshipNotification } from "../../../../systems/classes/notifications/Notification";
+import { NotificationType } from "../../../../systems/classes/notifications/notification_types";
+import create_summary_statement from "../../../../systems/functions/create_summary_statement";
+import fetch_donations_from_params from "../../../../systems/functions/fetch_donations_from_params";
 
 export default async function handler(req, res) {
-    const donation_id = req.body.donation_id
+
+    const user_email = req.body.user_email
+    const send_as_email = req.body.send_as_email
 
     try {
-        fetch_donation(donation_id).then((donation_object)=>{
-            const successful_response: DonationResponse = {
+
+        fetch_donations_from_params(false, null, null, null, null, user_email.user_email).then((donations)=>{
+            const summary = create_summary_statement(donations)
+
+            const successful_response: DonationSummaryResponse = {
                 status: 200,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                donation: donation_object
+                endpoint_called: `/donor/donations/report`,
+                summary: summary
+            }
+
+            if (send_as_email) {
+                // const donor = new Donor()
+                // const notification = new KinshipNotification(NotificationType.REPORT_GENERATED, )
+                console.log("to implement")
             }
             return res.status(200).send(successful_response);
         }).catch((error)=>{
             const error_response: SimpleMessageResponse = {
                 status: 500,
-                endpoint_called: `/backend/donation/${donation_id}`,
+                endpoint_called: `/donor/donations/report`,
                 message: error.message
             }
             return res.status(500).send(error_response);

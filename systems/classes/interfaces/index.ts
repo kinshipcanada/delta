@@ -1,4 +1,5 @@
 import { Donation } from "../donation/Donation";
+import { SummaryStatement } from "../utility_classes/summary_statement";
 
 export interface BaseApiResponse {
     status: 200 | 400 | 500,
@@ -19,4 +20,8 @@ export interface BatchedDonationResponse extends BaseApiResponse {
 
 export interface BatchedSimpleDonationResponse extends BaseApiResponse {
     donations: any[]
+}
+
+export interface DonationSummaryResponse extends BaseApiResponse {
+    summary: SummaryStatement
 }

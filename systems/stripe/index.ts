@@ -159,6 +159,7 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
     
     const donation = new Donation(
         donor, 
+        new Date(stripe_data.charge_object.created * 1000),
         amount_in_cents, 
         native_currency,
         amount_captured,

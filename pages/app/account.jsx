@@ -69,7 +69,7 @@ export default function Index() {
                         <div className="md:grid md:grid-cols-3 md:gap-6">
                             <div className="md:col-span-1">
                             <h3 className="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
-                            <p className="mt-1 text-sm text-gray-500">Use a permanent address where you can receive mail.</p>
+                            <p className="mt-1 text-sm text-gray-500">This are your personal details, including the email we send donations to.</p>
                             </div>
                             <div className="mt-5 md:mt-0 md:col-span-2">
                             <form action="#" method="POST">
@@ -88,7 +88,7 @@ export default function Index() {
                                             <p>Email address</p>
                                             
                                         </label>
-                                        <span className="border border-yellow-800 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                        <span className=" inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
                                             Warning: this changes your account email
                                         </span>
                                     </div>
@@ -124,7 +124,72 @@ export default function Index() {
                             </form>
                             </div>
                         </div>
+                        
 
+                        
+                    </div>
+
+                        <div className="space-y-6">
+                            <div className="bg-white border border-gray-200 px-4 py-5 sm:rounded-lg sm:p-6">
+                            <div className="md:grid md:grid-cols-3 md:gap-6">
+                                <div className="md:col-span-1">
+                                <h3 className="text-lg font-medium leading-6 text-gray-900">Billing Address</h3>
+                                <p className="mt-1 text-sm text-gray-500">Use a permanent address where you can receive mail.</p>
+                                </div>
+                                <div className="mt-5 md:mt-0 md:col-span-2">
+                                <form action="#" method="POST">
+                                    <div className="grid grid-cols-6 gap-6">
+
+                                        <div className="col-span-full">
+                                            <div className = 'w-full flex justify-between'>
+                                                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+                                                    <p>Line Address</p>
+                                                </label>
+                                            </div>
+                                            <TextInput type="text" defaultValue={profile ? profile.address_line_address : null} required={false} setter={setNewEmail}  />
+                                        </div>
+                                        
+                                        <div className="col-span-6 sm:col-span-3">
+                                            <TextInput type="text" label="Province/State" defaultValue={profile ? profile.address_state : null} required={false} setter={setNewFirstName}  />
+                                        </div>
+                        
+                                        <div className="col-span-6 sm:col-span-3">
+                                            <TextInput type="text" label="Postal Code" defaultValue={profile ? profile.address_postal_code : null} required={false} setter={setNewLastName}  />
+                                        </div>
+                    
+                                    
+                    
+                                    </div>
+
+                                    {((newFirstName != null && newFirstName != profile.first_name) || (newLastName != null && newLastName != profile.last_name) || (newEmail != null && newEmail != profile.email)) ?
+                                        <div className="flex justify-end mt-6">
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    setNewFirstName(null)
+                                                    setNewLastName(null)
+                                                    setNewEmail(null)
+                                                }}
+                                                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            >
+                                                Cancel Changes
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+
+                                    : null
+                                    
+                                    }
+                                </form>
+                                </div>
+                            </div>
+                            
+                        </div>
                     </div>
 
                     <PaymentMethods />

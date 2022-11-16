@@ -1,4 +1,4 @@
-import { HomeIcon, DocumentDuplicateIcon, UserCircleIcon, PaperAirplaneIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, DocumentDuplicateIcon, UserCircleIcon, ArrowLeftOnRectangleIcon, ChatBubbleOvalLeftIcon } from '@heroicons/react/24/outline'
 import { ArrowPathIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,6 +27,7 @@ export default function AppLayout({ children }) {
     { name: 'Your Donations', link: '/app/donations', icon: DocumentDuplicateIcon, current: (path == "/app/donations") },
     { name: 'Recurring Donations', link: '/app/recurring', icon: ArrowPathIcon, current: (path == "/app/recurring") },
     { name: 'Account & Billing', link: '/app/account', icon: UserCircleIcon, current: (path == "/app/account") },
+    { name: 'Feedback', link: '/app/feedback', icon: ChatBubbleOvalLeftIcon, current: (path == "/app/feedback") },
   ]
 
   useEffect(async ()=>{
@@ -124,7 +125,7 @@ export default function AppLayout({ children }) {
 
         :
 
-        <div className='p-10'>
+        <div className='col-span-3'>
           <UserSetup setUserConfigured={setUserConfigured} />
         </div>
       }
