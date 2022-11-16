@@ -6,7 +6,7 @@ import { ArrowDownCircleIcon, PaperClipIcon, QuestionMarkCircleIcon } from "@her
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
 import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 import { BlueLoading } from "../../components/core/Loaders";
-import ReactTooltip from 'react-tooltip';
+import ReactTooltip from "react-tooltip";
 
 export default function Index() {
 
@@ -23,8 +23,8 @@ export default function Index() {
 
     async function fetchDonationsForUser(user_email) {
 
-        const response = await fetchPostJSON('/api/backend/donation/fetch/all_donations', {
-            user_email: "hobbleabbas@gmail.com",
+        const response = await fetchPostJSON('/api/donor/donations/fetch', {
+            user_email: user_email,
         });
     
         if (response.status === 500) {
@@ -37,13 +37,23 @@ export default function Index() {
             setDonations(response.donations)
 
             let totalDonated = 0
+            let totalDeductible = 0
 
             for (let i = 0; i < response.donations.length; i++) {
                 totalDonated += (parseFloat(response.donations[i].amount_in_cents))
             }
+
+            if (totalDonated < 20000) {
+                totalDeductible += (parseFloat(totalDonated)*0.2005)
+            } else {
+                totalDeductible += (parseFloat(20000)*0.2005) + ((totalDonated - 20000)*0.4016)
+            }
             
             setStatTotalDonated((totalDonated/100).toFixed(2))
             setStatTotalDonations(response.donations.length)
+            setStatTotalDeductible((totalDeductible/100).toFixed(2))
+
+
             return;
         }
     }
@@ -67,7 +77,6 @@ export default function Index() {
             }
 
             setUser(loggedInUser.data.user)
-
             await fetchDonationsForUser(loggedInUser.data.user.email)
             setLoading(false)
             return
@@ -81,7 +90,7 @@ export default function Index() {
     const stats = [
         { name: 'Total Donated', stat: `$${statTotalDonated}`, warning: false },
         { name: 'Number Of Donations', stat: statTotalDonations, warning: false },
-        { name: 'Total Tax Deduction', stat: '$48,556', warning: true },
+        { name: 'Total Tax Deduction', stat: `$${statTotalDeductible}`, warning: true },
     ]
 
     return (
@@ -102,10 +111,6 @@ export default function Index() {
                             </div>
                         </div>
 
-                        : donations.length == 0 ?
-
-                        <p className="text-center">You have no donations to download.</p>
-
                         : 
                         <div>
                             <div>
@@ -119,6 +124,7 @@ export default function Index() {
                                     </div>
                                     ))}
                                 </dl>
+                                <ReactTooltip />
                             </div>
 
                             <div className="my-4" />
@@ -150,7 +156,6 @@ export default function Index() {
                 : null
 
             }
-            <ReactTooltip />
         </AppLayout>
     )
 }

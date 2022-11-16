@@ -15,7 +15,8 @@ export default function Navigation() {
 
     const pages = [
       { name: "Home", link: "/", current: router.asPath == "/" },
-      { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" }
+      { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" },
+      { name: "About", link: "/about", current: router.asPath == "/about" }
     ]
 
     useEffect(async () => {

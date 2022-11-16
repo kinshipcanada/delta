@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import { ArrowDownCircleIcon, PaperClipIcon } from "@heroicons/react/24/solid";
+import { ArrowDownCircleIcon as ArrowDownCircleIconOutline } from "@heroicons/react/24/outline";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
 import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
 import { BlueLoading } from "../../components/core/Loaders";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export default function Index() {
 
@@ -18,12 +21,13 @@ export default function Index() {
 
     async function fetchDonationsForUser(user_email) {
 
-        const response = await fetchPostJSON('/api/backend/donation/fetch/all_donations', {
-            user_email: "hobbleabbas@gmail.com",
+        const response = await fetchPostJSON('/api/donor/donations/fetch', {
+            user_email: user_email,
         });
     
         if (response.status === 500) {
             setError('Something went wrong. Please try again later')
+            console.log(response)
             return;
         }
     
@@ -83,7 +87,12 @@ export default function Index() {
 
                             : donations.length == 0 ?
 
-                            <p className="text-center">You have no donations to download.</p>
+                            <div className="text-center mt-16">
+                                <ShoppingCartIcon className="mx-auto h-8 w-8 text-gray-400" aria-hidden="true" />
+                                <h3 className="mt-2 text-sm font-medium text-gray-900">No donations made</h3>
+                                <p className="mt-1 text-sm text-gray-500">You haven&apos;t made any donations with this email yet. If you just made a donation, and it isn&apos;t appearing, please wait 5 minutes and then check back. </p>
+                                <p className="mt-1 text-sm text-gray-500">You can also <Link href = "/support"><a href = "#" className="text-blue-600">get support here</a></Link>.</p>
+                            </div>
 
                             : donations.map((donation) => (
                                 <Receipt key={donation.id} donation={donation} />
@@ -148,6 +157,8 @@ function Receipt({ donation }) {
                         <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>
                         <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2)}</dd>
                     </div>
+                    {donation.proof_available == true ?
+                    
                     <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Proof Available</dt>
                         <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -177,12 +188,15 @@ function Receipt({ donation }) {
                         </ul>
                         </dd>
                     </div>
+
+                    : null
+                    }
                     </dl>
                 </div>
                 </div>
             <div className="bg-gray-50 px-4 py-4 sm:px-6">
                 <div className="w-full flex justify-end">
-                    <SecondaryButton link = "/" text = "Download"  />
+                    <SecondaryButton link = "/" text = "Download" iconRight={ArrowDownCircleIconOutline}  />
                     <div className="m-1" />
                     <PrimaryButton link = {"https://receipts.kinshipcanada.com/" + donation.id} text = {<>View Receipt &rarr;</>} />
                 </div>

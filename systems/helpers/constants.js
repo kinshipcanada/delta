@@ -335,14 +335,38 @@ export const causes = [
     },
     {
         cause_id: 1,
-        name: "Complete Care For Orphan",
-        description: "Provide shelter, meals, and education for an orphan",
+        name: 'Education',
+        description: 'Help the next generation get on their feet. Break the cycle of poverty through education.',
         default_selected: false
     },
     {
         cause_id: 2,
-        name: "Education",
-        description: "Help a deserving child afford their tuition",
+        name: 'Orphans',
+        description: 'Cover an orphans basic housing, food, educational, and clothing needs.',
         default_selected: false
-    }
+    },
+    {
+        cause_id: 3,
+        name: 'Housing',
+        description: 'Provide a roof over the heads of those who need it most. Help them get back on their feet by providing a reliable place to stay.',
+        default_selected: false
+    },
+    {
+        cause_id: 4,
+        name: 'Medical Aid',
+        description: 'Contribute to much needed medical aid, including life-saving operations and medication.',
+        default_selected: false
+    },
+    {
+        cause_id: 5,
+        name: 'Poverty Relief',
+        description: 'Covers general needs of those in poverty or in extreme situation of needs, such as emergency medical relief, food & water, and more.',
+        default_selected: false
+    },
+    {
+        cause_id: 6,
+        name: 'Khums Donations',
+        description: 'Kinship is registered to recieve and distribute Khums donations, also eligible for a tax receipt.',
+        default_selected: false
+    },
 ]

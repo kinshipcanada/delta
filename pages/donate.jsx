@@ -14,8 +14,9 @@ import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase } from "../systems/helpers/supabaseClient";
 import TextInput from "../components/core/TextInput";
-import { InformationCircleIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
+import { InformationCircleIcon, ShoppingBagIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import ReactTooltip from "react-tooltip";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -113,15 +114,15 @@ export default function Donate() {
                         <dt>Subtotal</dt>
                         <dd>{ amount ? <>${amount}</> : "$0.00" }</dd>
                         </div>
+                        
+                        <div className="flex items-center justify-between">
+                        <dt>Fees Covered</dt>
+                        <dd>{ coverFees ? `$${(parseFloat(amount) * 0.029).toFixed(2)}` : "$0.00" }</dd>
+                        </div>
 
                         <div className="flex items-center justify-between">
                         <dt>Eligible For Tax Receipt</dt>
                         <dd>{ amount && coverFees && country == 'ca' ? <>${(parseFloat(amount) * 1.029).toFixed(2)}</> : amount && !coverFees && country == 'ca'  ? <>${amount}</> : "$0.00" }</dd>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                        <dt>Fees Covered</dt>
-                        <dd>{ coverFees ? `$${(parseFloat(amount) * 0.029).toFixed(2)}` : "$0.00" }</dd>
                         </div>
 
                         <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
@@ -321,7 +322,7 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
                         If you prefer your donation go to specific causes, choose those causes here
                     </label>
                     
-                    <fieldset className="space-y-5 mt-4">
+                    <fieldset className="space-y-4 mt-4">
                         {causes.map((cause) => (
                             <PreferredCauseCheckbox key={cause.cause_id} cause_object = {cause} default_selected={cause.default_selected} selected_causes = {selected_causes} set_selected_causes = {set_selected_causes} />
                         ))}
@@ -374,13 +375,14 @@ export function PreferredCauseCheckbox({ cause_object, selected_causes, set_sele
             />
             </div>
             <label htmlFor={cause_object.cause_id} className="cursor-pointer ml-3 text-sm">
-                <p className="font-medium text-gray-700">
-                    { cause_object.name }
+                <p className="font-medium text-gray-700 flex items-center">
+                    { cause_object.name } { cause_object.cause_id != 0 ? <p data-tip={ cause_object.description } className="ml-2 inline"><QuestionMarkCircleIcon className="text-slate-400 hover:text-slate-600 h-4 w-4" /></p> : null }
                 </p>
-                <p id="cause-description" className="text-gray-500">
-                    { cause_object.description }
-                </p>
+                {
+                    cause_object.cause_id == 0 ? <p className="text-gray-500">{ cause_object.description }</p> : null
+                }
             </label>
+            <ReactTooltip />
         </div>
     )
 }

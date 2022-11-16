@@ -124,7 +124,7 @@ export default function AppLayout({ children }) {
 
         :
 
-        <div className='p-10'>
+        <div className='col-span-3'>
           <UserSetup setUserConfigured={setUserConfigured} />
         </div>
       }
