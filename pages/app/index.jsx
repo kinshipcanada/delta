@@ -53,9 +53,9 @@ export default function Index() {
                 totalDeductible += (parseFloat(20000)*0.2005) + ((totalDonated - 20000)*0.4016)
             }
             
-            setStatTotalDonated((totalDonated/100).toFixed(2))
+            setStatTotalDonated((totalDonated/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","))
             setStatTotalDonations(response.donations.length)
-            setStatTotalDeductible((totalDeductible/100).toFixed(2))
+            setStatTotalDeductible((totalDeductible/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","))
 
 
             return;
