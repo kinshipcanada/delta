@@ -15,7 +15,8 @@ export default async function handler(req, res) {
         state_or_province,
         postal_code,
         country,
-        stripe_customer_id
+        stripe_customer_id,
+        fees_covered,
     } = req.body
 
     let customer_id = stripe_customer_id
@@ -41,18 +42,19 @@ export default async function handler(req, res) {
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.update(payment_intent_id, 
         {
-            metadata: { 
-                address: address,
-                suite: suite,
-                city: city,
-                state_or_province: state_or_province,
-                postal_code: postal_code,
-                country: country,
-                first_name: first_name,
-                last_name: last_name,
-                email: email,
-            },
-            customer: customer_id
+          metadata: { 
+            address: address,
+            suite: suite,
+            city: city,
+            state_or_province: state_or_province,
+            postal_code: postal_code,
+            country: country,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            fees_covered: fees_covered,
+          },
+          customer: customer_id,
         }
     );
 

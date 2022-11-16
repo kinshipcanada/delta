@@ -141,27 +141,23 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
             postal_code: stripe_data.customer.address.postal_code,
             city: stripe_data.customer.address.city,
             state: stripe_data.customer.address.state,
-            country: stripe_data.customer.address.country == "Canada" ? CountryList.CANADA : stripe_data.customer.address.country == "United States" ? CountryList.UNITED_STATES : CountryList.UNDEFINED,
+            country: stripe_data.customer.address.country == "ca" ? CountryList.CANADA : stripe_data.customer.address.country == "us" ? CountryList.UNITED_STATES : CountryList.UNDEFINED,
         }
     }, (stripe_data.customer.metadata != null && stripe_data.customer.metadata != undefined) ? stripe_data.customer.metadata.user_id : null)
 
     const amount_in_cents = stripe_data.charge_object.amount_captured
     const native_currency = stripe_data.charge_object.currency == "cad" ? CountryList.CANADA : stripe_data.charge_object.currency == "usd" ? CountryList.UNITED_STATES : CountryList.UNDEFINED
-    const amount_captured = stripe_data.charge_object.amount_captured
-    const fees_covered = stripe_data.charge_object.metadata.fees_covered ? Boolean(stripe_data.charge_object.metadata.fees_covered) : false
-    const fees_paid_in_cents = fees_covered ? stripe_data.charge_object.amount_captured / 1.029 : 0
+    const fees_covered = parseInt(stripe_data.charge_object.metadata.fees_covered)
     const fees_charged_by_stripe = stripe_data.balance_transaction_object.fee
-    const cart = new Cart([], stripe_data.charge_object.amount_captured, fees_covered)
+    const cart = new Cart([], stripe_data.charge_object.amount_captured, fees_covered > 0 ? true : false)
     
     const donation = new Donation(
         donor, 
         new Date(stripe_data.charge_object.created * 1000),
         amount_in_cents, 
         native_currency,
-        amount_captured,
         cart,
         fees_covered,
-        fees_paid_in_cents,
         fees_charged_by_stripe,
         stripe_data.payment_method,
         stripe_data.payment_intent_object.id,

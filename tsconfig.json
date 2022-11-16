@@ -24,7 +24,7 @@
     "**/*.ts",
     "**/*.tsx",
     "components/NavBar.jsx"
-  ],
+, "pages/api/donor/profile/create.js"  ],
   "exclude": [
     "node_modules"
   ]

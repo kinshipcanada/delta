@@ -513,6 +513,7 @@ function BillingStep({
                 state_or_province: state_or_province,
                 postal_code: postal_code,
                 country: country ? country.code : "ca",
+                fees_covered: coverFees == true ? (parseFloat(amount) * 0.029 * 100).toFixed(0): 0,
             })
         })
 

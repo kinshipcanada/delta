@@ -150,14 +150,20 @@ export default function Index() {
                                         </div>
                                         
                                         <div className="col-span-6 sm:col-span-3">
-                                            <TextInput type="text" label="Province/State" defaultValue={profile ? profile.address_state : null} required={false} setter={setNewFirstName}  />
+                                            <TextInput type="text" label="City" defaultValue={profile ? profile.address_city : null} required={false} setter={setNewFirstName}  />
                                         </div>
                         
                                         <div className="col-span-6 sm:col-span-3">
                                             <TextInput type="text" label="Postal Code" defaultValue={profile ? profile.address_postal_code : null} required={false} setter={setNewLastName}  />
                                         </div>
-                    
-                                    
+
+                                        <div className="col-span-6 sm:col-span-3">
+                                            <TextInput type="text" label="Province/State" defaultValue={profile ? profile.address_state : null} required={false} setter={setNewFirstName}  />
+                                        </div>
+                        
+                                        <div className="col-span-6 sm:col-span-3">
+                                            <TextInput type="text" label="Country" defaultValue={profile ? profile.address_country.name : null} required={false} setter={setNewLastName}  />
+                                        </div>
                     
                                     </div>
 
