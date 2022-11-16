@@ -1,11 +1,15 @@
+import { Donor } from "../../../../systems/classes/donors/Donor";
 import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
 import { DonationSummaryResponse, SimpleMessageResponse } from "../../../../systems/classes/interfaces";
+import { KinshipNotification } from "../../../../systems/classes/notifications/Notification";
+import { NotificationType } from "../../../../systems/classes/notifications/notification_types";
 import create_summary_statement from "../../../../systems/functions/create_summary_statement";
 import fetch_donations_from_params from "../../../../systems/functions/fetch_donations_from_params";
 
 export default async function handler(req, res) {
 
     const user_email = req.body.user_email
+    const send_as_email = req.body.send_as_email
 
     try {
 
@@ -18,6 +22,11 @@ export default async function handler(req, res) {
                 summary: summary
             }
 
+            if (send_as_email) {
+                // const donor = new Donor()
+                // const notification = new KinshipNotification(NotificationType.REPORT_GENERATED, )
+                console.log("to implement")
+            }
             return res.status(200).send(successful_response);
         }).catch((error)=>{
             const error_response: SimpleMessageResponse = {

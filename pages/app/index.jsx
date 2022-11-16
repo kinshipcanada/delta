@@ -252,6 +252,7 @@ export function CRAPackage(user_email) {
 
         const response = await fetchPostJSON('/api/donor/donations/report', {
             user_email: user_email,
+            send_as_email: true
         });
     
         if (response.status === 500) {
@@ -280,14 +281,7 @@ export function CRAPackage(user_email) {
                         Email It To Me
                     </a>
                     <div className="ml-4" />
-                    <button
-                        type="button"
-                        onClick={downloadPackage}
-                        className="flex justify-center transition delay-50 border border-slate-300 inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        View Package
-                        { downloadLoading ? <BlueLoading show={true} /> : <ArrowRightCircleIcon className = "h-4 w-4 ml-2" /> }
-                    </button>
+                    <SecondaryButton link = "/" text = "View Package" iconRight = {ArrowRightCircleIcon} action = {downloadPackage} loading={downloadLoading} />
                 </div>
             </div>
             { craPackage && <CraPackageModal open = {open} setOpen = {setOpen} craPackage = {craPackage} /> }
@@ -328,7 +322,7 @@ export function CraPackageModal({open, setOpen, craPackage}) {
                         <div className = "mt-4" />
                         <p>In 2022, you donated a total of ${parseFloat(craPackage.total_donated/100).toFixed(2)} across {craPackage.donations.length} donations. Since you live in Ontario, this qualifies you for (an estimated) ${(parseFloat(craPackage.total_eligible_estimate)/100).toFixed(2)} in tax deductions and savings - this isn&apos;t an exact number, and you should consult with your accountant to confirm.</p>
                         <div className="my-1" />
-                        <p>A summary of your donations can be seen below. If you have any questions, don&apos;t hesitate to reach out at <a href="mailto:info@kinshipcanada.com" className="text-blue-600 hover:text-blue-800">info@kinshipcanada.com</a></p>
+                        <p>A summary of your donations can be seen below. If you have any questions, don&apos;t hesitate to reach out at <a href="mailto:info@kinshipcanada.com" className="focus:outline-none text-blue-600 hover:text-blue-800">info@kinshipcanada.com</a></p>
                         <div className="my-4" />
                         <p className="text-md font-semibold text-slate-900">Summary</p>
                         <ul>
@@ -377,13 +371,7 @@ export function CraPackageModal({open, setOpen, craPackage}) {
                             </div>
                         </div>
                         <div className="w-full flex justify-end mt-6">
-                            <button
-                                type="button"
-                                onClick={() => setOpen(false)}
-                                className="flex justify-center transition delay-50 border border-slate-300 inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Close Summary
-                            </button>
+                            <SecondaryButton action={() => setOpen(false)} text="Close Summary" />
                         </div>
                     </div>
                 </Dialog.Panel>
