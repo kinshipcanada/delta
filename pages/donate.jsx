@@ -240,7 +240,7 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
                     }
                 }
 
-                await fetch("/api/frontend/payment-intent", {
+                await fetch("/api/donation/stripe/createPaymentIntent", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ causes: selected_causes, amount: amount*100 }),
@@ -496,7 +496,7 @@ function BillingStep({
         const payment_intent_id = payment_intent_object.paymentIntent.id
 
         // Update the payment intent with the full details
-        const update_payment_intent_response = await fetch('/api/frontend/update_payment_intent', {
+        const update_payment_intent_response = await fetch('/api/donation/stripe/updatePaymentIntent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,5 +1,5 @@
 import { Donation } from "../classes/donation/Donation";
-import { SummaryStatement } from "../classes/utility_classes/summary_statement";
+import { SummaryStatement } from "../classes/utility_classes";
 
 export default function create_summary_statement(donations: Donation[]) : SummaryStatement {
     /**

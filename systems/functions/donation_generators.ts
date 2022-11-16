@@ -1,8 +1,7 @@
-import { fetch_customer_object } from "../../stripe";
-import { Donor } from "../donors/Donor";
-import { donor_details } from "../donors/donor_details";
-import { CountryList } from "../utility_classes/country_list";
-import { Donation } from "./Donation";
+import { fetch_customer_object } from "../helpers/stripe";
+import { Donor } from "../classes/donors/Donor";
+import { donor_details, CountryList } from "../classes/utility_classes";
+import { Donation } from "../classes/donation/Donation";
 
 export async function generate_donation_from_database(donation_object: any) : Promise<Donation> {
     const fetched_donor_from_stripe = await fetch_customer_object(donation_object.stripe_customer_id)

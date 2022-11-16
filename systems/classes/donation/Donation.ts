@@ -1,12 +1,8 @@
 import Stripe from "stripe";
-import { DatabaseDonation, UserFormattedDonation } from "../../database/interfaces";
-import { PaymentMethods } from "../../stripe/enums";
-import { StripeTags } from "../../stripe/interfaces";
+import { PaymentMethods, StripeTags } from "../utility_classes";
 import { Cart } from "../cart/Cart";
 import { Donor } from "../donors/Donor";
-import { CountryList } from "../utility_classes/country_list";
-import { CurrencyList } from "../utility_classes/currency_list";
-import { KinshipPaymentMethod } from "../utility_classes/payment_method";
+import { DatabaseDonation, UserFormattedDonation, CountryList, CurrencyList, KinshipPaymentMethod } from "../utility_classes";
 import { v4 as uuidv4 } from 'uuid';
 
 export class Donation {

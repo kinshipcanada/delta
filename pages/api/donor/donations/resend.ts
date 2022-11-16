@@ -1,5 +1,5 @@
 import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/interfaces";
+import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
 import fetch_donation from "../../../../systems/functions/fetch_donation";
 
 export default async function handler(req, res) {

@@ -1,15 +1,11 @@
 import Stripe from "stripe";
-import { Cart } from "../classes/cart/Cart";
-import { Donation } from "../classes/donation/Donation";
-import { Donor } from "../classes/donors/Donor";
-import { KinshipError } from "../classes/errors/KinshipError";
-import { DeliveryMethod } from "../classes/notifications/delivery_methods";
-import { KinshipNotification } from "../classes/notifications/Notification";
-import { NotificationType } from "../classes/notifications/notification_types";
-import { CountryList } from "../classes/utility_classes/country_list";
-import { kinship_config } from "../config";
-import { PaymentMethods } from "./enums";
-import { raw_stripe_transaction_object, StripeTags } from "./interfaces";
+import { Cart } from "../../classes/cart/Cart";
+import { Donation } from "../../classes/donation/Donation";
+import { Donor } from "../../classes/donors/Donor";
+import { KinshipError } from "../../classes/errors/KinshipError";
+import { DeliveryMethod, CountryList, PaymentMethods, raw_stripe_transaction_object, StripeTags, NotificationType } from "../../classes/utility_classes";
+import { KinshipNotification } from "../../classes/notifications/Notification";
+import { kinship_config } from "../../config";
 const StripeClient = require('stripe');
 const dotenv = require('dotenv')
 dotenv.config();

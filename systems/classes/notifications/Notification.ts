@@ -1,13 +1,9 @@
 import { Donation } from "../donation/Donation";
 import { Donor } from "../donors/Donor";
 import { KinshipEvent } from "../events/KinshipEvent";
-import { EventTypes } from "../events/event_types";
-import { CountryList } from "../utility_classes/country_list";
-import { DeliveryMethod } from "./delivery_methods";
-import { NotificationType } from "./notification_types";
+import { NotificationType, DeliveryMethod, CountryList, EventTypes } from "../utility_classes";
 import { Templates } from "./Templates";
 import { v4 as uuidv4 } from 'uuid';
-import { KinshipError } from "../errors/KinshipError";
 const twilio = require('twilio')
 const postmark = require("postmark");
 

@@ -1,7 +1,6 @@
 import { Donation } from "../donation/Donation";
 import { Donor } from "../donors/Donor";
-import { CountryList } from "../utility_classes/country_list";
-import { NotificationType } from "./notification_types";
+import { CountryList, NotificationType } from "../utility_classes";
 
 export interface NotificationTemplate {
     email_subject: string;

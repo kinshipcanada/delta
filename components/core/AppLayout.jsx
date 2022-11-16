@@ -209,7 +209,7 @@ export function UserSetup({ setUserConfigured }) {
       }
     }
 
-    const response = await fetchPostJSON('/api/frontend/setup', {
+    const response = await fetchPostJSON('/api/donor/profile/create', {
       user: user_stripe_profile,
     });
   

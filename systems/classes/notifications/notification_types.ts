@@ -1,8 +1,0 @@
-export const enum NotificationType {
-    PROOF_AVAILABLE,
-    DONATION_MADE,
-    REFUND_PROCESSING,
-    REFUND_ISSUED,
-    REPORT_GENERATED,
-    DONATION_SENT
-}

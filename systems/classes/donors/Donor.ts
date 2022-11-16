@@ -1,5 +1,4 @@
-import { CountryList } from "../utility_classes/country_list";
-import { donor_details } from "./donor_details";
+import { CountryList, donor_details } from "../utility_classes";
 
 export class Donor {
 

@@ -1,4 +1,4 @@
-import { EventTypes } from "./event_types";
+import { EventTypes } from "../utility_classes";
 
 /**
  * Base event classes. All events must adhere to this

@@ -1,5 +1,5 @@
-import { KinshipError } from "../classes/errors/KinshipError";
-import { DatabaseDonation } from "./interfaces";
+import { KinshipError } from "../../classes/errors/KinshipError";
+import { DatabaseDonation } from "../../classes/utility_classes"
 
 require('dotenv').config();
 

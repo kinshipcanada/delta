@@ -1,8 +1,7 @@
 import { Donor } from "../../../../systems/classes/donors/Donor";
 import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationSummaryResponse, SimpleMessageResponse } from "../../../../systems/classes/interfaces";
+import { DonationSummaryResponse, SimpleMessageResponse, NotificationType } from "../../../../systems/classes/utility_classes";
 import { KinshipNotification } from "../../../../systems/classes/notifications/Notification";
-import { NotificationType } from "../../../../systems/classes/notifications/notification_types";
 import create_summary_statement from "../../../../systems/functions/create_summary_statement";
 import fetch_donations_from_params from "../../../../systems/functions/fetch_donations_from_params";
 

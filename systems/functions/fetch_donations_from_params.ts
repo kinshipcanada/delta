@@ -1,8 +1,7 @@
 import { Donation } from "../classes/donation/Donation";
-import { generate_donation_from_database } from "../classes/donation/donation_generators";
-import { CountryList } from "../classes/utility_classes/country_list";
-import { fetch_receipts_from_database, fetch_receipt_from_database } from "../database";
-import { DatabaseDonation } from "../database/interfaces";
+import { generate_donation_from_database } from "./donation_generators";
+import { fetch_receipts_from_database, fetch_receipt_from_database } from "../helpers/database";
+import { DatabaseDonation, CountryList } from "../classes/utility_classes";
 
 export default async function fetch_donations_from_params(
     format_for_user: boolean = false,

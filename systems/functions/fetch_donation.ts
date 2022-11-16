@@ -1,10 +1,10 @@
 import { Donation } from "../classes/donation/Donation";
 import { KinshipError } from "../classes/errors/KinshipError";
-import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../stripe";
-import { StripeTags } from "../stripe/interfaces";
+import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../helpers/stripe";
+import { StripeTags } from "../classes/utility_classes";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
-import { fetch_receipt_from_database, upload_donation_to_database } from "../database";
-import { generate_donation_from_database } from "../classes/donation/donation_generators";
+import { fetch_receipt_from_database } from "../helpers/database";
+import { generate_donation_from_database } from "./donation_generators";
 
 export default async function fetch_donation( donation_id : string ) : Promise<Donation> {
     

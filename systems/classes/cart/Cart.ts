@@ -1,6 +1,4 @@
-import { AmountForRegion, Cause } from "../utility_classes/interfaces"
-import { RegionList } from "../utility_classes/region_list"
-import { CartInterface } from "./CartInterface"
+import { AmountForRegion, Cause, RegionList, CartInterface } from "../utility_classes"
 
 export interface BreakdownByRegion {
     total_amount_in_cents_for_region: number,

@@ -1,5 +1,5 @@
 import { KinshipEvent } from "../events/KinshipEvent";
-import { EventTypes } from "../events/event_types";
+import { EventTypes } from "../utility_classes";
 import { v4 as uuidv4 } from 'uuid';
 
 export class KinshipError extends KinshipEvent {
