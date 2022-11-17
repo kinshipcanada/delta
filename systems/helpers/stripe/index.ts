@@ -37,10 +37,9 @@ export async function fetch_specific_payment_method(payment_method_id: string) :
     return stripe_client.paymentMethods.retrieve(payment_method_id) as Promise<Stripe.PaymentMethod>
 }
 
-export async function fetch_payment_methods(stripe_customer_id: string, payment_method_type: PaymentMethods = PaymentMethods.CARD) {
-    return stripe_client.stripe.paymentMethods.retrieve(
+export async function fetch_payment_methods(stripe_customer_id: string) {
+    return stripe_client.paymentMethods.list(
         stripe_customer_id,
-        { type: payment_method_type }
     )
 }
 

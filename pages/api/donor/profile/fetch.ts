@@ -1,22 +1,22 @@
 import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
-import fetch_donation from "../../../../systems/functions/fetch_donation";
+import { DonorResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
+import fetch_donor from "../../../../systems/functions/fetch_donor";
 
 export default async function handler(req, res) {
-    const donation_id = req.body.donation_id
+    const user_id = req.body.user_id
 
     try {
-        fetch_donation(donation_id).then((donation_object)=>{
-            const successful_response: DonationResponse = {
+        fetch_donor(user_id).then((donor_object)=>{
+            const successful_response: DonorResponse = {
                 status: 200,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                donation: donation_object
+                endpoint_called: `/donor/profile/fetch`,
+                donor: donor_object
             }
             return res.status(200).send(successful_response);
         }).catch((error)=>{
             const error_response: SimpleMessageResponse = {
                 status: 500,
-                endpoint_called: `/backend/donation/${donation_id}`,
+                endpoint_called: `/donor/profile/fetch`,
                 message: error.message
             }
             return res.status(500).send(error_response);

@@ -4,7 +4,11 @@ import { Stripe } from "stripe"
 export interface KinshipPaymentMethod {
     type: PaymentMethods,
     card_brand?: string,
-    checks: {
+    card_last_four?: string,
+    card_exp_month?: number,
+    card_exp_year?: number,
+    created_at?: Date,
+    checks?: {
         address_line1_check_passed: boolean,
         address_postal_code_check_passed: boolean,
         cvc_check_passed: boolean
@@ -28,7 +32,8 @@ export interface donor_details {
         city: string,
         state: string,
         country: CountryList,
-    }
+    },
+    payment_methods?: any[],
 }
 
 export interface CartInterface {
@@ -109,6 +114,10 @@ export interface BaseApiResponse {
 
 export interface SimpleMessageResponse extends BaseApiResponse {
     message: string
+}
+
+export interface DonorResponse extends BaseApiResponse {
+    donor: donor_details
 }
 
 export interface DonationResponse extends BaseApiResponse {

@@ -32,6 +32,15 @@ export function fetch_receipt_from_database(donation_id?: string, stripe_charge_
     }
 }
 
+export function fetch_donor_from_database(donor_id: string) : Promise<any> {
+    try {
+        return database('donor_profiles').where('id', donor_id)
+    } catch (error) {
+        new KinshipError(`Error fetching donor from database: ${error.message}`, "/src/database/index", "fetch_donor_from_database")
+        return
+    }
+}
+
 export async function fetch_receipts_from_database(user_email: string) : Promise<any> {
     try {
         // We currently fetch all donations by email, which is why we require email verification
