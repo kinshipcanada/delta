@@ -94,9 +94,12 @@ export default function Index() {
                                 <p className="mt-1 text-sm text-gray-500">You can also <Link href = "/support"><a href = "#" className="text-blue-600">get support here</a></Link>.</p>
                             </div>
 
-                            : donations.map((donation) => (
-                                <Receipt key={donation.id} donation={donation} />
-                            ))
+                            : 
+                            <div className="space-y-4">
+                                {donations.map((donation) => (
+                                    <Receipt key={donation.id} donation={donation} />
+                                ))}
+                            </div>
                         }
                     </ul>
                 </div>
@@ -155,7 +158,7 @@ function Receipt({ donation }) {
                     </div>
                     <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2)}</dd>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
                     </div>
                     {donation.proof_available == true ?
                     

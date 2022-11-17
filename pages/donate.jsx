@@ -100,7 +100,7 @@ export default function Donate() {
                     <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
                     <dl>
                         <dt className="text-sm font-medium">Your Donation</dt>
-                        <dd className="mt-1 text-3xl font-bold tracking-tight text-white">{ amount ? <>${amount}</> : "$0.00" }</dd>
+                        <dd className="mt-1 text-3xl font-bold tracking-tight text-white">{ amount ? <>${amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</> : "$0.00" }</dd>
                         <dd className="flex text-white text-base font-medium my-4">Donating:
                         <p className="text-blue-300 flex">
                             {selected_causes.map((cause, cause_index)=>(<p key={cause.name}>{cause_index === 0 ? <span className="ml-2">{cause.name}</span> : <span>, {cause.name}</span> }</p>))}

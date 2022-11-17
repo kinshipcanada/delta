@@ -2,7 +2,6 @@ import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
 export default function About() {
 
@@ -30,7 +29,7 @@ export default function About() {
     
     const features = [
         {
-        name: <p className = 'flex items-center' >Download Tax Receipts<span><QuestionMarkCircleIcon className = 'ml-2 w-5 h-5' data-tip="We are considering adding support for US tax receipts. If this is something you are interested in, please let us know."/></span></p>,
+        name: 'Download Tax Receipts',
         description: <>Download CRA-Eligible tax receipts in our dashboard.</>,
         },
         { name: 'Proof Of Donation', description: <>Kinship aims to provide proof of your donations where possible, including through pictures and receipts.</> },
