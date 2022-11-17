@@ -2,7 +2,6 @@ import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { PrimaryButton } from "../../components/core/Buttons";
 
 export default function Feedback() {

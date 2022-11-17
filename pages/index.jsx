@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { ArrowRightIcon } from "@heroicons/react/20/solid"
 import { PrimaryButton, SecondaryButton } from '../components/core/Buttons';
 import {
@@ -10,10 +9,6 @@ import {
   UserGroupIcon,
 } from '@heroicons/react/24/outline'
 import * as React from "react";
-
-import { Fragment } from 'react'
-import { Popover, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;

@@ -3,8 +3,7 @@ import { useState, useRef, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
-import Head from 'next/head'
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
 
 export default function Register() {
 

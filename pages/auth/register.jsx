@@ -2,7 +2,6 @@ import { supabase } from '../../systems/helpers/supabaseClient'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import Head from 'next/head'
 
 export default function Register() {
 

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import TextInput from "../../components/core/TextInput";
-import SectionHeader from "../../components/app/SectionHeader";
 import { SecondaryButton } from "../../components/core/Buttons";
 
 export default function Index() {

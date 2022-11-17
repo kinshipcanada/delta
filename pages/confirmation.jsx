@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import Loading, { LargeLoading } from "../components/core/Loading";
+import { LargeLoading } from "../components/core/Loading";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
