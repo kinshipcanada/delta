@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class Donation {
 
     donation_id: string;
+    livemode: boolean;
 
     donor: Donor;
 
@@ -34,6 +35,7 @@ export class Donation {
 
     constructor ( 
         donor: Donor,
+        livemode: boolean,
         created_at: Date,
         amount_in_cents: number,
         native_currency: CountryList,
@@ -48,6 +50,7 @@ export class Donation {
         proof_available?: boolean,
     ) {
         this.donation_id = new uuidv4()
+        this.livemode = livemode
         this.donor = donor;
         this.created_at = created_at;
         this.amount_in_cents = amount_in_cents;
@@ -139,7 +142,8 @@ export class Donation {
             address_postal_code: this.donor.address.postal_code,
             address_city: this.donor.address.city,
             address_state: this.donor.address.state,
-            proof_available: this.proof_available
+            proof_available: this.proof_available,
+            livemode: this.livemode
         }
 
         return formatted_donation

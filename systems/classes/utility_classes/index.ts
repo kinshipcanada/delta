@@ -207,7 +207,8 @@ export interface UserFormattedDonation {
     address_postal_code: string,
     address_city: string,
     address_state: string,
-    proof_available: boolean
+    proof_available: boolean,
+    livemode: boolean,
 }
 
 export const enum PaymentMethods {

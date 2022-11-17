@@ -543,6 +543,7 @@ function BillingStep({
 
     return (
         <div>
+            { !first_name ? <p className="text-sm text-slate-600 font-regular mb-4">You can also <a className="text-blue-600" href = "/auth/register">log in</a> and have all your information pre-filled, so that all you have to do is click donate.</p> : null }
             {/** Contact Info Section */}
             <section>
               <SectionHeader text = "Your Information" />
@@ -692,10 +693,6 @@ function BillingStep({
                     </Tab.List>
                     <Tab.Panels className="flex col-span-full">
                         <Tab.Panel className="w-full col-span-full focus:outline-none">
-                            <span className="mb-4 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-sm font-medium text-yellow-800">
-                                <InformationCircleIcon className="w-5 h-5" />
-                                <span className="ml-2">You are on test mode - your card won&apos;t be charged.</span>
-                            </span>
                             {stripeOptions.clientSecret && (
                                 <div>
                                     <PaymentElement id="payment-element" />
@@ -721,10 +718,6 @@ function BillingStep({
                         <Tab.Panel className="focus:outline-none">
                             <div className="w-full">
                                 <div>
-                                    <span className="mb-4 inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-sm font-medium text-yellow-800">
-                                        <InformationCircleIcon className="w-5 h-5" />
-                                        <span className="ml-2">You are on test mode - your card won&apos;t be charged.</span>
-                                    </span>
                                     <p className="text-sm font-slate-600">Kinship accepts eTransfer donations. Click initiate donation, and you will receive instructions on where to send funds as well as details required.</p>
                                 </div>
                                 <div className="mt-10 flex border-t border-gray-200 pt-6 justify-between items-center">

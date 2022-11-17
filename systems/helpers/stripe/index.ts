@@ -10,7 +10,7 @@ const StripeClient = require('stripe');
 const dotenv = require('dotenv')
 dotenv.config();
 
-const stripe_client = StripeClient(kinship_config.PRODUCTION_MODE ? process.env.STRIPE_LIVE_API_KEY : process.env.STRIPE_TEST_API_KEY)
+const stripe_client = StripeClient(process.env.STRIPE_SECRET_KEY);
 
 /**
  * 
@@ -152,6 +152,7 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
     
     const donation = new Donation(
         donor, 
+        stripe_data.charge_object.livemode,
         new Date(stripe_data.charge_object.created * 1000),
         amount_in_cents, 
         native_currency,

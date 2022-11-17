@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
         const response: SimpleMessageResponse = {
             status: 200,
-            endpoint_called: `/backend/admin/resend`,
+            endpoint_called: `/api/admin/resend`,
             message: resend_response.already_existed ? `Receipt already existed, resent to ${resend_response.donation.donor.email}` : "Receipt generated and sent"
         }
 
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     } catch (e) {
         res.status(500).send({
             status: 500,
-            endpoint_called: `/backend/admin/resend`,
+            endpoint_called: `/api/admin/resend`,
             message: e.message
         });
     }

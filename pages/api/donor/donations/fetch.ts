@@ -13,6 +13,7 @@ export default async function handler(req, res) {
                 endpoint_called: `/donor/donations/fetch`,
                 donations: donations
             }
+
             return res.status(200).send(successful_response);
         }).catch((error)=>{
             const error_response: SimpleMessageResponse = {

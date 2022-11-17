@@ -134,9 +134,21 @@ function Receipt({ donation }) {
                 <div className="px-4 py-5 sm:px-6 flex justify-between">
                     <div>
                         <h3 className="text-lg font-medium leading-6 text-gray-900">{donation.donation_created}</h3>
-                        <p className="mt-1 max-w-2xl text-sm text-gray-500">You donated {(parseFloat(donation.amount_in_cents)/100).toFixed(2)} on {donation.donation_created} using Visa ending in 4242</p>
+                        <p className="mt-1 max-w-2xl text-sm text-gray-500">You donated {(parseFloat(donation.amount_in_cents)/100).toFixed(2)} on {donation.donation_created}</p>
                     </div>
-                    <div>
+                    <div className="flex items-center">
+                        {donation.livemode == false ?
+                        
+                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-0.5 text-sm font-medium text-yellow-800">
+                            <svg className="-ml-1 mr-1.5 h-2 w-2 text-yellow-600" fill="currentColor" viewBox="0 0 8 8">
+                            <circle cx={4} cy={4} r={3} />
+                            </svg>
+                            Test Donation
+                        </span>
+                        
+                        : null
+                        }
+                        <div className="m-2" />
                         {donation.address_country == "ca" ?
                         
                         <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">

@@ -20,14 +20,14 @@ export default async function handler(req, res) {
             fetch_donation(donation_id).then((donation_object)=>{
                 const successful_response: DonationResponse = {
                     status: 200,
-                    endpoint_called: `/backend/donation/${donation_id}`,
+                    endpoint_called: `/donation/fetch`,
                     donation: donation_object
                 }
                 return res.status(200).send(successful_response);
             }).catch((error)=>{
                 const error_response: SimpleMessageResponse = {
                     status: 500,
-                    endpoint_called: `/backend/donation/${donation_id}`,
+                    endpoint_called: `/donation/fetch`,
                     message: error.message
                 }
                 return res.status(500).send(error_response);
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
             }).catch((error)=>{
                 const error_response: SimpleMessageResponse = {
                     status: 500,
-                    endpoint_called: `/backend/donation/${donation_id}`,
+                    endpoint_called: `/donation/fetch`,
                     message: error.message
                 }
                 return res.status(500).send(error_response);
