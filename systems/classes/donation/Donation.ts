@@ -48,8 +48,9 @@ export class Donation {
         stripe_balance_transaction_id?: string,
         stripe_customer_id?: string,
         proof_available?: boolean,
+        donation_id?: string,
     ) {
-        this.donation_id = new uuidv4()
+        this.donation_id = donation_id ? donation_id : new uuidv4()
         this.livemode = livemode
         this.donor = donor;
         this.created_at = created_at;

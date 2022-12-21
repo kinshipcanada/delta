@@ -66,7 +66,7 @@ export default function Navigation() {
                 <div className="hidden md:flex-1 md:flex md:items-center md:justify-between">
                     <Popover.Group as="nav" className="flex space-x-10">
                         {pages.map((page)=>(
-                          <MenuLink text={page.name} link={page.link} current={page.current} />
+                          <MenuLink key={page.name} text={page.name} link={page.link} current={page.current} />
                         ))}
                         <Support />
                     </Popover.Group>

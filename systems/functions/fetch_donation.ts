@@ -3,7 +3,7 @@ import { KinshipError } from "../classes/errors/KinshipError";
 import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../helpers/stripe";
 import { StripeTags } from "../classes/utility_classes";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
-import { fetch_receipt_from_database } from "../helpers/database";
+import { fetch_receipts_from_database, fetch_receipt_from_database } from "../helpers/database";
 import { generate_donation_from_database } from "./donation_generators";
 
 export default async function fetch_donation( donation_id : string ) : Promise<Donation> {
@@ -29,7 +29,7 @@ export default async function fetch_donation( donation_id : string ) : Promise<D
 
         } catch (error) {
             new KinshipError(error, "/api/functions/fetch_donation", "fetch_donation")
-            throw new Error("Invalid payment intent id")
+            throw new Error("An error went wrong fetching your donation")
         }
 
     } else if (donation_id.substring(0, 3) == "ch_") {
@@ -58,7 +58,10 @@ export default async function fetch_donation( donation_id : string ) : Promise<D
             new KinshipError(`${donation_id} is not a valid donation_id uuid`, "/api/functions/fetch_donation", "fetch_donation")
             throw new Error(`${donation_id} is not a valid donation id`)
         } else {
-            return null
+            const donations_from_database = await fetch_receipt_from_database(donation_id)
+            const donation = await generate_donation_from_database(donations_from_database[0])
+
+            return donation
         }
     }
     
