@@ -1,4 +1,5 @@
 import { EventTypes } from "../utility_classes";
+import { log } from 'next-axiom';
 
 /**
  * Base event classes. All events must adhere to this
@@ -13,6 +14,6 @@ export class KinshipEvent {
     }
 
     log_event(custom_data) {
-        console.log(`logged; ${custom_data}`)
+        log.info(custom_data)
     }
 }
