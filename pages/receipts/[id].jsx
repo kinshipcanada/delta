@@ -69,7 +69,7 @@ export default function Receipt() {
             return (
                 <div className = 'w-screen h-screen sm:p-12 p-8'>
                     <Head>
-                        <title>{receipt.name}&apos;s tax receipt</title>
+                        <title>{receipt.donor.first_name}&apos;s tax receipt</title>
                     </Head>
                     <div className="md:flex md:items-center md:justify-between flex">
                         <div className="flex-1 min-w-0">
