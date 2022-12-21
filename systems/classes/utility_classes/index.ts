@@ -165,30 +165,32 @@ export interface DonorAddress {
 }
 
 export interface DatabaseDonation {
-    donation_created: string,
-    donor: string | null,
-    email: string,
-    phone_number: number,
-    amount_in_cents: number,
-    native_currency: CurrencyList,
-    fees_covered: number,
-    fees_charged_by_stripe: number,
-    transaction_successful: boolean,
-    transaction_refunded: boolean,
-    payment_method: KinshipPaymentMethod,
-    donation_causes: CartInterface,
-    stripe_payment_intent_id: string,
-    stripe_charge_id: string,
-    stripe_balance_transaction_id: string,
-    stripe_customer_id: string,
-    address_line_address: DonorAddress["line_address"],
-    address_country: DonorAddress["country"],
-    address_postal_code: DonorAddress["postal_code"],
-    address_city: DonorAddress["city"],
-    address_state: DonorAddress["state"]
+    donation_created?: string,
+    donor?: string | null,
+    email?: string,
+    phone_number?: number,
+    amount_in_cents?: number,
+    native_currency?: CurrencyList,
+    fees_covered?: number,
+    fees_charged_by_stripe?: number,
+    transaction_successful?: boolean,
+    transaction_refunded?: boolean,
+    payment_method?: KinshipPaymentMethod,
+    donation_causes?: CartInterface,
+    stripe_payment_intent_id?: string,
+    stripe_charge_id?: string,
+    stripe_balance_transaction_id?: string,
+    stripe_customer_id?: string,
+    livemode?: boolean,
+    address_line_address?: DonorAddress["line_address"],
+    address_country?: DonorAddress["country"],
+    address_postal_code?: DonorAddress["postal_code"],
+    address_city?: DonorAddress["city"],
+    address_state?: DonorAddress["state"]
 }
 
 export interface UserFormattedDonation {
+    id: string,
     donation_created: string,
     // Update this
     donor: string | null,
@@ -218,7 +220,6 @@ export const enum PaymentMethods {
     CUSTOMER_BALANCE = 'customer_balance'
 }
 
-
 /**
  * @section interfaces: these form templates for responses from stripe
  */
@@ -237,4 +238,10 @@ export interface raw_stripe_transaction_object {
     balance_transaction_object: Stripe.BalanceTransaction,
     customer: Stripe.Customer,
     payment_method: Stripe.PaymentMethod
+}
+
+export interface DonationIdentifiers {
+    payment_intent_id?: string,
+    charge_id?: string,
+    kinship_donation_id?: string
 }

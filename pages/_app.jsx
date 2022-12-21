@@ -11,3 +11,5 @@ export default function App({ Component, pageProps }) {
     </Layout>
   );
 }
+
+export { reportWebVitals } from 'next-axiom';

@@ -1,6 +1,6 @@
 import { KinshipError } from "../../../systems/classes/errors/KinshipError";
 import { DonationResponse, BatchedDonationResponse, SimpleMessageResponse } from "../../../systems/classes/utility_classes";
-import fetch_donation from "../../../systems/functions/fetch_donation";
+import fetch_donation from "../../../systems/methods/fetch_donation";
 
 export default async function handler(req, res) {
     const donation_id = req.body.donation_id

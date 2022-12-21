@@ -71,13 +71,6 @@ export class Donation {
         this.proof_available = proof_available ? proof_available : false
     }
 
-    async store_donation() {
-        /**
-         * logs donation in database
-         */
-        return null
-    }
-
     format_donation_for_upload() : DatabaseDonation {
 
         const kinship_formatted_payment_method: KinshipPaymentMethod = {
@@ -125,6 +118,7 @@ export class Donation {
 
     format_donation_for_user() : UserFormattedDonation {
         const formatted_donation: UserFormattedDonation = {
+            id: this.donation_id,
             donation_created: this.created_at.toDateString(),
             // Update this
             donor: this.donor.donor_id,

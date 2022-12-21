@@ -1,4 +1,4 @@
-import create_donation from "../../../systems/functions/create_donation";
+import create_donation from "../../../systems/methods/create_donation";
 
 export default async function handler(req, res) {
     try {

@@ -31,8 +31,9 @@ export default function Index() {
             return;
         }
     
-        if (response.status == 200) {
-            console.log(donations)
+        if (199 < response.status && response.status < 300) {
+            console.log("donations")
+            console.log(response.donations)
             setDonations(response.donations)
             return;
         }

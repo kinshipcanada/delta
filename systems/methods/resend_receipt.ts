@@ -2,7 +2,7 @@ import { Donation } from "../classes/donation/Donation";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
 import { KinshipError } from "../classes/errors/KinshipError";
 import { fetch_receipt_from_database, upload_donation_to_database } from "../helpers/database";
-import { generate_donation_from_database } from "./donation_generators";
+import { _format_donation_from_database } from "../functions/donations";
 import { KinshipNotification } from "../classes/notifications/Notification";
 import { NotificationType, DeliveryMethod } from "../classes/utility_classes";
 import { StripeTags } from "../classes/utility_classes";
@@ -12,11 +12,11 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
 
     if (donation_id.substring(0, 3) == "ch_") {
         // Check if the charge ID has already been logged to database
-        const donation_from_database = await fetch_receipt_from_database(null, donation_id, null)
+        const donation_from_database = await fetch_receipt_from_database({ charge_id: donation_id })
 
         if (donation_from_database.length > 0) {
             // If it has, send the receipt email and return the donation object
-            const donation = await generate_donation_from_database(donation_from_database[0])
+            const donation = await _format_donation_from_database(donation_from_database[0])
             const notification =  new KinshipNotification(NotificationType.DONATION_MADE, donation, donation.donor)
             await notification.send(DeliveryMethod.EMAIL)
             
@@ -45,11 +45,11 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
 
     } else if (donation_id.substring(0, 3) == "pi_") {
         // Check if the payment intent ID has already been logged to database
-        const donation_from_database = await fetch_receipt_from_database(null, null, donation_id)
+        const donation_from_database = await fetch_receipt_from_database({ payment_intent_id: donation_id })
 
         if (donation_from_database.length > 0) {
             // If it has, send the receipt email and return the donation object
-            const donation = await generate_donation_from_database(donation_from_database[0])
+            const donation = await _format_donation_from_database(donation_from_database[0])
             const notification =  new KinshipNotification(NotificationType.DONATION_MADE, donation, donation.donor)
             await notification.send(DeliveryMethod.EMAIL)
             
@@ -77,11 +77,11 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
         }
 
     } else if (verify_uuid(donation_id)) {
-        const donation_from_database = await fetch_receipt_from_database(donation_id)
+        const donation_from_database = await fetch_receipt_from_database({ kinship_donation_id: donation_id })
 
         if (donation_from_database.length > 0) {
             // If it has, send the receipt email and return the donation object
-            const donation = await generate_donation_from_database(donation_from_database[0])
+            const donation = await _format_donation_from_database(donation_from_database[0])
             const notification =  new KinshipNotification(NotificationType.DONATION_MADE, donation, donation.donor)
             await notification.send(DeliveryMethod.EMAIL)
             
@@ -90,10 +90,10 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
                 already_existed: true
             }
         } else {
-            new KinshipError(`${donation_id} is not a valid donation_id uuid`, "/api/functions/resend_receipt", "resend_receipt")
+            new KinshipError(`${donation_id} is not a valid donation_id uuid`, "/api/methods/resend_receipt", "resend_receipt")
         }
     } else {
-        throw new KinshipError(`${donation_id} is not a valid donation_id uuid`, "/api/functions/resend_receipt", "resend_receipt")
+        throw new KinshipError(`${donation_id} is not a valid donation_id uuid`, "/api/methods/resend_receipt", "resend_receipt")
     }
 
 }

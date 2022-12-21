@@ -49,7 +49,7 @@ export default async function fetch_donor(donor_id) : Promise<donor_details> {
 
         return donor_details
     } catch (error) {
-        new KinshipError(error, "/api/functions/fetch_donor", "fetch_donor")
+        new KinshipError(error, "/api/methods/fetch_donor", "fetch_donor")
         throw new Error("Error fetching donor details")
     }
 }

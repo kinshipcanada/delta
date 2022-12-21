@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { SecondaryButton } from "../../components/core/Buttons";
 import { DocumentIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import Loading from "../../components/core/Loading";
 
 export default function Receipt() {
     const [loading, setLoading] = useState(true)
@@ -41,10 +42,7 @@ export default function Receipt() {
     if (loading) {
         return (
             <div className = 'w-screen h-screen flex items-center justify-center'>
-                <svg className="animate-spin h-5 w-5 text-blue-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-		            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-		            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-		        </svg>
+                <Loading color={"BLUE"} />
             </div>
         )
     } else {
@@ -69,7 +67,7 @@ export default function Receipt() {
             )
         } else {
             return (
-                <div className = 'w-screen h-screen bg-gray-50 sm:p-12 p-8'>
+                <div className = 'w-screen h-screen sm:p-12 p-8'>
                     <Head>
                         <title>{receipt.name}&apos;s tax receipt</title>
                     </Head>
@@ -99,7 +97,7 @@ export default function Receipt() {
                         <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your CRA-Eligible Tax Receipt. You donated a total amount of ${(receipt.amount_in_cents/100).toFixed(2)} CAD.</p>
                         <span className = 'flex mb-1'>
                             <p  className="font-bold text-gray-800  mr-1">Kinship Receipt ID:</p> 
-                            <p className="font-medium text-gray-800">{receipt.id}</p>
+                            <p className="font-medium text-gray-800">{receipt.donation_id}</p>
                         </span>
                         <span className = 'flex mb-1'>
                             <p  className="font-bold text-gray-800 mr-1">Location Issued: </p>
