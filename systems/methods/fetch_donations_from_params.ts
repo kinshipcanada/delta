@@ -1,6 +1,5 @@
-import { Donation } from "../classes/donation/Donation";
 import { _format_donation_from_database } from "../functions/donations";
-import { fetch_receipts_from_database, fetch_receipt_from_database } from "../helpers/database";
+import { fetch_receipts_from_database } from "../functions/database";
 import { DatabaseDonation } from "../classes/utility_classes";
 
 export default async function fetch_donations_from_params(

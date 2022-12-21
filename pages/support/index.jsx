@@ -1,5 +1,5 @@
 import { supabase } from '../../systems/helpers/supabaseClient';
-import { fetchPostJSON } from '../../systems/helpers/apiHelpers';
+import { fetchPostJSON } from '../../systems/functions/helpers';
 import { useState } from 'react';
 import Head from 'next/head'
 

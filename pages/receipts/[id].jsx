@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
+import { fetchPostJSON } from "../../systems/functions/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { SecondaryButton } from "../../components/core/Buttons";

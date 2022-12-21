@@ -1,7 +1,7 @@
 import { KinshipError } from "../classes/errors/KinshipError";
 import { donor_details, KinshipPaymentMethod, PaymentMethods } from "../classes/utility_classes";
-import { fetch_donor_from_database } from "../helpers/database";
-import { fetch_payment_methods, fetch_specific_payment_method } from "../helpers/stripe";
+import { fetch_donor_from_database } from "../functions/database";
+import { fetch_specific_payment_method } from "../functions/stripe";
 
 export default async function fetch_donor(donor_id) : Promise<donor_details> {
     try { 

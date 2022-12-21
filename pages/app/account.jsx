@@ -4,7 +4,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import TextInput from "../../components/core/TextInput";
 import { SecondaryButton } from "../../components/core/Buttons";
-import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
+import { fetchPostJSON } from "../../systems/functions/helpers";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 export default function Index() {

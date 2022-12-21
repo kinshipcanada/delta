@@ -4,7 +4,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import { ArrowDownCircleIcon, PaperClipIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
-import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
+import { fetchPostJSON } from "../../systems/functions/helpers";
 import { BlueLoading } from "../../components/core/Loaders";
 import ReactTooltip from "react-tooltip";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";

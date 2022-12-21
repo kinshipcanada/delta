@@ -1,12 +1,12 @@
 import { Donation } from "../classes/donation/Donation";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
 import { KinshipError } from "../classes/errors/KinshipError";
-import { fetch_receipt_from_database, upload_donation_to_database } from "../helpers/database";
+import { fetch_receipt_from_database, upload_donation_to_database } from "../functions/database";
 import { _format_donation_from_database } from "../functions/donations";
 import { KinshipNotification } from "../classes/notifications/Notification";
 import { NotificationType, DeliveryMethod } from "../classes/utility_classes";
 import { StripeTags } from "../classes/utility_classes";
-import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../helpers/stripe";
+import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../functions/stripe";
 
 export default async function check_and_resend_receipt( donation_id: string ) : Promise<ResendReceiptResponse> {
 

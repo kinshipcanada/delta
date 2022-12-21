@@ -3,7 +3,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
-import { fetchPostJSON } from "../../systems/helpers/apiHelpers";
+import { fetchPostJSON } from "../../systems/functions/helpers";
 
 export default function Index() {
 

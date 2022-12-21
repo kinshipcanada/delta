@@ -1,11 +1,8 @@
 import { Donation } from "../classes/donation/Donation";
 import { KinshipError } from "../classes/errors/KinshipError";
-import { build_donation_from_raw_stripe_data, fetch_donation_from_stripe } from "../helpers/stripe";
-import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
-import { upload_donation_to_database } from "../helpers/database";
-import { KinshipNotification } from "../classes/notifications/Notification";
-import { NotificationType, DeliveryMethod, StripeTags, DonationIdentifiers } from "../classes/utility_classes";
+import { DonationIdentifiers, NotificationType } from "../classes/utility_classes";
 import { _create_donation_from_identifier } from "../functions/donations";
+import { notify_about_donation } from "../functions/notifications";
 
 const FILE_NAME = "/systems/methods/create_donation";
 
@@ -24,7 +21,11 @@ export default async function create_donation( donation_id?: string, params?: an
             identifiers.payment_intent_id = donation_id
         }
 
-        return _create_donation_from_identifier(identifiers)
+        const donation = await _create_donation_from_identifier(identifiers)
+        await notify_about_donation(donation, NotificationType.DONATION_MADE)
+
+        return donation
+
     } else if (params) {
         return null
     }

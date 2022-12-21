@@ -1,11 +1,10 @@
-import { CountryList, DatabaseDonation, DonationIdentifiers, donor_details } from "../classes/utility_classes";
+import { CountryList, DonationIdentifiers, donor_details } from "../classes/utility_classes";
 import { Donation } from "../classes/donation/Donation";
 import { KinshipError } from "../classes/errors/KinshipError";
-import { build_donation_from_raw_stripe_data, fetch_customer_object, fetch_donation_from_stripe } from "../helpers/stripe";
+import { build_donation_from_raw_stripe_data, fetch_customer_object, fetch_donation_from_stripe } from "./stripe";
 import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
-import { upload_donation_to_database } from "../helpers/database";
+import { upload_donation_to_database, fetch_receipt_from_database } from "./database";
 import { StripeTags } from "../classes/utility_classes";
-import { fetch_receipt_from_database } from "../helpers/database";
 import { Donor } from "../classes/donors/Donor";
 
 const FILE_NAME = "/systems/functions/donations";

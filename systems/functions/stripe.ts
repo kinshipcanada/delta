@@ -1,11 +1,11 @@
 import Stripe from "stripe";
-import { Cart } from "../../classes/cart/Cart";
-import { Donation } from "../../classes/donation/Donation";
-import { Donor } from "../../classes/donors/Donor";
-import { KinshipError } from "../../classes/errors/KinshipError";
-import { DeliveryMethod, CountryList, PaymentMethods, raw_stripe_transaction_object, StripeTags, NotificationType } from "../../classes/utility_classes";
-import { KinshipNotification } from "../../classes/notifications/Notification";
-import { kinship_config } from "../../config";
+import { Cart } from "../classes/cart/Cart";
+import { Donation } from "../classes/donation/Donation";
+import { Donor } from "../classes/donors/Donor";
+import { KinshipError } from "../classes/errors/KinshipError";
+import { DeliveryMethod, CountryList, raw_stripe_transaction_object, StripeTags, NotificationType } from "../classes/utility_classes";
+import { KinshipNotification } from "../classes/notifications/Notification";
+
 const StripeClient = require('stripe');
 const dotenv = require('dotenv')
 dotenv.config();
@@ -221,19 +221,4 @@ export async function refund_payment(donation: Donation, delivery_method: Delive
         new KinshipError(`Error refunding payment: ${error}`, "/src/stripe/index", "update_charge_metadata", true)
         return null
     }
-}
-
-/**
- * @section functions to create data on Stripe
- */
-
-export async function create_stripe_customer(auth_0_user: any) {
-    return stripe_client.customers.create({
-        description: "Customer ID created on signup by Kinship API",
-        email: auth_0_user.email,
-        metadata: {
-            user_id: auth_0_user.user_id,
-            email: auth_0_user.email
-        }
-    })
 }
