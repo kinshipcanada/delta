@@ -36,7 +36,7 @@ export default function Donate() {
     const [email, set_email] = useState(null)
     const [address, set_address] = useState(null)
     const [suite, set_suite] = useState(null)
-    const [country, set_country] = useState(countries[0])
+    const [country, set_country] = useState("ca")
     const [city, set_city] = useState(null)
     const [state_or_province, set_state_or_province] = useState(canadian_states[6].name)
     const [postal_code, set_postal_code] = useState(null)
@@ -582,7 +582,8 @@ function BillingStep({
                       className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                       defaultValue={country}
                       onChange={(e)=>{
-                        set_country(countries[e.target.value])
+                        console.log(countries[e.target.value])
+                        set_country(countries[e.target.value].code)
                       }}
                     >
                       {countries.map((country, countryIdx)=>(
