@@ -11,7 +11,7 @@ export class KinshipError extends KinshipEvent {
         super (error_id, EventTypes.INTERNAL_ERROR)
 
         if (log_error) {
-            log.error(`ERROR::${function_name}::${file_name}::${message}`)
+            log.error(`ERROR::${function_name}::${file_name}::${message}`);
         }
         
         throw new Error(message)
