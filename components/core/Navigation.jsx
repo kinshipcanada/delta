@@ -47,19 +47,11 @@ export default function Navigation() {
                         alt=""
                         />
                         <a target="_blank" href = 'https://documentation-5v9j7ekpv-kinshipcanada.vercel.app'>
-                            <span className="flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
+                            <span className="hidden sm:block flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
                                 Beta V1.0.0
                             </span>
                         </a>
                     </a>
-                </div>
-
-                {/* Menu Icon */}
-                <div className="-mr-2 -my-2 md:hidden">
-                    {/* <Popover.Button className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none ">
-                        <span className="sr-only">Open menu</span>
-                        <MenuIcon className="h-6 w-6" aria-hidden="true" />
-                    </Popover.Button> */}
                 </div>
 
                 {/* Menu */}
@@ -70,8 +62,6 @@ export default function Navigation() {
                         ))}
                         <Support />
                     </Popover.Group>
-
-
                 </div>
 
                 <div className="flex items-center md:ml-12">
