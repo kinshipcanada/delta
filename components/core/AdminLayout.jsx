@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../systems/helpers/supabaseClient'
 
 function classNames(...classes) {
@@ -62,7 +63,7 @@ export default function AdminLayout({ children }) {
       .single()
 
     if (error) {
-      console.log(error)
+      toast.error("Something went wrong loading the admin profile.")
       return
     }
 

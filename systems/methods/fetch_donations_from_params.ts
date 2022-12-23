@@ -1,4 +1,4 @@
-import { _format_donation_from_database } from "../functions/donations";
+import { _format_donation_from_database, _create_pdf_from_donation } from "../functions/donations";
 import { fetch_receipts_from_database } from "../functions/database";
 import { DatabaseDonation } from "../classes/utility_classes";
 
@@ -8,7 +8,6 @@ export default async function fetch_donations_from_params(
 ) : Promise<any> {
 
     const donations_from_database = await fetch_receipts_from_database(donation)
-
     let donations = donations_from_database.map(_format_donation_from_database)
 
     const resolved_donations = await Promise.all(donations)

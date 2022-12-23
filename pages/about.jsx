@@ -2,6 +2,7 @@ import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 export default function About() {
 

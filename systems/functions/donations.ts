@@ -1,4 +1,4 @@
-import { CountryList, DonationIdentifiers, donor_details } from "../classes/utility_classes";
+import { CountryList, DatabaseDonation, DonationIdentifiers, donor_details } from "../classes/utility_classes";
 import { Donation } from "../classes/donation/Donation";
 import { KinshipError } from "../classes/errors/KinshipError";
 import { build_donation_from_raw_stripe_data, fetch_customer_object, fetch_donation_from_stripe } from "./stripe";
@@ -6,10 +6,29 @@ import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
 import { upload_donation_to_database, fetch_receipt_from_database } from "./database";
 import { StripeTags } from "../classes/utility_classes";
 import { Donor } from "../classes/donors/Donor";
+const html_to_pdf = require('html-pdf-node');
 
 const FILE_NAME = "/systems/functions/donations";
 
 // Formatters
+export async function _create_pdf_from_donation(donation?: Donation) {
+    const FUNCTION_NAME = "_create_pdf_from_donation"
+
+    let options = { format: 'A4' };
+    // Example of options with args //
+    // let options = { format: 'A4', args: ['--no-sandbox', '--disable-setuid-sandbox'] };
+
+    let file = { content: "<h1>Welcome to html-pdf-node</h1>" };
+    // or //
+
+    console.log("BUFFER")
+    html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+        console.log("PDF Buffer:-", pdfBuffer);
+    });
+
+    return null
+}
+
 export async function _format_donation_from_database(donation_object: any) {
     const fetched_donor_from_stripe = await fetch_customer_object(donation_object.stripe_customer_id)
     const generatedDonorDetails: donor_details = {
@@ -59,7 +78,7 @@ export async function _create_donation_from_identifier(donation_identifiers: Don
     }
 }
 
-export async function _create_donation_from_parameters() {}
+export async function _create_donation_from_parameters(parameters: DatabaseDonation) {}
 
 // Fetch donations
 export async function _fetch_donation_from_identifier(donation_identifiers: DonationIdentifiers) {
