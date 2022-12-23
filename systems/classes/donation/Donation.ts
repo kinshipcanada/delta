@@ -93,7 +93,7 @@ export class Donation {
             email: this.donor.email,
             phone_number: this.donor.phone_number ? this.donor.phone_number : null,
             amount_in_cents: parseInt(this.amount_in_cents.toString()),
-            native_currency: this.native_currency == CountryList.CANADA ? CurrencyList.CANADIAN_DOLLAR : CountryList.UNITED_STATES ? CurrencyList.UNITED_STATES_DOLLAR : null,
+            native_currency: this.native_currency == CountryList.CANADA ? CurrencyList.CANADIAN_DOLLAR : CountryList.UNITED_STATES ? CurrencyList.UNITED_STATES_DOLLAR : CurrencyList.CANADIAN_DOLLAR,
             fees_covered: this.fees_covered,
             fees_charged_by_stripe: this.fees_charged_by_stripe,
             // Hardcoding true for now, later we will log attempted txns too

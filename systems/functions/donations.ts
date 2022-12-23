@@ -41,7 +41,7 @@ export async function _format_donation_from_database(donation_object: any) {
             postal_code: fetched_donor_from_stripe.address.postal_code,
             city: fetched_donor_from_stripe.address.city,
             state: fetched_donor_from_stripe.address.state,
-            country: fetched_donor_from_stripe.address.country == "CA" ? CountryList.CANADA : fetched_donor_from_stripe.address.country == "US" ? CountryList.UNITED_STATES : CountryList.UNDEFINED,
+            country: fetched_donor_from_stripe.address.country.toLowerCase(),
         }
     }
     

@@ -140,12 +140,12 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
             postal_code: stripe_data.customer.address.postal_code,
             city: stripe_data.customer.address.city,
             state: stripe_data.customer.address.state,
-            country: stripe_data.customer.address.country == "ca" ? CountryList.CANADA : stripe_data.customer.address.country == "us" ? CountryList.UNITED_STATES : CountryList.UNDEFINED,
+            country: stripe_data.customer.address.country,
         }
     }, (stripe_data.customer.metadata != null && stripe_data.customer.metadata != undefined) ? stripe_data.customer.metadata.user_id : null)
 
     const amount_in_cents = stripe_data.charge_object.amount_captured
-    const native_currency = stripe_data.charge_object.currency == "cad" ? CountryList.CANADA : stripe_data.charge_object.currency == "usd" ? CountryList.UNITED_STATES : CountryList.UNDEFINED
+    const native_currency = stripe_data.charge_object.currency == "cad" ? CountryList.CANADA : stripe_data.charge_object.currency == "usd" ? CountryList.UNITED_STATES : CountryList.CANADA
     const fees_covered = parseInt(stripe_data.charge_object.metadata.fees_covered)
     const fees_charged_by_stripe = stripe_data.balance_transaction_object.fee
     const cart = new Cart([], stripe_data.charge_object.amount_captured, fees_covered > 0 ? true : false)
