@@ -5,7 +5,7 @@ import PageHeader from "../../components/app/PageHeader";
 import { ArrowDownCircleIcon, PaperClipIcon } from "@heroicons/react/24/solid";
 import { ArrowDownCircleIcon as ArrowDownCircleIconOutline } from "@heroicons/react/24/outline";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
-import { fetchPostJSON } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../systems/functions/helpers";
 import { BlueLoading } from "../../components/core/Loaders";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function Index() {
 
     async function fetchDonationsForUser(user_email) {
 
-        const response = await fetchPostJSON('/api/donor/donations/fetch', {
+        const response = await callKinshipAPI('/api/donor/donations/fetch', {
             user_email: user_email,
         });
     

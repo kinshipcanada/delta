@@ -17,6 +17,7 @@ import TextInput from "../components/core/TextInput";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import ReactTooltip from "react-tooltip";
 import { SectionHeader } from "../components/core/Typography";
+import { callKinshipAPI } from "../systems/functions/helpers";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -471,7 +472,25 @@ function BillingStep({
         set_global_loading(true)
 
         // Create a cart object
-        const { data, error } = await supabase.from('carts').insert({})
+        const response = await callKinshipAPI('/api/donation/initiate', {
+            payload: [amount, first_name, last_name, email, address, suite, city, state_or_province, country, postal_code, coverFee]
+        });
+    
+        if (response.status === 500) {
+            setError("Error resending receipt.");
+            setErrorMessage(response.message);
+            setLoading(false)
+            return;
+        } else {
+            console.log(response)
+            setSuccess("Receipt resent successfully!");
+            setSuccessMessage(response.message);
+            setLoading(false)
+            return;
+        }
+
+        // Redirect the user to the confirmation page, with the cart ID in the URL
+        window.location.href = `/confirmation?cart_id=${cart_id}`
 
         return
     }

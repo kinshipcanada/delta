@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { fetchPostJSON } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../systems/functions/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { SecondaryButton } from "../../components/core/Buttons";
@@ -17,7 +17,7 @@ export default function Receipt() {
 
     async function fetchDonation(donation_id) {
 
-        const response = await fetchPostJSON('/api/donation/fetch', {
+        const response = await callKinshipAPI('/api/donation/fetch', {
             donation_id: donation_id,
         });
         

@@ -3,7 +3,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
-import { fetchPostJSON } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../systems/functions/helpers";
 
 export default function Index() {
 
@@ -86,7 +86,7 @@ function ResendReceipt() {
             return
         }
 
-        const response = await fetchPostJSON('/api/backend/admin/resend', {
+        const response = await callKinshipAPI('/api/backend/admin/resend', {
             donation_id: donationId,
         });
     

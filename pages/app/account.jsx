@@ -4,7 +4,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import TextInput from "../../components/core/TextInput";
 import { SecondaryButton } from "../../components/core/Buttons";
-import { fetchPostJSON } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../systems/functions/helpers";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 export default function Index() {
@@ -22,7 +22,7 @@ export default function Index() {
     
     async function fetchDonorProfile(user_id) {
 
-        const response = await fetchPostJSON('/api/donor/profile/fetch', {
+        const response = await callKinshipAPI('/api/donor/profile/fetch', {
             user_id: user_id,
         });
         

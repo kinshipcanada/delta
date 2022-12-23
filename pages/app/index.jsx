@@ -4,7 +4,7 @@ import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import { ArrowDownCircleIcon, PaperClipIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons";
-import { fetchPostJSON } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../systems/functions/helpers";
 import { BlueLoading } from "../../components/core/Loaders";
 import ReactTooltip from "react-tooltip";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
@@ -26,7 +26,7 @@ export default function Index() {
 
     async function fetchDonationsForUser(user_email) {
 
-        const response = await fetchPostJSON('/api/donor/donations/fetch', {
+        const response = await callKinshipAPI('/api/donor/donations/fetch', {
             user_email: user_email,
         });
     
@@ -249,7 +249,7 @@ export function CRAPackage(user_email) {
     async function downloadPackage() {
         setDownloadLoading(true)
 
-        const response = await fetchPostJSON('/api/donor/donations/report', {
+        const response = await callKinshipAPI('/api/donor/donations/report', {
             user_email: user_email,
             send_as_email: true
         });

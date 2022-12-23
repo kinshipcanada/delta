@@ -1,5 +1,5 @@
 import { supabase } from '../../systems/helpers/supabaseClient';
-import { fetchPostJSON } from '../../systems/functions/helpers';
+import { callKinshipAPI } from '../../systems/functions/helpers';
 import { useState } from 'react';
 import Head from 'next/head'
 
@@ -42,7 +42,7 @@ export default function Home() {
             }
         }
 
-        const response = await fetchPostJSON('/api/support', {
+        const response = await callKinshipAPI('/api/support', {
             details: details,
         });
     

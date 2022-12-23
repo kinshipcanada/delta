@@ -1,4 +1,4 @@
-export async function fetchPostJSON(url: string, data?: {}) {
+export async function callKinshipAPI(url: string, data?: {}) {
     try {
       const response = await fetch(url, {
         method: 'POST', 

@@ -5,7 +5,7 @@ import { Router, useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { supabase } from '../../systems/helpers/supabaseClient'
-import { fetchPostJSON } from '../../systems/functions/helpers'
+import { callKinshipAPI } from '../../systems/functions/helpers'
 import { BlueLoading } from './Loaders'
 import { countries, canadian_states } from '../../systems/helpers/constants'
 import Loading from './Loading'
@@ -211,7 +211,7 @@ export function UserSetup({ setUserConfigured }) {
       }
     }
 
-    const response = await fetchPostJSON('/api/donor/profile/create', {
+    const response = await callKinshipAPI('/api/donor/profile/create', {
       user: user_stripe_profile,
     });
   
