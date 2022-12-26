@@ -1,11 +1,15 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Loading, { LargeLoading } from "../components/core/Loading";
 import { callKinshipAPI } from "../systems/functions/helpers";
+let Globe = () => null;
+if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
 
 export default function Donate() {
 
@@ -129,6 +133,7 @@ export default function Donate() {
   }
   ```
 */
+
 const products = [
     {
       id: 1,
@@ -172,6 +177,16 @@ const products = [
   }
   
   export function ConfirmationView({ donation, paymentIntentId }) {
+    const [imageUrl, setImageUrl] = useState("/images/texture.png");
+    const globeRef = useRef(null);
+    const arcsData = [1, 2, 3, 4, 5, 6].map(() => ({
+      startLat: (Math.random() - 0.5) * 180,
+      startLng: (Math.random() - 0.5) * 360,
+      endLat: (Math.random() - 0.5) * 180,
+      endLng: (Math.random() - 0.5) * 360,
+      color: [["#000000"][0], ["#000000"][0]],
+    }));  
+
     return (
       <div className="">
         <div className="mx-auto max-w-2xl sm:py-8 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -197,87 +212,88 @@ const products = [
             </a>
           </div>
   
-          {/* Products */}
+          {/* Donation Summary */}
           <div className="mt-6">
-            <h2 className="sr-only">Products purchased</h2>
-  
             <div className="space-y-8">
-              {donation.cart.causes.map((product) => (
-                <div
-                  key={product.id}
-                  className="border-t border-b border-gray-200 bg-white shadow-sm sm:rounded-lg sm:border"
-                >
-                  <div className="py-6 px-4 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:p-8">
-                    <div className="sm:flex lg:col-span-7">
-                      <div className="aspect-w-1 aspect-h-1 w-full flex-shrink-0 overflow-hidden rounded-lg sm:aspect-none sm:h-40 sm:w-40">
-                        <img
-                          src={product.imageSrc}
-                          alt={product.imageAlt}
-                          className="h-full w-full object-cover object-center sm:h-full sm:w-full"
-                        />
-                      </div>
-  
-                      <div className="mt-6 sm:mt-0 sm:ml-6">
-                        <h3 className="text-base font-medium text-gray-900">
-                          <a href={product.href}>{product.name}</a>
-                        </h3>
-                        <p className="mt-2 text-sm font-medium text-gray-900">${product.price}</p>
-                        <p className="mt-3 text-sm text-gray-500">{product.description}</p>
-                      </div>
+              <div
+                className="border-t border-b border-gray-200 bg-white shadow-sm sm:rounded-lg sm:border"
+              >
+                <div className="py-6 px-4 sm:px-6 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:p-8">
+                  <div className="sm:flex lg:col-span-7">
+                    <div className="aspect-w-1 aspect-h-1 w-full flex-shrink-0 overflow-hidden rounded-lg sm:aspect-none sm:h-40 sm:w-40">
+                      <Globe
+                        //@ts-ignore
+                        ref={globeRef}
+                        width={150}
+                        height={150}
+                        backgroundColor={"rgba(0,0,0,0)"}
+                        globeImageUrl={imageUrl}
+                        arcColor={"white"}
+                        arcsData={arcsData}
+                        arcDashGap={0.6}
+                        arcDashLength={0.3}
+                        arcDashAnimateTime={4000 + 500}
+                        rendererConfig={{ preserveDrawingBuffer: true }}
+                      />
                     </div>
-  
-                    <div className="mt-6 lg:col-span-5 lg:mt-0">
-                      <dl className="grid grid-cols-2 gap-x-6 text-sm">
-                        <div>
-                          <dt className="font-medium text-gray-900">Delivery address</dt>
-                          <dd className="mt-3 text-gray-500">
-                            <span className="block">{product.address[0]}</span>
-                            <span className="block">{product.address[1]}</span>
-                            <span className="block">{product.address[2]}</span>
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="font-medium text-gray-900">Shipping updates</dt>
-                          <dd className="mt-3 space-y-3 text-gray-500">
-                            <p>{product.email}</p>
-                            <p>{product.phone}</p>
-                            <button type="button" className="font-medium text-blue-600 hover:text-blue-500">
-                              Edit
-                            </button>
-                          </dd>
-                        </div>
-                      </dl>
+
+                    <div className="mt-6 sm:mt-0 sm:ml-6">
+                      <h3 className="text-base font-medium text-gray-900">{ "Donation for $" + (donation.amount_in_cents/100).toFixed(2) + " on " + new Date(donation.created_at).toDateString() }</h3>
+                      <p className="mt-2 text-sm font-medium text-gray-900">Made out to {donation.donor.first_name}{' '}{donation.donor.last_name}</p>
+                      <p className="mt-3 text-sm text-gray-500">Thank you so much for your donation. Your {donation.donor.address.country == "ca" ? "tax" : null} receipt is being generated and will be emailed to your shortly. {donation.donor.address.country == "ca" ? null : "Please note that because you are not in Canada, this is not a tax-eligible donation."}</p>
                     </div>
                   </div>
-  
-                  <div className="border-t border-gray-200 py-6 px-4 sm:px-6 lg:p-8">
-                    <h4 className="sr-only">Status</h4>
-                    <p className="text-sm font-medium text-gray-900">
-                      {product.status} on <time dateTime={product.datetime}>{product.date}</time>
-                    </p>
-                    <div className="mt-6" aria-hidden="true">
-                      <div className="overflow-hidden rounded-full bg-gray-200">
-                        <div
-                          className="h-2 rounded-full bg-blue-600"
-                          style={{ width: `calc((${product.step} * 2 + 1) / 8 * 100%)` }}
-                        />
+
+                  <div className="mt-6 lg:col-span-5 lg:mt-0">
+                    <dl className="grid grid-cols-2 gap-x-6 text-sm">
+                      <div>
+                        <dt className="font-medium text-gray-900">Donated To</dt>
+                        <dd className="mt-3 text-gray-500">
+                          { donation.cart.causes.map((cause)=>(
+                            <span className="block">{cause}</span>
+                          ))}
+                        </dd>
                       </div>
-                      <div className="mt-6 hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
-                        <div className="text-blue-600">Order placed</div>
-                        <div className={classNames(product.step > 0 ? 'text-blue-600' : '', 'text-center')}>
-                          Processing
-                        </div>
-                        <div className={classNames(product.step > 1 ? 'text-blue-600' : '', 'text-center')}>
-                          Shipped
-                        </div>
-                        <div className={classNames(product.step > 2 ? 'text-blue-600' : '', 'text-right')}>
-                          Delivered
-                        </div>
+                      <div>
+                        <dt className="font-medium text-gray-900">Updates</dt>
+                        <dd className="mt-3 space-y-3 text-gray-500">
+                          <p>{donation.donor.email}</p>
+                          <p>{donation.donor.phone ? donation.donor.phone : null }</p>
+                          <Link href = "/app/account">
+                            <a href = "/app/account" className="font-medium text-blue-600 hover:text-blue-500">
+                              Edit
+                            </a>
+                          </Link>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 py-6 px-4 sm:px-6 lg:p-8">
+                  <h4 className="sr-only">Status</h4>
+                  <div className="mt-4" aria-hidden="true">
+                    <div className="overflow-hidden rounded-full bg-gray-200">
+                      <div
+                        className="h-2 rounded-full bg-blue-600"
+                        style={{ width: `calc((${1} * 2 + 1) / 8 * 100%)` }}
+                      />
+                    </div>
+                    <div className="mt-6 hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
+                      <div className="text-blue-600">Donation Made</div>
+                      <div className={classNames(products[0].step > 0 ? 'text-blue-600' : '', 'text-center')}>
+                        Tax Receipt Generated
+                      </div>
+                      <div className={classNames(products[0].step > 1 ? 'text-blue-600' : '', 'text-center')}>
+                        Funds Distributed
+                      </div>
+                      <div className={classNames(products[0].step > 2 ? 'text-blue-600' : '', 'text-right')}>
+                        Proof Available
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
   
