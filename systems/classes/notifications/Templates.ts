@@ -18,7 +18,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 
                 Thank you very much for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. We'll ensure that this is processed and sent to those who need it most as soon as we can.
 
-                ${donation.donor.address.country == CountryList.CANADA ? `You can access your CRA-eligible tax receipt here: https://receipts.kinshipcanada.com/${donation.stripe_tags.charge_id}` : null}
+                ${donation.donor.address.country == "ca" ? `You can access your CRA-eligible tax receipt here: https://receipts.kinshipcanada.com/${donation.stripe_tags.charge_id}` : ""}
 
                 Kind regards,
                 The Team At Kinship Canada
