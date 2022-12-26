@@ -6,25 +6,12 @@ import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
 import { upload_donation_to_database, fetch_receipt_from_database } from "./database";
 import { StripeTags } from "../classes/utility_classes";
 import { Donor } from "../classes/donors/Donor";
-const html_to_pdf = require('html-pdf-node');
 
 const FILE_NAME = "/systems/functions/donations";
 
 // Formatters
 export async function _create_pdf_from_donation(donation?: Donation) {
     const FUNCTION_NAME = "_create_pdf_from_donation"
-
-    let options = { format: 'A4' };
-    // Example of options with args //
-    // let options = { format: 'A4', args: ['--no-sandbox', '--disable-setuid-sandbox'] };
-
-    let file = { content: "<h1>Welcome to html-pdf-node</h1>" };
-    // or //
-
-    console.log("BUFFER")
-    html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
-        console.log("PDF Buffer:-", pdfBuffer);
-    });
 
     return null
 }

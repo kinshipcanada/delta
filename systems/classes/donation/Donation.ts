@@ -107,7 +107,7 @@ export class Donation {
             stripe_balance_transaction_id: this.stripe_tags.balance_transaction_id,
             stripe_customer_id: this.stripe_tags.customer_id,
             address_line_address: this.donor.address.line_address,
-            address_country: this.donor.address.country,
+            address_country: this.donor.address.country.toLowerCase(),
             address_postal_code: this.donor.address.postal_code,
             address_city: this.donor.address.city,
             address_state: this.donor.address.state

@@ -403,7 +403,7 @@ export interface DonorAddress {
     state: string,
     city: string,
     postal_code: string,
-    country: CountryList
+    country: CountryList | string
 }
 
 export interface DatabaseDonation {

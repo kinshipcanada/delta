@@ -28,6 +28,7 @@ export default function Receipt() {
         }
     
         if (199 < response.status && response.status < 300) {
+            console.log(response.donation)
             setReceipt(response.donation)
             setLoading(false)
             return;
@@ -96,8 +97,8 @@ export default function Receipt() {
                     <div className="px-4 py-5 sm:p-6">
                         <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your CRA-Eligible Tax Receipt. You donated a total amount of ${(receipt.amount_in_cents/100).toFixed(2)} CAD.</p>
                         <span className = 'flex mb-1'>
-                            <p  className="font-bold text-gray-800  mr-1">Kinship Receipt ID:</p> 
-                            <p className="font-medium text-gray-800">{receipt.donation_id}</p>
+                            <p  className="font-bold text-gray-800  mr-1">{id.substring(0, 3) == "pi_" ? "Payment ID" : id.substring(0,3) == "ch_" ? "Payment ID" : "Kinship Receipt ID"}:</p> 
+                            <p className="font-medium text-gray-800">{id}</p>
                         </span>
                         <span className = 'flex mb-1'>
                             <p  className="font-bold text-gray-800 mr-1">Location Issued: </p>
@@ -121,7 +122,7 @@ export default function Receipt() {
                         </span>
                         <span className = 'flex mb-1'>
                             <p  className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
-                            <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
+                            <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country.toLowerCase() == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
                         </span>
                     </div>
                     </main>
