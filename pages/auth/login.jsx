@@ -36,24 +36,6 @@ export default function Register() {
 		setLoading(false)
 	}
 
-	async function signInWithDiscord() {
-		const { user, session, error } = await supabase.auth.signIn({
-			provider: 'discord'
-		});
-	}
-
-	async function signInWithFacebook() {
-		const { user, session, error } = await supabase.auth.signIn({
-		  provider: 'facebook'
-		});
-	}
-
-	async function signInWithGoogle() {
-		const { user, session, error } = await supabase.auth.signIn({
-		  provider: 'google'
-		});
-	}
-
 	return (
 		<div className="min-h-screen flex flex-col justify-center sm:px-6 lg:px-8">
 

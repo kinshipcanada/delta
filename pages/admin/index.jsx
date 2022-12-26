@@ -86,7 +86,7 @@ function ResendReceipt() {
             return
         }
 
-        const response = await callKinshipAPI('/api/backend/admin/resend', {
+        const response = await callKinshipAPI('/api/admin/resend', {
             donation_id: donationId,
         });
     
