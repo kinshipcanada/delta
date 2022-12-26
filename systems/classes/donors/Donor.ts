@@ -14,7 +14,7 @@ export class Donor {
         postal_code: string,
         city: string,
         state: string,
-        country: CountryList,
+        country: CountryList | string,
     }
 
     constructor ( donor_details: donor_details, donor_id: string ) {
@@ -25,7 +25,13 @@ export class Donor {
         this.email = donor_details.email;
         this.stripe_cus_id = [donor_details.stripe_cus_id];
         this.phone_number = donor_details.phone_number ? donor_details.phone_number : null;
-        this.address = donor_details.address
+        this.address = {
+            line_address: donor_details.address.line_address,
+            postal_code: donor_details.address.postal_code,
+            city: donor_details.address.city,
+            state: donor_details.address.state,
+            country: donor_details.address.country
+        }
     }
 
     fetch_donor_details() {
