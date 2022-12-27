@@ -175,6 +175,8 @@ export function UserSetup({ setUserConfigured }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const router = useRouter()
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -233,7 +235,7 @@ export function UserSetup({ setUserConfigured }) {
             address_line_address: address,
             address_city: city,
             address_state: state,
-            address_postal_code: postalCode,
+            address_postal_code: postalCode.toUpperCase(),
             address_country: country.code,
             admin: false,
             partner: false
@@ -247,6 +249,7 @@ export function UserSetup({ setUserConfigured }) {
       } else {
         setLoading(false)
         setUserConfigured(true)
+        router.reload(window.location.pathname)
       }
     }
   }

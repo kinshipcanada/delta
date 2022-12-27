@@ -10,6 +10,8 @@ export class KinshipError extends KinshipEvent {
 
         super (error_id, EventTypes.INTERNAL_ERROR)
 
+        console.log(message)
+
         if (log_error) {
             log.error(`ERROR::${function_name}::${file_name}::${message}`);
         }

@@ -478,7 +478,17 @@ function BillingStep({
         set_global_loading(true)
 
         const user = await supabase.auth.getUser()
+        if (!first_name || !last_name || !email || !address || !postal_code || !country || !state_or_province || !city) {
+            setStepError("Please fill out all required fields")
+            set_global_loading(false);
+            return
+        }
 
+        let causes = []
+
+        for (const cause of selected_causes) {
+            causes.push(cause.name)
+        }
         // Create a cart object
         const response = await callKinshipAPI('/api/donation/initiate', {
             donor: user.data.user ? user.data.user.id : null,
@@ -487,24 +497,25 @@ function BillingStep({
             email: email,
             phone_number: null,
             amount_in_cents: amount*100,
-            donation_causes: null,
+            donation_causes: JSON.stringify(causes),
             address_line_address: address,
             address_state: state_or_province,
             address_city: city,
             address_postal_code: postal_code,
             native_currency: 'cad',
-            address_country: country.code
+            address_country: country
         });
-    
-        if (response.status === 500) {
-            setError("Error generating cart.");
-            setErrorMessage(response.message);
-            setLoading(false)
+
+        console.log(response)
+        
+        if (199 < response.status && response.status < 300) {
+            // Redirect the user to the confirmation page, with the cart ID in the URL
+            router.push(`/confirmation?cart_id=${response.cart.id}`)
+            set_global_loading(false)
             return;
         } else {
-            // Redirect the user to the confirmation page, with the cart ID in the URL
-            router.push(`/confirmation?cart_id=${response.cart_id}`)
-            set_global_loading(false)
+            setStepError("Please fill out all required fields")
+            set_global_loading(false);
             return;
         }
 

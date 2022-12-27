@@ -94,3 +94,14 @@ export function upload_cart_to_database(id: string, donor: string, email: string
         return
     }
 }
+
+export async function fetch_cart_from_database(cart_id:string) {
+    const FUNCTION_NAME = "fetch_cart_from_database"
+
+    try {
+        return database('kinship_carts').where('id', cart_id)
+    } catch (error) {
+        new KinshipError(`Error fetching cart from database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
+        return
+    }
+}

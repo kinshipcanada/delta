@@ -10,6 +10,7 @@ import ReactTooltip from "react-tooltip";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import CopyableInput from "../../components/core/CopyableInput";
 
 export default function Index() {
 
@@ -129,6 +130,7 @@ export default function Index() {
                                 </dl>
                                 <div className="my-4 sm:my-6" />
                                 <CRAPackage user_email={user.email} />
+                                {/* <PendingTransfers user_email = {user.email} /> */}
                                 <ReactTooltip />
                             </div>
 
@@ -239,6 +241,20 @@ function Receipt({ donation }) {
     )
 }
 
+export function PendingTransfers(user_email) {
+
+    async function fetchPendingTransfers() {
+        return 
+    }
+
+    return (
+        <div className="mt-6">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">Pending eTransfers</h3>
+            <p className="text-sm font-regular mt-2 text-gray-600">You have some pending e-Transfer donations. If you would still like to make these donations, please use the Kinship Cart ID's below. <span className="text-blue-600 font-medium hover:cursor-pointer hover:text-blue-400">How to send an e-Transfer to Kinship.</span></p>
+            <CopyableInput content = {{"label": "kasdads", "value": "hello"}} />
+        </div>
+    )
+}
 export function CRAPackage(user_email) {
 
     const [downloadLoading, setDownloadLoading] = useState(false);

@@ -25,30 +25,46 @@ export default function Donate() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const [confirmationMode, setConfirmationMode] = useState(false)
-
+    const [cart, setCart] = useState(null)
     const [donation, setDonation] = useState(null)
 
 
     const paymentIntentId = router.query.payment_intent;
     const kinshipCartId = router.query.cart_id;
 
+    async function fetchFromCartID(kinshipCartId) {
+      const response = await callKinshipAPI('/api/donation/instructions', {
+          cart_id: kinshipCartId,
+      });
+
+      if (response.statusCode === 500) {
+          setError(error.message);
+          setLoading(false)
+          return;
+      } else {
+          setCart(response.cart)
+          setError(null)
+          setLoading(false)
+          return;
+      }
+    }
+
     async function fetchFromPaymentIntentID(paymentIntentID) {
-        const response = await callKinshipAPI('/api/donation/fetch', {
-            donation_id: paymentIntentID,
-        });
-    
-        if (response.statusCode === 500) {
-            setError(error.message);
-            setLoading(false)
-            return;
-        } else {
-            console.log("Donation: ", response.donation)
-            setDonation(response.donation)
-            setError(null)
-            setLoading(false)
-            return;
-        }
+      const response = await callKinshipAPI('/api/donation/fetch', {
+          donation_id: paymentIntentID,
+      });
+  
+      if (response.statusCode === 500) {
+          setError(error.message);
+          setLoading(false)
+          return;
+      } else {
+          console.log("Donation: ", response.donation)
+          setDonation(response.donation)
+          setError(null)
+          setLoading(false)
+          return;
+      }
     }
 
     useEffect(()=>{
@@ -57,13 +73,14 @@ export default function Donate() {
         } else {
           // Otherwise, fetch the donation from the paymentIntentID
           if (paymentIntentId) {
-              fetchFromPaymentIntentID(paymentIntentId)
-              return; 
+            fetchFromPaymentIntentID(paymentIntentId)
+            return; 
           }
 
           // If it was a kinship cart id, load the cart info and then give the user instructions
           if (kinshipCartId) {
-              return 
+            fetchFromCartID(kinshipCartId)
+            return 
           }
             
         }
@@ -110,7 +127,7 @@ export default function Donate() {
 
             : kinshipCartId ?
 
-            "Your donation" 
+            <CartView cart={cart} />
 
             : null
             
@@ -120,6 +137,11 @@ export default function Donate() {
     )
 }
 
+function CartView({ cart }) {
+  return (
+    <div>eTransfer to: {cart.id}</div>
+  )
+}
 
 const products = [
     {
