@@ -31,7 +31,7 @@ export default function Donate() {
 
 
     const paymentIntentId = router.query.payment_intent;
-    const kinshipCartId = router.query.kinship_cart_id;
+    const kinshipCartId = router.query.cart_id;
 
     async function fetchFromPaymentIntentID(paymentIntentID) {
         const response = await callKinshipAPI('/api/donation/fetch', {
@@ -55,16 +55,17 @@ export default function Donate() {
         if (!paymentIntentId && !kinshipCartId) {
             toast.error("Sorry, an error occurred.")
         } else {
-            // If it was a kinship cart id, load the cart info and then give the user instructions
-            if (kinshipCartId) {
-                return 
-            }
+          // Otherwise, fetch the donation from the paymentIntentID
+          if (paymentIntentId) {
+              fetchFromPaymentIntentID(paymentIntentId)
+              return; 
+          }
 
-            // Otherwise, fetch the donation from the paymentIntentID
-            if (paymentIntentId) {
-                fetchFromPaymentIntentID(paymentIntentId)
-                return; 
-            }
+          // If it was a kinship cart id, load the cart info and then give the user instructions
+          if (kinshipCartId) {
+              return 
+          }
+            
         }
     }, [paymentIntentId, kinshipCartId])
 
@@ -119,20 +120,6 @@ export default function Donate() {
     )
 }
 
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
 
 const products = [
     {
@@ -281,13 +268,13 @@ const products = [
                     </div>
                     <div className="mt-6 hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
                       <div className="text-blue-600">Donation Made</div>
-                      <div className={classNames(products[0].step > 0 ? 'text-blue-600' : '', 'text-center')}>
+                      <div className='text-blue-600 text-center'>
                         Tax Receipt Generated
                       </div>
-                      <div className={classNames(products[0].step > 1 ? 'text-blue-600' : '', 'text-center')}>
+                      <div className='text-center'>
                         Funds Distributed
                       </div>
-                      <div className={classNames(products[0].step > 2 ? 'text-blue-600' : '', 'text-right')}>
+                      <div className='text-center'>
                         Proof Available
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import { DatabaseDonation, DonationIdentifiers } from "../classes/utility_classes"
+import { CountryList, DatabaseDonation, DonationIdentifiers } from "../classes/utility_classes"
 import { KinshipError } from "../classes/errors/KinshipError"
 
 require('dotenv').config();
@@ -65,6 +65,32 @@ export async function fetch_receipts_from_database(params: any) : Promise<any> {
         return database(table).where(parameterizedQuery)
     } catch (error) {
         new KinshipError(`Error fetching receipt from database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
+        return
+    }
+}
+
+export function upload_cart_to_database(id: string, donor: string, email: string, amount_in_cents: number, donation_causes: any, address_line_address: string, address_state: string, address_city: string, address_postal_code: string, address_country: CountryList | string, native_currency: string, livemode: boolean, first_name: string, last_name: string) {
+    const FUNCTION_NAME = "upload_cart_to_database"
+    
+    try {
+        return database('kinship_carts').insert({
+            id: id,
+            donor: donor,
+            email: email,
+            amount_in_cents: amount_in_cents,
+            donation_causes: donation_causes,
+            address_line_address: address_line_address,
+            address_state: address_state,
+            address_city: address_city,
+            address_postal_code: address_postal_code,
+            address_country: address_country,
+            native_currency: "cad",
+            livemode: livemode,
+            first_name: first_name,
+            last_name: last_name
+        })
+    } catch (error) {
+        new KinshipError(`Error uploading donation to database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
         return
     }
 }

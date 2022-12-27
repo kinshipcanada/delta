@@ -18,6 +18,7 @@ import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import ReactTooltip from "react-tooltip";
 import { SectionHeader } from "../components/core/Typography";
 import { callKinshipAPI } from "../systems/functions/helpers";
+import { useRouter } from "next/router";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -147,6 +148,7 @@ export default function Donate() {
                                 coverFees={coverFees}
                                 setCoverFees={setCoverFees}
                                 user={user}
+                                selected_causes={selected_causes}
                             />
                         </Elements>
 
@@ -414,8 +416,12 @@ function BillingStep({
     passedClientSecret,
     coverFees,
     setCoverFees,
-    user
+    user,
+    selected_causes
 }) {
+
+    const router = useRouter()
+
     const stripe = useStripe();
     const elements = useElements();
   
@@ -471,28 +477,38 @@ function BillingStep({
     const handleETransferSubmit = async () => {
         set_global_loading(true)
 
+        const user = await supabase.auth.getUser()
+
         // Create a cart object
         const response = await callKinshipAPI('/api/donation/initiate', {
-            payload: [amount, first_name, last_name, email, address, suite, city, state_or_province, country, postal_code, coverFee]
+            donor: user.data.user ? user.data.user.id : null,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            phone_number: null,
+            amount_in_cents: amount*100,
+            donation_causes: null,
+            address_line_address: address,
+            address_state: state_or_province,
+            address_city: city,
+            address_postal_code: postal_code,
+            native_currency: 'cad',
+            address_country: country.code
         });
     
         if (response.status === 500) {
-            setError("Error resending receipt.");
+            setError("Error generating cart.");
             setErrorMessage(response.message);
             setLoading(false)
             return;
         } else {
-            console.log(response)
-            setSuccess("Receipt resent successfully!");
-            setSuccessMessage(response.message);
-            setLoading(false)
+            // Redirect the user to the confirmation page, with the cart ID in the URL
+            router.push(`/confirmation?cart_id=${response.cart_id}`)
+            set_global_loading(false)
             return;
         }
 
-        // Redirect the user to the confirmation page, with the cart ID in the URL
-        window.location.href = `/confirmation?cart_id=${cart_id}`
-
-        return
+       
     }
 
     const handleCCSubmit = async () => {
