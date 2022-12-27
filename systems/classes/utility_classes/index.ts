@@ -447,7 +447,7 @@ export interface UserFormattedDonation {
     // Need to add this
     transaction_refunded: false,
     address_line_address: string,
-    address_country: CountryList,
+    address_country: CountryList | string,
     address_postal_code: string,
     address_city: string,
     address_state: string,
