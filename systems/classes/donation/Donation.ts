@@ -1,9 +1,10 @@
 import Stripe from "stripe";
-import { PaymentMethods, StripeTags } from "../utility_classes";
+import { DonorAddress, KinshipDonation, PaymentMethods, StripeTags } from "../utility_classes";
 import { Cart } from "../cart/Cart";
 import { Donor } from "../donors/Donor";
-import { DatabaseDonation, UserFormattedDonation, CountryList, CurrencyList, KinshipPaymentMethod } from "../utility_classes";
+import { DatabaseDonation, CountryList, CurrencyList, KinshipPaymentMethod } from "../utility_classes";
 import { v4 as uuidv4 } from 'uuid';
+import { format_kinship_payment_method } from "../../functions/stripe";
 
 export class Donation {
 
@@ -14,7 +15,6 @@ export class Donation {
 
     created_at: Date;
     amount_in_cents: number;
-    native_currency: CountryList;
 
     fees_covered: number;
     fees_charged_by_stripe: number;
@@ -29,7 +29,7 @@ export class Donation {
     recurring_donation: boolean;
     proof_available: boolean;
 
-    payment_method: Stripe.PaymentMethod
+    payment_method: KinshipPaymentMethod
 
     cart: Cart;
 
@@ -38,11 +38,10 @@ export class Donation {
         livemode: boolean,
         created_at: Date,
         amount_in_cents: number,
-        native_currency: CountryList,
         cart: Cart,
         fees_covered: number,
         fees_charged_by_stripe: number,
-        payment_method: Stripe.PaymentMethod,
+        payment_method: KinshipPaymentMethod,
         stripe_payment_intent_id?: string,
         stripe_charge_id?: string,
         stripe_balance_transaction_id?: string,
@@ -55,7 +54,6 @@ export class Donation {
         this.donor = donor;
         this.created_at = created_at;
         this.amount_in_cents = amount_in_cents;
-        this.native_currency = native_currency;
         this.fees_covered = fees_covered;
         this.fees_charged_by_stripe = fees_charged_by_stripe;
         this.cart = cart
@@ -73,17 +71,6 @@ export class Donation {
 
     format_donation_for_upload() : DatabaseDonation {
 
-        const kinship_formatted_payment_method: KinshipPaymentMethod = {
-            card_brand: this.payment_method.card.brand,
-            checks: {
-                address_line1_check_passed: this.payment_method.card.checks.address_line1_check == "pass" ? true : false,
-                address_postal_code_check_passed: this.payment_method.card.checks.address_postal_code_check == "pass" ? true : false,
-                cvc_check_passed: this.payment_method.card.checks.cvc_check == "pass" ? true : false
-            },
-            // Currently only support cards
-            type: PaymentMethods.CARD
-        }
-
         const formatted_cart = this.cart.format_cart_for_upload()
 
         const formatted_donation: DatabaseDonation = {
@@ -93,14 +80,13 @@ export class Donation {
             email: this.donor.email,
             phone_number: this.donor.phone_number ? this.donor.phone_number : null,
             amount_in_cents: parseInt(this.amount_in_cents.toString()),
-            native_currency: this.native_currency == CountryList.CANADA ? CurrencyList.CANADIAN_DOLLAR : CountryList.UNITED_STATES ? CurrencyList.UNITED_STATES_DOLLAR : CurrencyList.CANADIAN_DOLLAR,
             fees_covered: this.fees_covered,
             fees_charged_by_stripe: this.fees_charged_by_stripe,
             // Hardcoding true for now, later we will log attempted txns too
             transaction_successful: true,
             // Need to add this
             transaction_refunded: false,
-            payment_method: kinship_formatted_payment_method,
+            payment_method: this.payment_method,
             donation_causes: formatted_cart,
             stripe_payment_intent_id: this.stripe_tags.payment_intent_id,
             stripe_charge_id: this.stripe_tags.charge_id,
@@ -116,29 +102,27 @@ export class Donation {
         return formatted_donation
     }
 
-    format_donation_for_user() : UserFormattedDonation {
-        const formatted_donation: UserFormattedDonation = {
-            id: this.donation_id,
-            donation_created: this.created_at.toDateString(),
-            // Update this
-            donor: this.donor.donor_id,
-            email: this.donor.email,
-            phone_number: this.donor.phone_number ? this.donor.phone_number : null,
-            amount_in_cents: parseInt(this.amount_in_cents.toString()),
-            native_currency: this.native_currency == CountryList.CANADA ? CurrencyList.CANADIAN_DOLLAR : CountryList.UNITED_STATES ? CurrencyList.UNITED_STATES_DOLLAR : null,
+    format_donation_for_user() : KinshipDonation {
+
+        const formatted_donation: KinshipDonation = {
+            donation_identifiers: {
+                kinship_donation_id: this.donation_id,
+                stripe_charge_id: this.stripe_tags.charge_id,
+                stripe_payment_intent_id: this.stripe_tags.payment_intent_id,
+                stripe_balance_transaction_id: this.stripe_tags.balance_transaction_id,
+                stripe_customer_id: this.stripe_tags.customer_id,
+                stripe_payment_method_id: this.stripe_tags.payment_method_id
+            },
+            donation_created: this.created_at, 
+            donor: this.donor, 
+            amount_in_cents: this.amount_in_cents,
             fees_covered: this.fees_covered,
             fees_charged_by_stripe: this.fees_charged_by_stripe,
-            // Hardcoding true for now, later we will log attempted txns too
-            transaction_successful: true,
-            // Need to add this
-            transaction_refunded: false,
-            address_line_address: this.donor.address.line_address,
-            address_country: this.donor.address.country,
-            address_postal_code: this.donor.address.postal_code,
-            address_city: this.donor.address.city,
-            address_state: this.donor.address.state,
-            proof_available: this.proof_available,
-            livemode: this.livemode
+            transaction_successful: this.transaction_successful,
+            transaction_refunded: this.transaction_refunded,
+            payment_method: this.payment_method,
+            donation_causes: this.cart.format_cart_for_upload(),
+            livemode: this.livemode,
         }
 
         return formatted_donation

@@ -222,13 +222,13 @@ export function CartView({ cart }) {
                   <div className="overflow-hidden rounded-full bg-gray-200">
                     <div
                       className="h-2 rounded-full bg-blue-600"
-                      style={{ width: `calc((${1} * 2 + 1) / 8 * 100%)` }}
+                      style={{ width: `calc((${0} * 2 + 1) / 8 * 100%)` }}
                     />
                   </div>
                   <div className="mt-6 hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
-                    <div className="text-blue-600">Donation Made</div>
-                    <div className='text-blue-600 text-center'>
-                      Tax Receipt Generated
+                    <div className="text-blue-600">Donation Initiated</div>
+                    <div className='text-center'>
+                      Funds Received & Receipt Issued
                     </div>
                     <div className='text-center'>
                       Funds Distributed

@@ -12,7 +12,7 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
 
     if (donation_id.substring(0, 3) == "ch_") {
         // Check if the charge ID has already been logged to database
-        const donation_from_database = await fetch_receipt_from_database({ charge_id: donation_id })
+        const donation_from_database = await fetch_receipt_from_database({ stripe_charge_id: donation_id })
 
         if (donation_from_database.length > 0) {
             // If it has, send the receipt email and return the donation object
@@ -45,7 +45,7 @@ export default async function check_and_resend_receipt( donation_id: string ) : 
 
     } else if (donation_id.substring(0, 3) == "pi_") {
         // Check if the payment intent ID has already been logged to database
-        const donation_from_database = await fetch_receipt_from_database({ payment_intent_id: donation_id })
+        const donation_from_database = await fetch_receipt_from_database({ stripe_payment_intent_id: donation_id })
 
         if (donation_from_database.length > 0) {
             // If it has, send the receipt email and return the donation object

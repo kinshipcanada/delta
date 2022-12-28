@@ -26,10 +26,10 @@ export function fetch_receipt_from_database(donation_identifiers: DonationIdenti
     try {
         if (donation_identifiers.kinship_donation_id) {
             return database('donations').where('id', donation_identifiers.kinship_donation_id)
-        } else if (donation_identifiers.charge_id) {
-            return database('donations').where('stripe_charge_id', donation_identifiers.charge_id)
-        } else if (donation_identifiers.payment_intent_id) {
-            return database('donations').where('stripe_payment_intent_id', donation_identifiers.payment_intent_id)
+        } else if (donation_identifiers.stripe_charge_id) {
+            return database('donations').where('stripe_charge_id', donation_identifiers.stripe_charge_id)
+        } else if (donation_identifiers.stripe_payment_intent_id) {
+            return database('donations').where('stripe_payment_intent_id', donation_identifiers.stripe_payment_intent_id)
         }
     } catch (error) {
         new KinshipError(`Error fetching receipt from database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
@@ -69,7 +69,7 @@ export async function fetch_receipts_from_database(params: any) : Promise<any> {
     }
 }
 
-export function upload_cart_to_database(id: string, donor: string, email: string, amount_in_cents: number, donation_causes: any, address_line_address: string, address_state: string, address_city: string, address_postal_code: string, address_country: CountryList | string, native_currency: string, livemode: boolean, first_name: string, last_name: string) {
+export function upload_cart_to_database(id: string, donor: string, email: string, amount_in_cents: number, donation_causes: any, address_line_address: string, address_state: string, address_city: string, address_postal_code: string, address_country: CountryList | string, livemode: boolean, first_name: string, last_name: string) {
     const FUNCTION_NAME = "upload_cart_to_database"
     
     try {
@@ -84,7 +84,6 @@ export function upload_cart_to_database(id: string, donor: string, email: string
             address_city: address_city,
             address_postal_code: address_postal_code,
             address_country: address_country,
-            native_currency: "cad",
             livemode: livemode,
             first_name: first_name,
             last_name: last_name

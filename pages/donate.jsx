@@ -508,7 +508,6 @@ function BillingStep({
             address_state: state_or_province,
             address_city: city,
             address_postal_code: postal_code,
-            native_currency: 'cad',
             address_country: country
         });
 

@@ -1,5 +1,6 @@
 import { Donation } from "../donation/Donation";
 import { Stripe } from "stripe"
+import { Donor } from "../donors/Donor";
 
 export interface KinshipPaymentMethod {
     type: PaymentMethods,
@@ -382,7 +383,7 @@ export interface SummaryStatement {
     donor_email: string,
     total_donated: number,
     total_eligible_estimate: number,
-    donations: UserFormattedDonation[]
+    donations: KinshipDonation[]
 }
 
 export interface DonorAddress {
@@ -393,13 +394,26 @@ export interface DonorAddress {
     country: CountryList | string
 }
 
+export interface KinshipDonation {
+    donation_identifiers: DonationIdentifiers,
+    donation_created: string | Date, 
+    donor: Donor, 
+    amount_in_cents: number,
+    fees_covered: number,
+    fees_charged_by_stripe?: number,
+    transaction_successful?: boolean,
+    transaction_refunded?: boolean,
+    payment_method?: KinshipPaymentMethod,
+    donation_causes: FormattedCart,
+    livemode: boolean,
+}
+
 export interface DatabaseDonation {
     donation_created?: string,
     donor?: string | null,
     email?: string,
     phone_number?: number,
     amount_in_cents?: number,
-    native_currency?: CurrencyList,
     fees_covered?: number,
     fees_charged_by_stripe?: number,
     transaction_successful?: boolean,
@@ -416,30 +430,6 @@ export interface DatabaseDonation {
     address_postal_code?: DonorAddress["postal_code"],
     address_city?: DonorAddress["city"],
     address_state?: DonorAddress["state"]
-}
-
-export interface UserFormattedDonation {
-    id: string,
-    donation_created: string,
-    // Update this
-    donor: string | null,
-    email: string,
-    phone_number: number,
-    amount_in_cents: number,
-    native_currency: CurrencyList,
-    fees_covered: number,
-    fees_charged_by_stripe: number,
-    // Hardcoding true for now, later we will log attempted txns too
-    transaction_successful: true,
-    // Need to add this
-    transaction_refunded: false,
-    address_line_address: string,
-    address_country: CountryList | string,
-    address_postal_code: string,
-    address_city: string,
-    address_state: string,
-    proof_available: boolean,
-    livemode: boolean,
 }
 
 export const enum PaymentMethods {
@@ -470,7 +460,10 @@ export interface raw_stripe_transaction_object {
 }
 
 export interface DonationIdentifiers {
-    payment_intent_id?: string,
-    charge_id?: string,
-    kinship_donation_id?: string
+    kinship_donation_id?: string,
+    stripe_payment_intent_id?: string,
+    stripe_charge_id?: string,
+    stripe_balance_transaction_id?: string,
+    stripe_customer_id?: string,
+    stripe_payment_method_id?: string,
 }

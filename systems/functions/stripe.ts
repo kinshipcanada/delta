@@ -3,7 +3,7 @@ import { Cart } from "../classes/cart/Cart";
 import { Donation } from "../classes/donation/Donation";
 import { Donor } from "../classes/donors/Donor";
 import { KinshipError } from "../classes/errors/KinshipError";
-import { DeliveryMethod, CountryList, raw_stripe_transaction_object, StripeTags, NotificationType } from "../classes/utility_classes";
+import { DeliveryMethod, CountryList, raw_stripe_transaction_object, StripeTags, NotificationType, KinshipPaymentMethod, PaymentMethods } from "../classes/utility_classes";
 import { KinshipNotification } from "../classes/notifications/Notification";
 
 const StripeClient = require('stripe');
@@ -145,21 +145,20 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
     }, (stripe_data.customer.metadata != null && stripe_data.customer.metadata != undefined) ? stripe_data.customer.metadata.user_id : null)
 
     const amount_in_cents = stripe_data.charge_object.amount_captured
-    const native_currency = stripe_data.charge_object.currency == "cad" ? CountryList.CANADA : stripe_data.charge_object.currency == "usd" ? CountryList.UNITED_STATES : CountryList.CANADA
     const fees_covered = parseInt(stripe_data.charge_object.metadata.fees_covered)
     const fees_charged_by_stripe = stripe_data.balance_transaction_object.fee
     const cart = new Cart(JSON.parse(stripe_data.charge_object.metadata.causes), stripe_data.charge_object.amount_captured, fees_covered > 0 ? true : false)
-    
+    const payment_method = format_kinship_payment_method(stripe_data.payment_method)
+
     const donation = new Donation(
         donor, 
         stripe_data.charge_object.livemode,
         new Date(stripe_data.charge_object.created * 1000),
         amount_in_cents, 
-        native_currency,
         cart,
         fees_covered,
         fees_charged_by_stripe,
-        stripe_data.payment_method,
+        payment_method,
         stripe_data.payment_intent_object.id,
         stripe_data.charge_object.id,
         stripe_data.balance_transaction_object.id,
@@ -221,4 +220,21 @@ export async function refund_payment(donation: Donation, delivery_method: Delive
         new KinshipError(`Error refunding payment: ${error}`, "/src/stripe/index", "update_charge_metadata", true)
         return null
     }
+}
+
+export function format_kinship_payment_method(stripe_payment_method: Stripe.PaymentMethod) : KinshipPaymentMethod {
+    const kinship_formatted_payment_method: KinshipPaymentMethod = {
+        card_brand: stripe_payment_method.card.brand,
+        card_exp_month: stripe_payment_method.card.exp_month,
+        card_exp_year: stripe_payment_method.card.exp_year,
+        checks: {
+            address_line1_check_passed: stripe_payment_method.card.checks.address_line1_check == "pass" ? true : false,
+            address_postal_code_check_passed: stripe_payment_method.card.checks.address_postal_code_check == "pass" ? true : false,
+            cvc_check_passed: stripe_payment_method.card.checks.cvc_check == "pass" ? true : false
+        },
+        // Currently only support cards
+        type: PaymentMethods.CARD
+    }
+
+    return kinship_formatted_payment_method
 }
