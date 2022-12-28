@@ -552,6 +552,7 @@ function BillingStep({
             headers: {
                 'Content-Type': 'application/json'
             },
+            // BREAKPOINT
             body: JSON.stringify({
                 payment_intent_id: payment_intent_id,
                 stripe_customer_id: user ? user.stripe_customer_ids[0] : null,
@@ -563,7 +564,7 @@ function BillingStep({
                 city: city,
                 state_or_province: state_or_province,
                 postal_code: postal_code,
-                country: country ? country.code : "ca",
+                country: country.code != undefined ? country.code : (country != null && country != undefined) ? country : "ca",
                 fees_covered: coverFees == true ? (parseFloat(amount) * 0.029 * 100).toFixed(0): 0,
             })
         })
