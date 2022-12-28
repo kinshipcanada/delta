@@ -6,6 +6,7 @@ import { isValidUUIDV4 as verify_uuid } from 'is-valid-uuid-v4';
 import { upload_donation_to_database, fetch_receipt_from_database } from "./database";
 import { StripeTags } from "../classes/utility_classes";
 import { Donor } from "../classes/donors/Donor";
+import { Cart } from "../classes/cart/Cart";
 
 const FILE_NAME = "/systems/functions/donations";
 
@@ -34,7 +35,8 @@ export async function _format_donation_from_database(donation_object: any) {
     
     const donor = new Donor(generatedDonorDetails, fetched_donor_from_stripe.metadata.user_id)
     const donation_date = new Date(donation_object.donation_created)
-    return new Donation(donor, donation_object.livemode, donation_date, donation_object.amount_in_cents, donation_object.native_currency, donation_object.donation_causes, donation_object.fees_covered, donation_object.fees_charged_by_stripe, donation_object.payment_method, donation_object.stripe_payment_intent_id, donation_object.stripe_charge_id, donation_object.stripe_balance_transaction_id, donation_object.stripe_customer_id, donation_object.proof_available, donation_object.id)
+    const cart = new Cart(donation_object.donation_causes.causes, donation_object.donation_causes.total_amount_paid_in_cents, donation_object.fees_covered == 0 ? false : true)
+    return new Donation(donor, donation_object.livemode, donation_date, donation_object.amount_in_cents, donation_object.native_currency, cart, donation_object.fees_covered, donation_object.fees_charged_by_stripe, donation_object.payment_method, donation_object.stripe_payment_intent_id, donation_object.stripe_charge_id, donation_object.stripe_balance_transaction_id, donation_object.stripe_customer_id, donation_object.proof_available, donation_object.id)
 }
 
 // Create donations

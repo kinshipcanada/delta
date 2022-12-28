@@ -11,6 +11,7 @@ import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import CopyableInput from "../../components/core/CopyableInput";
+import { ErrorAlert } from "../../components/core/Alerts";
 
 export default function Index() {
 
@@ -32,7 +33,8 @@ export default function Index() {
         });
     
         if (response.status === 500) {
-            setError('Something went wrong. Please try again later')
+            setError(response.message)
+            setDonations({})
             return;
         }
     
@@ -115,7 +117,12 @@ export default function Index() {
                             </div>
                         </div>
 
-                        : 
+                        : error ?
+
+                        <p><ErrorAlert title = "Sorry, something went wrong fetching your donation" message={error} /></p>
+
+                        :
+
                         <div>
                             <div>
                                 <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
