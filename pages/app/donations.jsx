@@ -74,7 +74,7 @@ export default function Index() {
             {(user && profile) ? 
             
                 <div>
-                    <PageHeader text={`Welcome, ${profile.first_name}`} description={"You can download any tax receipts you are eligible for."} customSecondaryButton = {<SecondaryButton link = "/support" text = "Download Donation Summary" />} customPrimaryButton={<DownloadAllReceipts />} />
+                    <PageHeader text={`Welcome, ${profile.first_name}`} description={"You can download any tax receipts you are eligible for."} /*customSecondaryButton = {<SecondaryButton link = "/support" text = "Download Donation Summary" />}*/ /*customPrimaryButton={<DownloadAllReceipts />}*/ />
                     <div className="my-6 sm:my-8" />
                     <ul role="list" className="space-y-4">
                         {(donations == null || donations == undefined) ? 
@@ -173,6 +173,14 @@ function Receipt({ donation }) {
                         <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>
                         <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
                     </div>
+                    {donation.cart ? 
+                    
+                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">${(parseFloat(donation.amount_in_cents)/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
+                    </div>
+                    
+                    : null }
                     {donation.proof_available == true ?
                     
                     <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
@@ -214,7 +222,7 @@ function Receipt({ donation }) {
                 <div className="w-full flex justify-end">
                     <SecondaryButton link = "/" text = "Download" iconRight={ArrowDownCircleIconOutline}  />
                     <div className="m-1" />
-                    <PrimaryButton link = {"/receipts/" + donation.id} text = {<>View Receipt &rarr;</>} />
+                    <PrimaryButton link = {"/receipts/" + donation.donation_identifiers.kinship_donation_id} text = {<>View Receipt &rarr;</>} />
                 </div>
             </div>
         </div>

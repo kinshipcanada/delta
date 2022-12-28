@@ -77,7 +77,7 @@ export default function Receipt() {
                             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor.first_name}&apos;{receipt.donor.first_name[receipt.donor.first_name.length-1] == "s" ? null : "s"} receipt from {(new Date(Date.parse(receipt.created_at))).toLocaleDateString()}</h2>
                         </div>
                         <div className="sm:mt-4 flex md:mt-0 md:ml-4">
-                            <SecondaryButton iconLeft={DocumentIcon} text = "Download PDF" link = "/" />
+                            {/* <SecondaryButton iconLeft={DocumentIcon} text = "Download PDF" link = "/" /> */}
                         </div>
                     </div>
 

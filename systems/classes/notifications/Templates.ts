@@ -16,7 +16,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you very much for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. We'll ensure that this is processed and sent to those who need it most as soon as we can.
+                Thank you very much for your donation of ${donation.amount_in_cents/100} ${donation.donor.address.country == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. We'll ensure that this is processed and sent to those who need it most as soon as we can.
 
                 ${donation.donor.address.country == "ca" ? `You can access your CRA-eligible tax receipt here: https://receipts.kinshipcanada.com/${donation.stripe_tags.charge_id}` : ""}
 
@@ -33,7 +33,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
+                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.donor.address.country == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
 
                 
                 `, 
@@ -47,7 +47,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
+                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.donor.address.country == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
 
                 PROOF_AVAILABLE
                 `, 
@@ -61,7 +61,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
+                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.donor.address.country == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
 
                 REFUND_ISSUED
                 `, 
@@ -75,7 +75,7 @@ export function Templates( notification_type: NotificationType, donor: Donor, do
                 email_body: `
                 Dear ${donor.first_name},
                 
-                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.native_currency == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
+                Thank you for your donation of ${donation.amount_in_cents/100} ${donation.donor.address.country == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "USD" : null }. 
 
                 REFUND_PROCESSING
                 `, 

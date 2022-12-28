@@ -1,4 +1,4 @@
-import { CountryList, DatabaseDonation, DonationIdentifiers, donor_details } from "../classes/utility_classes";
+import { CountryList, DatabaseDonation, DonationIdentifiers, donor_details, KinshipDonation } from "../classes/utility_classes";
 import { Donation } from "../classes/donation/Donation";
 import { KinshipError } from "../classes/errors/KinshipError";
 import { build_donation_from_raw_stripe_data, fetch_customer_object, fetch_donation_from_stripe } from "./stripe";
@@ -36,7 +36,7 @@ export async function _format_donation_from_database(donation_object: any) {
     const donor = new Donor(generatedDonorDetails, fetched_donor_from_stripe.metadata.user_id)
     const donation_date = new Date(donation_object.donation_created)
     const cart = new Cart(donation_object.donation_causes.causes, donation_object.donation_causes.total_amount_paid_in_cents, donation_object.fees_covered == 0 ? false : true)
-    return new Donation(donor, donation_object.livemode, donation_date, donation_object.amount_in_cents, donation_object.native_currency, cart, donation_object.fees_covered, donation_object.fees_charged_by_stripe, donation_object.payment_method, donation_object.stripe_payment_intent_id, donation_object.stripe_charge_id, donation_object.stripe_balance_transaction_id, donation_object.stripe_customer_id, donation_object.proof_available, donation_object.id)
+    return new Donation(donor, donation_object.livemode, donation_date, donation_object.amount_in_cents, cart, donation_object.fees_covered, donation_object.fees_charged_by_stripe, donation_object.payment_method, donation_object.stripe_payment_intent_id, donation_object.stripe_charge_id, donation_object.stripe_balance_transaction_id, donation_object.stripe_customer_id, donation_object.proof_available, donation_object.id)
 }
 
 // Create donations
@@ -44,11 +44,11 @@ export async function _create_donation_from_identifier(donation_identifiers: Don
     
     const FUNCTION_NAME = "_create_donation_from_identifier"
 
-    if (donation_identifiers.charge_id || donation_identifiers.payment_intent_id) {
+    if (donation_identifiers.stripe_charge_id || donation_identifiers.stripe_payment_intent_id) {
         try {
             const tags: StripeTags = {
-                charge_id: donation_identifiers.charge_id,
-                payment_intent_id: donation_identifiers.payment_intent_id
+                charge_id: donation_identifiers.stripe_charge_id,
+                payment_intent_id: donation_identifiers.stripe_payment_intent_id
             }
 
             const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
@@ -74,7 +74,7 @@ export async function _fetch_donation_from_identifier(donation_identifiers: Dona
 
     const FUNCTION_NAME = "_fetch_donation_from_identifier"
 
-    if (donation_identifiers.charge_id || donation_identifiers.payment_intent_id) {
+    if (donation_identifiers.stripe_charge_id || donation_identifiers.stripe_payment_intent_id) {
         try {
             // Check first to see if the donation exists in the database
             const donation_in_database = await fetch_receipt_from_database(donation_identifiers)
@@ -86,8 +86,8 @@ export async function _fetch_donation_from_identifier(donation_identifiers: Dona
             
             // If it doesn't, build the donation from stripe
             const tags: StripeTags = {
-                charge_id: donation_identifiers.charge_id,
-                payment_intent_id: donation_identifiers.payment_intent_id
+                charge_id: donation_identifiers.stripe_charge_id,
+                payment_intent_id: donation_identifiers.stripe_payment_intent_id
             }
 
             const raw_stripe_data = await fetch_donation_from_stripe(tags, true)
