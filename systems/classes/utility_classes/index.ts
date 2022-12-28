@@ -36,9 +36,9 @@ export interface donor_details {
     payment_methods?: any[],
 }
 
-export interface CartInterface {
-    regions: any,
-    causes: any
+export interface FormattedCart {
+    total_amount_paid_in_cents: number
+    causes: string[]
 }
 
 export const enum EventTypes {
@@ -341,14 +341,6 @@ export type AmountForRegion = {
     [region_id in RegionList] : number
 }
 
-export interface Cause {
-    cause: string,
-    amount_in_cents: number,
-    region: RegionList,
-    recurring: boolean
-}
-
-
 export interface BaseApiResponse {
     status: 200 | 400 | 500,
     endpoint_called: string
@@ -376,11 +368,6 @@ export interface BatchedSimpleDonationResponse extends BaseApiResponse {
 
 export interface DonationSummaryResponse extends BaseApiResponse {
     summary: SummaryStatement
-}
-
-export interface CartInterface {
-    regions: any,
-    causes: any
 }
 
 export interface SummaryStatement {
@@ -418,7 +405,7 @@ export interface DatabaseDonation {
     transaction_successful?: boolean,
     transaction_refunded?: boolean,
     payment_method?: KinshipPaymentMethod,
-    donation_causes?: CartInterface,
+    donation_causes?: FormattedCart,
     stripe_payment_intent_id?: string,
     stripe_charge_id?: string,
     stripe_balance_transaction_id?: string,

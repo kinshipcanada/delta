@@ -148,7 +148,7 @@ export function build_donation_from_raw_stripe_data(stripe_data: raw_stripe_tran
     const native_currency = stripe_data.charge_object.currency == "cad" ? CountryList.CANADA : stripe_data.charge_object.currency == "usd" ? CountryList.UNITED_STATES : CountryList.CANADA
     const fees_covered = parseInt(stripe_data.charge_object.metadata.fees_covered)
     const fees_charged_by_stripe = stripe_data.balance_transaction_object.fee
-    const cart = new Cart([], stripe_data.charge_object.amount_captured, fees_covered > 0 ? true : false)
+    const cart = new Cart(JSON.parse(stripe_data.charge_object.metadata.causes), stripe_data.charge_object.amount_captured, fees_covered > 0 ? true : false)
     
     const donation = new Donation(
         donor, 

@@ -244,10 +244,16 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
                     }
                 }
 
+                let causes = []
+
+                for (const cause of selected_causes) {
+                    causes.push(cause.name)
+                }
+
                 await fetch("/api/donation/stripe/createPaymentIntent", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ causes: selected_causes, amount: amount*100 }),
+                    body: JSON.stringify({ causes: causes, amount: amount*100 }),
                     })
                     .then((res) => res.json())
                     .then((data) => {
@@ -506,8 +512,6 @@ function BillingStep({
             address_country: country
         });
 
-        console.log(response)
-        
         if (199 < response.status && response.status < 300) {
             // Redirect the user to the confirmation page, with the cart ID in the URL
             router.push(`/confirmation?cart_id=${response.cart.id}`)
@@ -645,7 +649,7 @@ function BillingStep({
                 <div>
                  
                   <div className="mt-1">
-                    { country.code == "ca" ?
+                    { country == "ca" || country.code == "ca" ?
 
                         <div>
                             <label htmlFor="state" className="block text-sm font-medium text-gray-700">

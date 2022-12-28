@@ -55,7 +55,8 @@ export default function Donate() {
       });
   
       if (response.statusCode === 500) {
-          setError(error.message);
+          setError(response.message);
+          console.log(response)
           setLoading(false)
           return;
       } else {
@@ -121,15 +122,15 @@ export default function Donate() {
 
             <p>Something went wrong fetching your receipt</p>
 
-            : paymentIntentId ?
+            : paymentIntentId && !error && donation != undefined && donation != null ?
 
             <ConfirmationView donation={donation} paymentIntentId={paymentIntentId} />
 
-            : kinshipCartId ?
+            : kinshipCartId && !error ?
 
             <CartView cart={cart} />
 
-            : null
+            : <p>Something went wrong fetching your receipt</p>
             
             }
         </div>
@@ -211,8 +212,8 @@ const products = [
             </div>
             <p className="text-sm text-gray-600">
               Donation Made{' '}
-              <time dateTime="2021-03-22" className="font-medium text-gray-900">
-                { new Date(donation.created_at).toDateString() }
+              <time className="font-medium text-gray-900">
+                { donation ? new Date(donation.created_at).toDateString() : new Date().toDateString() }
               </time>
             </p>
             <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500 sm:hidden">
@@ -247,7 +248,7 @@ const products = [
                     </div>
 
                     <div className="mt-6 sm:mt-0 sm:ml-6">
-                      <h3 className="text-base font-medium text-gray-900">{ "Donation for $" + (donation.amount_in_cents/100).toFixed(2) + " on " + new Date(donation.created_at).toDateString() }</h3>
+                      <h3 className="text-base font-medium text-gray-900">{ "Donation for $" + (donation.amount_in_cents/100).toFixed(2) + " on " + donation ? new Date(donation.created_at).toDateString() : new Date().toDateString() }</h3>
                       <p className="mt-2 text-sm font-medium text-gray-900">Made out to {donation.donor.first_name}{' '}{donation.donor.last_name}</p>
                       <p className="mt-3 text-sm text-gray-500">Thank you so much for your donation. Your {donation.donor.address.country == "ca" ? "tax" : null} receipt is being generated and will be emailed to your shortly. {donation.donor.address.country == "ca" ? null : "Please note that because you are not in Canada, this is not a tax-eligible donation."}</p>
                     </div>
@@ -259,7 +260,11 @@ const products = [
                         <dt className="font-medium text-gray-900">Donated To</dt>
                         <dd className="mt-3 text-gray-500">
                           { donation.cart.causes.map((cause)=>(
-                            <span className="block">{cause}</span>
+                            <span className="flex items-center">
+                              <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                                <circle cx={4} cy={4} r={3} />
+                              </svg>
+                              {cause}</span>
                           ))}
                         </dd>
                       </div>
@@ -324,25 +329,27 @@ const products = [
                   <dt className="font-medium text-gray-900">Payment information</dt>
                   <dd className="-ml-4 -mt-1 flex flex-wrap">
                     <div className="ml-4 mt-4 flex-shrink-0">
-                      <svg
-                        aria-hidden="true"
-                        width={36}
-                        height={24}
-                        viewBox="0 0 36 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-auto"
-                      >
-                        <rect width={36} height={24} rx={4} fill="#224DBA" />
-                        <path
-                          d="M10.925 15.673H8.874l-1.538-6c-.073-.276-.228-.52-.456-.635A6.575 6.575 0 005 8.403v-.231h3.304c.456 0 .798.347.855.75l.798 4.328 2.05-5.078h1.994l-3.076 7.5zm4.216 0h-1.937L14.8 8.172h1.937l-1.595 7.5zm4.101-5.422c.057-.404.399-.635.798-.635a3.54 3.54 0 011.88.346l.342-1.615A4.808 4.808 0 0020.496 8c-1.88 0-3.248 1.039-3.248 2.481 0 1.097.969 1.673 1.653 2.02.74.346 1.025.577.968.923 0 .519-.57.75-1.139.75a4.795 4.795 0 01-1.994-.462l-.342 1.616a5.48 5.48 0 002.108.404c2.108.057 3.418-.981 3.418-2.539 0-1.962-2.678-2.077-2.678-2.942zm9.457 5.422L27.16 8.172h-1.652a.858.858 0 00-.798.577l-2.848 6.924h1.994l.398-1.096h2.45l.228 1.096h1.766zm-2.905-5.482l.57 2.827h-1.596l1.026-2.827z"
-                          fill="#fff"
-                        />
-                      </svg>
-                      <p className="sr-only">Visa</p>
+                      {
+                        donation.payment_method.card_brand == "visa" ?
+
+                        <img src = "/cards/visa.png" className="h-8 w-auto" />
+
+                        : donation.payment_method.card_brand == "mastercard" ?
+
+                        <img src = "/cards/mastercard.png" className="h-8 w-auto" />
+
+                        : donation.payment_method.card_brand == "amex" ?
+
+                        <img src = "/cards/amex.png" className="h-8 w-auto" />
+
+                        :
+
+                        <img src = "/cards/card.png" className="h-8 w-auto" />
+                      }
                     </div>
                     <div className="ml-4 mt-4">
-                      <p className="text-gray-900">Ending with {donation.payment_method.card.last4}</p>
-                      <p className="text-gray-600">Expires {donation.payment_method.card.exp_month} / {donation.payment_method.card.exp_year}</p>
+                      {/* <p className="text-gray-900">Ending with {donation.payment_method.card.last4}</p> */}
+                      {/* <p className="text-gray-600">Expires {donation.payment_method.card.exp_month} / {donation.payment_method.card.exp_year}</p> */}
                     </div>
                   </dd>
                 </div>
@@ -359,11 +366,11 @@ const products = [
                 </div>
                 <div className="flex items-center justify-between py-4">
                   <dt className="text-gray-600">Eligible for tax receipt</dt>
-                  <dd className="font-medium text-gray-900">${((donation.amount_in_cents + donation.fees_covered)/100).toFixed(2)}</dd>
+                  <dd className="font-medium text-gray-900">${((Number(donation.amount_in_cents) + Number(donation.fees_covered))/100).toFixed(2)}</dd>
                 </div>
                 <div className="flex items-center justify-between pt-4">
                   <dt className="font-medium text-gray-900">Donation total</dt>
-                  <dd className="font-medium text-blue-600">${((donation.amount_in_cents + donation.fees_covered)/100).toFixed(2)}</dd>
+                  <dd className="font-medium text-blue-600">${((Number(donation.amount_in_cents) + Number(donation.fees_covered))/100).toFixed(2)}</dd>
                 </div>
               </dl>
             </div>
