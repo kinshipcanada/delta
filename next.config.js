@@ -14,6 +14,16 @@ module.exports = withAxiom({
         destination: '/auth/login',
         permanent: true,
       },
+      {
+        source: '/ramadan',
+        destination: '/campaigns/ramadhan',
+        permanent: true,
+      },
+      {
+        source: '/ramadhan',
+        destination: '/campaigns/ramadhan',
+        permanent: true,
+      }
     ]
   },
 });
