@@ -386,7 +386,15 @@ export function PreferredCauseCheckbox({ cause_object, selected_causes, set_sele
             </div>
             <label htmlFor={cause_object.cause_id} className="cursor-pointer ml-3 text-sm">
                 <p className="font-medium text-gray-700 flex items-center">
-                    { cause_object.name } { cause_object.cause_id != 0 ? <p data-tip={ cause_object.description } className="ml-2 inline"><QuestionMarkCircleIcon className="text-slate-400 hover:text-slate-600 h-4 w-4" /></p> : null }
+                    { cause_object.name } 
+                    { cause_object.campaign == true ? 
+                        <span className="ml-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                            Campaign
+                        </span> 
+                        
+                        : null 
+                    } 
+                    { cause_object.cause_id != 0 ? <p data-tip={ cause_object.description } className="ml-2 inline"><QuestionMarkCircleIcon className="text-slate-400 hover:text-slate-600 h-4 w-4" /></p> : null }
                 </p>
                 {
                     cause_object.cause_id == 0 ? <p className="text-gray-500">{ cause_object.description }</p> : null

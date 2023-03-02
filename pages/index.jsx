@@ -19,7 +19,7 @@ export default function Index() {
       <Hero />
       <Incentives />
       <Causes />
-      <Partners />
+      {/* <Partners /> */}
       <CTA />
     </div>
   );
@@ -73,7 +73,7 @@ export function Hero() {
                     <span className="md:block">Charity in its purest essence</span>
                   </h1>
                   <p className="mt-3 text-base text-gray-800 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                    All proceeds go directly to those who need it - Kinship pays any fees involved. Manage your tax receipts, get proof of donation, and more.
+                    All proceeds go directly to those who need it, with 0 admin fees. Manage your tax receipts, get proof of donation, and more.
                   </p>
                   <div className='m-4' />
                   <div className='flex'>
