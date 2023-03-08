@@ -23,8 +23,7 @@ export default async function handler(req, res) {
 
     if (customer_id === null) {
         const customer = await stripe.customers.create({
-            first_name: first_name,
-            last_name: last_name,
+            name: first_name + ' ' + last_name,
             email: email,
             address: {
                 line1: address,
