@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { supabase } from '../../systems/helpers/supabaseClient'
+import Loading from './Loading'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -23,8 +24,8 @@ export default function AdminLayout({ children }) {
   const navigation = [
     { name: 'Admin Panel Home', link: '/admin', icon: HomeIcon, current: (path == "/admin") },
     { name: 'View Donations', link: '/admin/donations', icon: MagnifyingGlassIcon, current: (path == "/admin/donations") },
-    { name: 'Generate Report', link: '/app/proof', icon: DocumentDuplicateIcon, current: (path == "/app/proof") },
-    { name: 'Create New Donation', link: '/app/donations', icon: PlusCircleIcon, current: (path == "/app/donations") },
+    { name: 'Generate Report', link: '/admin/reports', icon: DocumentDuplicateIcon, current: (path == "/app/proof") },
+    // { name: 'Create New Donation', link: '/admin/create', icon: PlusCircleIcon, current: (path == "/app/donations") },
   ]
 
   useEffect(async ()=>{
@@ -103,7 +104,9 @@ export default function AdminLayout({ children }) {
       {
         loading ?
 
-        <div className='col-span-3'>Loading...</div>
+        <div className='col-span-3'>
+          <div className='flex w-full items-center justify-center'><p className='mr-2 text-md font-semibold'>Loading admin panel</p> <Loading color={"BLUE"} /></div>
+        </div>
 
         : loginRequired ?
 

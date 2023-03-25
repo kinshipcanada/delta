@@ -136,7 +136,7 @@ export default function Index() {
                                     ))}
                                 </dl>
                                 <div className="my-4 sm:my-6" />
-                                <CRAPackage user_email={user.email} />
+                                { donations.length > 0 ? <CRAPackage user_email={user.email} /> : null }
                                 {/* <PendingTransfers user_email = {user.email} /> */}
                                 <ReactTooltip />
                             </div>

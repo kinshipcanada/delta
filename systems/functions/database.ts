@@ -1,4 +1,4 @@
-import { CountryList, DatabaseDonation, DonationIdentifiers } from "../classes/utility_classes"
+import { CountryList, DatabaseDonation, DonationIdentifiers, EventTypes } from "../classes/utility_classes"
 import { KinshipError } from "../classes/errors/KinshipError"
 
 require('dotenv').config();
@@ -90,6 +90,21 @@ export function upload_cart_to_database(id: string, donor: string, email: string
         })
     } catch (error) {
         new KinshipError(`Error uploading donation to database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
+        return
+    }
+}
+
+export function upload_event_to_database(eventType: EventTypes, message: string, identifiers: string) {
+    const FUNCTION_NAME = "upload_event_to_database"
+    
+    try {
+        return database('events').insert({
+            event_type: eventType,
+            message: message,
+            identifiers: identifiers
+        })
+    } catch (error) {
+        new KinshipError(`Error uploading event to database: ${error.message}`, FILE_NAME, FUNCTION_NAME)
         return
     }
 }

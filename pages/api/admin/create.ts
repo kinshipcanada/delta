@@ -7,7 +7,7 @@ export default async function handler(req, res) {
         const donation_id = req.body.donation_id
 
         if (!donation_id) {
-            await KinshipLogger(EventTypes.INTERNAL_ERROR, "Missing parameter: /api/admin/resend called without a donation_id", [])
+            
             res.status(500).send("No donation id provided");
             return
         }
