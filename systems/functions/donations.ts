@@ -22,10 +22,9 @@ export async function _format_donation_from_database(donation_object: any) {
 
     try {
         const fetched_donor_from_stripe = await fetch_customer_object(donation_object.stripe_customer_id)
-        console.log(fetched_donor_from_stripe)
         const generatedDonorDetails: donor_details = {
-            first_name: fetched_donor_from_stripe.metadata.first_name ? fetched_donor_from_stripe.metadata.first_name : fetched_donor_from_stripe.name.split(' ')[0],
-            last_name: fetched_donor_from_stripe.metadata.last_name ? fetched_donor_from_stripe.metadata.last_name : fetched_donor_from_stripe.name.split(' ')[1],
+            first_name: donation_object.donor_object ? donation_object.donor_object.first_name : fetched_donor_from_stripe.metadata.first_name ? fetched_donor_from_stripe.metadata.first_name : fetched_donor_from_stripe.name.split(' ')[0],
+            last_name: donation_object.donor_object ? donation_object.donor_object.last_name : fetched_donor_from_stripe.metadata.last_name ? fetched_donor_from_stripe.metadata.last_name : fetched_donor_from_stripe.name.split(' ')[1],
             stripe_cus_id: fetched_donor_from_stripe.id,
             email: fetched_donor_from_stripe.email,
             address: {
