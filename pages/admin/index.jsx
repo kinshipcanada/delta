@@ -4,6 +4,7 @@ import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
 import { callKinshipAPI } from "../../systems/functions/helpers";
+import TextInput from "../../components/core/TextInput";
 
 export default function Index() {
 
@@ -225,57 +226,42 @@ function ManuallyGenerateAndSend() {
         <div className="bg-white shadow border sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
                 <h3 className="text-lg font-medium leading-6 text-gray-900 leading-7">Create A New Receipt</h3>
-                <div className="mt-2 max-w-xl text-sm text-gray-500">
+                <div className="mt-2 text-sm text-gray-500">
                 <form>
                     <div>
                         <h2 className="text-md mb-2 font-semibold leading-7 text-gray-900">Donor Information</h2>
                         {/* <p className="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p> */}
                     </div>
 
-                    <div className="grid max-w-2xl grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-6 md:col-span-2">
+                    <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-6 md:col-span-2">
                         <div className="sm:col-span-3">
-                        <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-gray-900">
-                            First name
-                        </label>
-                        <div className="mt-2">
-                            <input
-                            type="text"
-                            name="first-name"
-                            id="first-name"
-                            autoComplete="given-name"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            <TextInput 
+                                label={'First Name'} 
+                                type={'text'} 
+                                required={true}
+                                setter={setFirstName}
+                                placeholder={'Ali'}
                             />
-                        </div>
                         </div>
 
                         <div className="sm:col-span-3">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-gray-900">
-                            Last name
-                        </label>
-                        <div className="mt-2">
-                            <input
-                            type="text"
-                            name="last-name"
-                            id="last-name"
-                            autoComplete="family-name"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            <TextInput 
+                                label={'Last Name'} 
+                                type={'text'} 
+                                required={true}
+                                setter={setLastName}
+                                placeholder={'Hussein'}
                             />
-                        </div>
                         </div>
 
                         <div className="sm:col-span-4">
-                        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                            Email address
-                        </label>
-                        <div className="mt-2">
-                            <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            <TextInput 
+                                label={'Email'} 
+                                type={'email'} 
+                                required={true}
+                                setter={setLastName}
+                                placeholder={'Hussein'}
                             />
-                        </div>
                         </div>
 
                         <div className="sm:col-span-3">
@@ -374,6 +360,9 @@ function ManuallyGenerateAndSend() {
                         - first_name
                         - last_name
                         - middle_names: null
+                    <button type="submit">
+                        Submit {lastName}
+                    </button>
                 </form>
                 </div>
             </div>

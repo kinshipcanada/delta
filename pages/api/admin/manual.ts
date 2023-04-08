@@ -4,6 +4,8 @@ import resend_receipt, { ResendReceiptResponse } from "../../../systems/methods/
 
 export default async function handler(req, res) {
     try {
+
+        console.log(req.body)
         const donation_id = req.body.donation_id
 
         if (!donation_id) {
