@@ -139,12 +139,13 @@ function Receipt({ donation }) {
                     <div className="flex items-center">
                         {donation.livemode == false ?
                         
-                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-0.5 text-sm font-medium text-yellow-800">
-                            <svg className="-ml-1 mr-1.5 h-2 w-2 text-yellow-600" fill="currentColor" viewBox="0 0 8 8">
-                            <circle cx={4} cy={4} r={3} />
-                            </svg>
-                            Test Donation
-                        </span>
+                        null
+                        // <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-0.5 text-sm font-medium text-yellow-800">
+                        //     <svg className="-ml-1 mr-1.5 h-2 w-2 text-yellow-600" fill="currentColor" viewBox="0 0 8 8">
+                        //     <circle cx={4} cy={4} r={3} />
+                        //     </svg>
+                        //     Test Donation
+                        // </span>
                         
                         : null
                         }
@@ -166,7 +167,7 @@ function Receipt({ donation }) {
                     <dl className="sm:divide-y sm:divide-gray-200">
                     <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Receipt Issued To</dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">Shakeel-Abbas Hussein</dd>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{donation.donor.first_name}{' '}{donation.donor.last_name}</dd>
                     </div>
                     <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
                         <dt className="text-sm font-medium text-gray-500">Amount Donated</dt>

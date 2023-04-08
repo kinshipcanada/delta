@@ -5,6 +5,8 @@ import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
 import { callKinshipAPI } from "../../systems/functions/helpers";
 import TextInput from "../../components/core/TextInput";
+import { PrimaryButton } from "../../components/core/Buttons";
+import { toast } from "react-hot-toast";
 
 export default function Index() {
 
@@ -343,26 +345,28 @@ function ManuallyGenerateAndSend() {
                             />
                         </div>
                         </div>
+                        <div className="mt-2">
+                            <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
+                                Amount Donated ($CAD)
+                            </label>
+                            <input
+                            type="text"
+                            name="amount"
+                            id="amount"
+                            autoComplete="amount"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            />
+                        </div>
+                        <div className="mt-2">
+                            <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
+                                Date of donation
+                            </label>
+                            <input type="date" id="start" name="trip-start"
+                                value="2021-01-01"
+                                min="2021-01-01" max="2021-12-31"/>
+                        </div>
                     </div>
-                    - donation created
-                    - email 
-                    - amount_in_cents
-                    - fees_covered
-                    - payment_method
-                    - donation_causes
-                    - address_line_address
-                    - address_state
-                    - address_city
-                    - address_postal_code
-                    - address_country
-                    - donor_object
-                        - email 
-                        - first_name
-                        - last_name
-                        - middle_names: null
-                    <button type="submit">
-                        Submit {lastName}
-                    </button>
+                    <PrimaryButton action={()=>{toast.error('Too Many Requests Made To Stripe. Please try again in 30 minutes.')}} text = {"Create donation and send receipt"} />
                 </form>
                 </div>
             </div>

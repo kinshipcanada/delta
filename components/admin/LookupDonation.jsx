@@ -63,13 +63,13 @@ export default function LookupDonation({ open, setOpen }) {
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                   <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
                     <div className="h-0 flex-1 overflow-y-auto">
-                      <div className="bg-indigo-700 py-6 px-4 sm:px-6">
+                      <div className="bg-blue-700 py-6 px-4 sm:px-6">
                         <div className="flex items-center justify-between">
                           <Dialog.Title className="text-lg font-medium text-white">New Project</Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
                               type="button"
-                              className="rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                              className="rounded-md bg-blue-700 text-blue-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                               onClick={() => setOpen(false)}
                             >
                               <span className="sr-only">Close panel</span>
@@ -78,7 +78,7 @@ export default function LookupDonation({ open, setOpen }) {
                           </div>
                         </div>
                         <div className="mt-1">
-                          <p className="text-sm text-indigo-300">
+                          <p className="text-sm text-blue-300">
                             Get started by filling in the information below to create your new project.
                           </p>
                         </div>
@@ -95,7 +95,7 @@ export default function LookupDonation({ open, setOpen }) {
                                   type="text"
                                   name="project-name"
                                   id="project-name"
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                 />
                               </div>
                             </div>
@@ -108,7 +108,7 @@ export default function LookupDonation({ open, setOpen }) {
                                   id="description"
                                   name="description"
                                   rows={4}
-                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                   defaultValue={''}
                                 />
                               </div>
@@ -128,7 +128,7 @@ export default function LookupDonation({ open, setOpen }) {
                                   ))}
                                   <button
                                     type="button"
-                                    className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                   >
                                     <span className="sr-only">Add team member</span>
                                     <PlusIcon className="h-5 w-5" aria-hidden="true" />
@@ -146,7 +146,7 @@ export default function LookupDonation({ open, setOpen }) {
                                       name="privacy"
                                       aria-describedby="privacy-public-description"
                                       type="radio"
-                                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                      className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                                       defaultChecked
                                     />
                                   </div>
@@ -167,7 +167,7 @@ export default function LookupDonation({ open, setOpen }) {
                                         name="privacy"
                                         aria-describedby="privacy-private-to-project-description"
                                         type="radio"
-                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                                       />
                                     </div>
                                     <div className="pl-7 text-sm">
@@ -188,7 +188,7 @@ export default function LookupDonation({ open, setOpen }) {
                                         name="privacy"
                                         aria-describedby="privacy-private-to-project-description"
                                         type="radio"
-                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                                       />
                                     </div>
                                     <div className="pl-7 text-sm">
@@ -208,10 +208,10 @@ export default function LookupDonation({ open, setOpen }) {
                             <div className="flex text-sm">
                               <a
                                 href="#"
-                                className="group inline-flex items-center font-medium text-indigo-600 hover:text-indigo-900"
+                                className="group inline-flex items-center font-medium text-blue-600 hover:text-blue-900"
                               >
                                 <LinkIcon
-                                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-900"
+                                  className="h-5 w-5 text-blue-500 group-hover:text-blue-900"
                                   aria-hidden="true"
                                 />
                                 <span className="ml-2">Copy link</span>
@@ -233,14 +233,14 @@ export default function LookupDonation({ open, setOpen }) {
                     <div className="flex flex-shrink-0 justify-end px-4 py-4">
                       <button
                         type="button"
-                        className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         onClick={() => setOpen(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="ml-4 inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       >
                         Save
                       </button>
