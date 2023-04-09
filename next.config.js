@@ -23,7 +23,22 @@ module.exports = withAxiom({
         source: '/ramadhan',
         destination: '/campaigns/ramadhan',
         permanent: true,
-      }
+      },
+      {
+        source: '/path',
+        destination: '/campaigns/vision',
+        permanent: true,
+      },
+      {
+        source: '/the-path',
+        destination: '/campaigns/vision',
+        permanent: true,
+      },
+      {
+        source: '/thepath',
+        destination: '/campaigns/vision',
+        permanent: true,
+      },
     ]
   },
 });
