@@ -16,7 +16,7 @@ export default function Navigation() {
     const pages = [
       { name: "Home", link: "/", current: router.asPath == "/" },
       { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" },
-      { name: "Ramadhan Campaign", link: "/campaigns/ramadhan", current: router.asPath == "/campaigns/ramadhan" },
+      { name: "Vision Kinship Campaign", link: "/campaigns/vision", current: router.asPath == "/campaigns/vision" },
       { name: "About", link: "/about", current: router.asPath == "/about" }
     ]
 
@@ -117,7 +117,8 @@ export function MenuLink({ text, link, current }) {
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
-  }  
+}  
+
 
 function Support() {
 
