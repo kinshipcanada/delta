@@ -242,6 +242,7 @@ export default function Vision() {
                       <dd className="text-5xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
                     </div>
                   ))} */}
+                  <img src = '/campaigns/vision/infographic.jpeg' className="rounded-lg" />
                 </dl>
               </div>
             </div>
@@ -390,9 +391,9 @@ export function DownloadPaperCTA() {
             <img
               className="absolute left-0 top-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
               src="/campaigns/vision/paper.png"
-              alt="App screenshot"
+              alt="Infographic"
               width={1824}
-              height={1080}
+              height={'auto'}
             />
           </div>
         </div>
