@@ -27,7 +27,7 @@ const families = [
       'Sewing Machine',
       'Tuition Fees'
     ],
-    imageSrc: "https://lirp.cdn-website.com/f2766bde/dms3rep/multi/opt/e6ec87a5c8abaa89d6dd149e9d85f73d-d97d8381-640w.jpg",
+    imageSrc: "/campaigns/vision/8.jpeg",
     imageAlt: 'A family eating dinner together',
   }
 ]
@@ -159,7 +159,7 @@ export default function Vision() {
                   <div className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
                     <div className="relative">
                       <img
-                        src="/campaigns/vision/4.jpg"
+                        src="/campaigns/vision/6.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -169,7 +169,7 @@ export default function Vision() {
                   <div className="mr-auto w-44 flex-none space-y-8 sm:mr-0 sm:pt-52 lg:pt-36">
                     <div className="relative">
                       <img
-                        src="/campaigns/vision/5.jpg"
+                        src="/campaigns/vision/7.png.webp"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -177,7 +177,7 @@ export default function Vision() {
                     </div>
                     <div className="relative">
                       <img
-                        src="/campaigns/vision/1.jpeg"
+                        src="/campaigns/vision/9.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -187,7 +187,7 @@ export default function Vision() {
                   <div className="w-44 flex-none space-y-8 pt-32 sm:pt-0">
                     <div className="relative">
                       <img
-                        src="/campaigns/vision/2.jpeg"
+                        src="/campaigns/vision/10.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -195,7 +195,7 @@ export default function Vision() {
                     </div>
                     <div className="relative">
                       <img
-                        src="/campaigns/vision/3.jpeg"
+                        src="/campaigns/vision/11.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -236,12 +236,12 @@ export default function Vision() {
               </div>
               <div className="lg:flex lg:flex-auto lg:justify-center">
                 <dl className="w-64 space-y-8 xl:w-80">
-                  {stats.map((stat) => (
+                  {/* {stats.map((stat) => (
                     <div key={stat.label} className="flex flex-col-reverse gap-y-4">
                       <dt className="text-base leading-7 text-gray-600">{stat.label}</dt>
                       <dd className="text-5xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
                     </div>
-                  ))}
+                  ))} */}
                 </dl>
               </div>
             </div>
