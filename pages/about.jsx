@@ -2,51 +2,60 @@ import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
 
-export default function About() {
+// Highlighted principles. These get mapped automatically.
+const principles = [
+    {
+    name: 'Helping everyone worldwide',
+    description:
+        'We believe that anyone in poverty around the world is deserving of our help, not just the people of one region. Kinship operates globally with partners in India, Africa, the Middle East, and Canada.',
+    icon: GlobeAltIcon,
+    },
+    {
+    name: 'No admin fees',
+    description:
+        'We believe that your entire donation should go to those who you committed to - not towards paying our processing fees or hotels. Any expenses incurred in getting your money there - we cover.',
+    icon: ScaleIcon,
+    },
+    {
+    name: 'Seamless process',
+    description:
+        'We want to make donating as easy as possible, from preparing tax receipt refund packages to providing an easy dashboard to download proof of donation.',
+    icon: BoltIcon,
+    },
+]
 
-
-    const principles = [
-        {
-        name: 'Helping everyone worldwide',
-        description:
-            'We believe that anyone in poverty around the world is deserving of our help, not just the people of one region. Kinship operates globally with partners in India, Africa, the Middle East, and Canada.',
-        icon: GlobeAltIcon,
-        },
-        {
-        name: 'No admin fees',
-        description:
-            'We believe that your entire donation should go to those who you committed to - not towards paying our processing fees or hotels. Any expenses incurred in getting your money there - we cover.',
-        icon: ScaleIcon,
-        },
-        {
-        name: 'Seamless process',
-        description:
-            'We want to make donating as easy as possible, from preparing tax receipt refund packages to providing an easy dashboard to download proof of donation.',
-        icon: BoltIcon,
-        },
-    ]
-    
-    const features = [
-        {
+const features = [
+    {
         name: 'Download Tax Receipts',
         description: <>Download CRA-Eligible tax receipts in our dashboard.</>,
-        },
-        { name: 'Proof Of Donation', description: <>Kinship aims to provide proof of your donations where possible, including through pictures and receipts.</> },
-        {
+    },
+    { 
+        name: 'Proof Of Donation', 
+        description: <>Kinship aims to provide proof of your donations where possible, including through pictures and receipts.</> },
+    {
         name: 'Recurring Donations',
         description: <>With Kinship, you can make recurring donations and manage them from your dashboard.</>,
-        },
-        { name: 'Email Notifications', description: <>Get tax receipts, proof of donation, and more. Customize what you are notified for on your dashboard.</> },
-        { name: 'All Proceeds Go To Those Who Need It', description: <>Kinship covers all processing, exchange, and wire fees unless you opt to cover it. We also pay volunteer expenses out of pocket.</> },
-        { name: 'Email Support', description: <>Need help? We&apos;re here for you. Send a ticket on our support page and we&apos;ll get back to you as soon as possible.</> },
-    ]
+    },
+    { 
+        name: 'Email Notifications', 
+        description: <>Get tax receipts, proof of donation, and more. Customize what you are notified for on your dashboard.</> 
+    },
+    { 
+        name: 'All Proceeds Go To Those Who Need It', 
+        description: <>Kinship covers all processing, exchange, and wire fees unless you opt to cover it. We also pay volunteer expenses out of pocket.</> 
+    },
+    { 
+        name: 'Email Support', 
+        description: <>Need help? We&apos;re here for you. Send a ticket on our support page and we&apos;ll get back to you as soon as possible.</> 
+    },
+]
+
+// Main About wrapper component
+export default function About() {
 
     return (
         <div>
-
-
             <div className="bg-white">
                 <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
                 <div className="text-center">
@@ -208,8 +217,6 @@ export default function About() {
                     </div>
                 </div>
                 </div>
-
-            
             
         </div>
     )
