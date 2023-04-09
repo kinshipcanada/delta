@@ -68,7 +68,7 @@ function FamilyCard({ family }) {
                     <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
                     Tax receipt eligible
                   </p>
-                  <div className="mt-6">
+                  {/* <div className="mt-6">
                     <div className="overflow-hidden rounded-full bg-gray-200">
                       <div
                         className="h-2 rounded-full bg-blue-600"
@@ -78,7 +78,7 @@ function FamilyCard({ family }) {
                     <div className="mt-6 font-medium text-gray-600">
                       <div className="text-blue-600">Raised: ${(family.amount_raised).toFixed(2)} CAD / ${(family.amount_needed).toFixed(2)} CAD Goal</div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               </a>
