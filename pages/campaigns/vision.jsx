@@ -1,5 +1,7 @@
 import { DocumentIcon } from "@heroicons/react/24/outline"
+import { CheckCircleIcon } from "@heroicons/react/20/solid"
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons"
+import Link from "next/link"
 
 const stats = [
   { label: 'Transactions every 24 hours', value: '44 million' },
@@ -11,88 +13,76 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
+
 const families = [
-    {
-      id: 1,
-      name: 'Distant Mountains Artwork Tee',
-      price: '$36.00',
-      description: 'You awake in a new, mysterious land. Mist hangs low along the distant mountains. What does it mean?',
-      address: ['Floyd Miles', '7363 Cynthia Pass', 'Toronto, ON N3Y 4H8'],
-      email: 'f•••@example.com',
-      phone: '1•••••••••40',
-      href: '#',
-      status: 'Processing',
-      step: 1,
-      date: 'March 24, 2021',
-      datetime: '2021-03-24',
-      imageSrc: 'https://tailwindui.com/img/ecommerce-images/confirmation-page-04-product-01.jpg',
-      imageAlt: 'Off-white t-shirt with circular dot illustration on the front of mountain ridges that fade.',
-    },
+  {
+    name: 'Family 1: Based in India',
+    amount_needed: 10000,
+    description: 'Will receive housing, a water pump, training and support to set up a small business (including a sewing machine for the wife) and school fees for their children for the year',
+    amount_raised: 100,
+    tax_receipt_eligible: true,
+    receives: [
+      'Housing',
+      'Water Pump',
+      'Sewing Machine',
+      'Tuition Fees'
+    ],
+    imageSrc: "https://lirp.cdn-website.com/f2766bde/dms3rep/multi/opt/e6ec87a5c8abaa89d6dd149e9d85f73d-d97d8381-640w.jpg",
+    imageAlt: 'A family eating dinner together',
+  }
 ]
 
-function FamilyCard({ product }) {
+function FamilyCard({ family }) {
     return (
+      <Link href = '/donate'><a href={'/donate'}>
         <div
                 className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
               >
                 <div className="sm:col-span-4 md:col-span-5 md:row-span-2 md:row-end-2">
                   <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-50">
-                    <img src={product.imageSrc} alt={product.imageAlt} className="object-cover object-center" />
+                    <img src={family.imageSrc} alt={family.imageAlt} className="object-cover object-center" />
                   </div>
                 </div>
                 <div className="mt-6 sm:col-span-7 sm:mt-0 md:row-end-1">
                   <h3 className="text-lg font-medium text-gray-900">
-                    <a href={product.href}>{product.name}</a>
+                    {family.name}
                   </h3>
-                  <p className="mt-1 font-medium text-gray-900">{product.price}</p>
-                  <p className="mt-3 text-gray-500">{product.description}</p>
+                  <p className="mt-1 font-medium text-gray-900">Goal: ${(family.amount_needed).toFixed(2)} CAD</p>
+                  <p className="mt-3 text-gray-500">{family.description}</p>
                 </div>
                 <div className="sm:col-span-12 md:col-span-7">
                   <dl className="grid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
                     <div>
-                      <dt className="font-medium text-gray-900">Delivery address</dt>
+                      <dt className="font-medium text-gray-900">Family will recieve</dt>
                       <dd className="mt-3 text-gray-500">
-                        <span className="block">{product.address[0]}</span>
-                        <span className="block">{product.address[1]}</span>
-                        <span className="block">{product.address[2]}</span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-medium text-gray-900">Shipping updates</dt>
-                      <dd className="mt-3 space-y-3 text-gray-500">
-                        <p>{product.email}</p>
-                        <p>{product.phone}</p>
-                        <button type="button" className="font-medium text-blue-600 hover:text-blue-500">
-                          Edit
-                        </button>
+                        { family.receives.map((item) => (
+                          <span className="flex items-center">
+                            <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+                            {item}
+                          </span>
+                        )) }
                       </dd>
                     </div>
                   </dl>
-                  <p className="mt-6 font-medium text-gray-900 md:mt-10">
-                    {product.status} on <time dateTime={product.datetime}>{product.date}</time>
+                  <p className="mt-6 font-medium text-gray-900 md:mt-5 flex items-center">
+                    <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+                    Tax receipt eligible
                   </p>
                   <div className="mt-6">
                     <div className="overflow-hidden rounded-full bg-gray-200">
                       <div
                         className="h-2 rounded-full bg-blue-600"
-                        style={{ width: `calc((${product.step} * 2 + 1) / 8 * 100%)` }}
+                        style={{ width: `calc((${family.amount_raised} / ${family.amount_needed}))` }}
                       />
                     </div>
-                    <div className="mt-6 hidden grid-cols-4 font-medium text-gray-600 sm:grid">
-                      <div className="text-blue-600">Order placed</div>
-                      <div className={classNames(product.step > 0 ? 'text-blue-600' : '', 'text-center')}>
-                        Processing
-                      </div>
-                      <div className={classNames(product.step > 1 ? 'text-blue-600' : '', 'text-center')}>
-                        Shipped
-                      </div>
-                      <div className={classNames(product.step > 2 ? 'text-blue-600' : '', 'text-right')}>
-                        Delivered
-                      </div>
+                    <div className="mt-6 font-medium text-gray-600">
+                      <div className="text-blue-600">Raised: ${(family.amount_raised).toFixed(2)} CAD / ${(family.amount_needed).toFixed(2)} CAD Goal</div>
                     </div>
                   </div>
                 </div>
               </div>
+              </a>
+              </Link>
           
     )
 }
@@ -149,11 +139,16 @@ export default function Vision() {
                     <span className="text-blue-600">Vision Kinship</span>  &middot; The Path To Self Sufficiency
                   </h1>
                   <p className="relative mt-6 text-lg leading-8 text-gray-600 sm:max-w-md lg:max-w-none">
-                    Cupidatat minim id magna ipsum sint dolor qui. Sunt sit in quis cupidatat mollit aute velit. Et
-                    labore commodo nulla aliqua proident mollit ullamco exercitation tempor. Sint aliqua anim nulla sunt
-                    mollit id pariatur in voluptate cillum. Eu voluptate tempor esse minim amet fugiat veniam occaecat
-                    aliqua.
+                    Vision Kinship is a campaign designed to <b>break the cycle of poverty.</b> We provide comprehensive support, care, 
+                    and guidance to recipients, with a program designed to help them achieve self-sufficiency. To lift them out of poverty,
+                    the donation package includes:
                   </p>
+                  <div className="mt-8 space-y-2">
+                    <CheckDetail title="Housing, if needed" />
+                    <CheckDetail title="Food and medical stipend" />
+                    <CheckDetail title="Small business supplies and training" />
+                    <CheckDetail title="Tuition and book stipend" />
+                  </div>                      
                   <div className="mt-8">
                     <PrimaryButton link = "/donate" text = "Make A Donation &rarr;" />
                     <div className="inline-block ml-2" />
@@ -164,7 +159,7 @@ export default function Vision() {
                   <div className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
                     <div className="relative">
                       <img
-                        src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&h=528&q=80"
+                        src="/campaigns/vision/4.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -174,7 +169,7 @@ export default function Vision() {
                   <div className="mr-auto w-44 flex-none space-y-8 sm:mr-0 sm:pt-52 lg:pt-36">
                     <div className="relative">
                       <img
-                        src="https://images.unsplash.com/photo-1485217988980-11786ced9454?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&h=528&q=80"
+                        src="/campaigns/vision/5.jpg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -182,7 +177,7 @@ export default function Vision() {
                     </div>
                     <div className="relative">
                       <img
-                        src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-x=.4&w=396&h=528&q=80"
+                        src="/campaigns/vision/1.jpeg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -192,7 +187,7 @@ export default function Vision() {
                   <div className="w-44 flex-none space-y-8 pt-32 sm:pt-0">
                     <div className="relative">
                       <img
-                        src="https://images.unsplash.com/photo-1670272504528-790c24957dda?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=left&w=400&h=528&q=80"
+                        src="/campaigns/vision/2.jpeg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -200,7 +195,7 @@ export default function Vision() {
                     </div>
                     <div className="relative">
                       <img
-                        src="https://images.unsplash.com/photo-1670272505284-8faba1c31f7d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&h=528&q=80"
+                        src="/campaigns/vision/3.jpeg"
                         alt=""
                         className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
                       />
@@ -216,16 +211,17 @@ export default function Vision() {
         {/* Content section */}
         <div className="mx-auto -mt-12 max-w-7xl px-6 sm:mt-0 lg:px-8 xl:-mt-8">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Our mission</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">What is Vision Kinship about?</h2>
             <div className="mt-6 flex flex-col gap-x-8 gap-y-20 lg:flex-row">
               <div className="lg:w-full lg:max-w-2xl lg:flex-auto">
                 <p className="text-xl leading-8 text-gray-600">
-                  Aliquet nec orci mattis amet quisque ullamcorper neque, nibh sem. At arcu, sit dui mi, nibh dui, diam
-                  eget aliquam. Quisque id at vitae feugiat egestas ac. Diam nulla orci at in viverra scelerisque eget.
-                  Eleifend egestas fringilla sapien.
+                  Poverty is a never ending cycle, and it is hard to break out of it. We want to help people break out of
+                  this cycle by providing them with the tools they need to succeed. We believe that each and every person has 
+                  what it takes to support them and their family, and with your help our goal is to give them the necessary 
+                  foundation and support to do so.
                 </p>
                 <div className="mt-10 max-w-xl text-base leading-7 text-gray-700">
-                  <p>
+                  {/* <p>
                     Faucibus commodo massa rhoncus, volutpat. Dignissim sed eget risus enim. Mattis mauris semper sed
                     amet vitae sed turpis id. Id dolor praesent donec est. Odio penatibus risus viverra tellus varius
                     sit neque erat velit. Faucibus commodo massa rhoncus, volutpat. Dignissim sed eget risus enim.
@@ -235,7 +231,7 @@ export default function Vision() {
                     Et vitae blandit facilisi magna lacus commodo. Vitae sapien duis odio id et. Id blandit molestie
                     auctor fermentum dignissim. Lacus diam tincidunt ac cursus in vel. Mauris varius vulputate et
                     ultrices hac adipiscing egestas. Iaculis convallis ac tempor et ut. Ac lorem vel integer orci.
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <div className="lg:flex lg:flex-auto lg:justify-center">
@@ -252,13 +248,18 @@ export default function Vision() {
           </div>
         </div>
 
-        {/* Team section */}
+        {/* CTA section */}
+        <DownloadPaperCTA />
+
+
+        {/* Families section */}
         <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-48 lg:px-8">
           <div className="mx-auto max-w-2xl lg:mx-0">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Families We Are Supporting</h2>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              Sit facilis neque ab nulla vel. Cum eos in laudantium. Temporibus eos totam in dolorum. Nemo vel facere
-              repellendus ut eos dolores similique.
+              In order to ensure that we are providing the best possible support to our families, we will focus on a small number of 
+              families at a time. Our team and grassroots partners will work closely with each family to ensure that they are receiving
+              the support they need to succeed.
             </p>
           </div>
           <ul
@@ -268,7 +269,7 @@ export default function Vision() {
             {families.map((family) => (
               <FamilyCard 
                 key = {family.name}
-                product = {family} 
+                family = {family} 
               />
             ))}
           </ul>
@@ -335,6 +336,67 @@ export default function Vision() {
 
 
       </main>
+    </div>
+  )
+}
+
+export function CheckDetail({ title, description }) {
+  return (
+    <div className="flex items-start">
+      <div className="flex-shrink-0">
+        <CheckCircleIcon className="w-5 h-5 text-green-600" aria-hidden="true" />
+      </div>
+      <div className="ml-3">
+        <p className="text-base font-medium text-gray-900">{ title }</p>
+        <p className="mt-1 text-base text-gray-500">
+          { description }
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export function DownloadPaperCTA() {
+  return (
+    <div className="bg-white">
+      <div className="mx-auto max-w-7xl pt-24 sm:px-6 sm:pt-32 lg:px-8">
+        <div className="relative isolate overflow-hidden bg-white px-6 pt-16 shadow-xl sm:rounded-3xl sm:px-16 md:pt-24 lg:flex lg:gap-x-20 lg:px-24 lg:pt-0">
+          <svg
+            viewBox="0 0 1024 1024"
+            className="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:left-full sm:-ml-80 lg:left-1/2 lg:ml-0 lg:-translate-x-1/2 lg:translate-y-0"
+            aria-hidden="true"
+          >
+            <circle cx={512} cy={512} r={512} fill="url(#759c1415-0410-454c-8f7c-9a820de03641)" fillOpacity="0.7" />
+            <defs>
+              <radialGradient id="759c1415-0410-454c-8f7c-9a820de03641">
+                <stop stopColor="#38BDF9" />
+                <stop offset={1} stopColor="#38BDF9" />
+              </radialGradient>
+            </defs>
+          </svg>
+          <div className="mx-auto max-w-md text-center lg:mx-0 lg:flex-auto lg:py-32 lg:text-left">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
+              Download our vision paper
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-gray-800">
+              If you&apos;d like to learn more about our vision, you can download our vision paper where we 
+              lay out in depth how exactly we plan to help each family.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+              <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" />
+            </div>
+          </div>
+          <div className="relative mt-16 h-80 lg:mt-8">
+            <img
+              className="absolute left-0 top-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
+              src="/campaigns/vision/paper.png"
+              alt="App screenshot"
+              width={1824}
+              height={1080}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

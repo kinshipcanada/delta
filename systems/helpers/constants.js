@@ -335,9 +335,9 @@ export const causes = [
         campaign: false
     },
     {
-        cause_id: 7,
-        name: 'Ramadhan',
-        description: 'Provide niyaz, food, and mosque services to those who cannot afford to break their fasts this Ramadhan',
+        cause_id: 8,
+        name: 'Vision Kinship',
+        description: 'Comprehensively lift a family out of poverty, by helping them start a business, build a home, and provide for their children\'s education.',
         default_selected: false,
         campaign: true
     },
