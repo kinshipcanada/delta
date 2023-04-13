@@ -41,9 +41,11 @@ export function generateNotificationTemplate(
         }
 
         case UserNotificationType.REFUND_ISSUED: {
+            throw new Error("Not implemented")
         }
 
         case UserNotificationType.REFUND_PROCESSING: {
+            throw new Error("Not implemented")
         }
 
         case AdminNotificationType.REPORT_GENERATED: {

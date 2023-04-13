@@ -1,11 +1,11 @@
 import { Stripe } from "stripe"
 
 export interface StripeTags {
-    payment_intent_id?: string,
-    charge_id?: string,
-    balance_transaction_id?: string,
-    customer_id?: string,
-    payment_method_id?: string
+    stripe_payment_intent_id?: string,
+    stripe_charge_id?: string,
+    stripe_balance_transaction_id?: string,
+    stripe_customer_id?: string,
+    stripe_payment_method_id?: string
 }
 
 export interface RawStripeTransactionObject {
