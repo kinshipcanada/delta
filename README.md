@@ -29,10 +29,13 @@ Charity should be powered by good software.
 - **GET** `/donation/[id]` - Fetches an individual donation from it's Kinship ID, Stripe charge ID, or Stripe payment intent id
 - **GET** `/donation/batch/[list_of_ids]` - Fetches a number of donations. ID types do not need to be the same. Uses promise.all to batch donations (effectively a `/donation/id` wrapper).
 
-## To Do
-- [ ] Add full state list
-- [ ] Add custom log info
-- [ ] Add phone number validation from stripe
-- [x] Allow donation retrieval from charge id + payment id
-- [ ] Implement fetching donations from Kinship donation ID
-- [ ] API key system?
+## Kinship Canada Refactor
+- [ ] Backend
+    - [ ] Unify design system + error handling
+    - [ ] Notify on error and allow the rest to go through rather than returning 500
+    - [ ] Logging system
+    - [ ] API key system
+    - [ ] Refactor API response system
+- [ ] Frontend
+    - [ ] Move to typescript
+    - [ ] Remove reused components (inputs, forms, etc)

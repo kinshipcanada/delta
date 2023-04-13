@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
-import TextInput from '../../components/core/TextInput';
+import TextInput from '../../components/core/inputs/TextInput';
 
 const locations = [
   {
