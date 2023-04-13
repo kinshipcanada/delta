@@ -84,6 +84,8 @@ export async function fetchFullDonationFromStripe(stripeTags: StripeTags): Promi
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(rawStripeTransactionObject.charge_object.payment_intent as string)
     }
 
+    console.log(rawStripeTransactionObject)
+
 
 
     return 

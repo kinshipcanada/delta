@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv'
 import { Donation } from '../classes/donation'
 import { DonationIdentifiers } from '../classes/utils'
 import { formatCartForDatabase, formatDonationForDatabase } from './formatting'
-import { logError } from '../utils/logger'
-import { DatabaseTable } from '../utils/constants'
+import { logError } from './logger'
+import { DatabaseTable } from './constants'
 
 dotenv.config()
 
