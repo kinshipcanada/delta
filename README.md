@@ -36,6 +36,11 @@ Charity should be powered by good software.
     - [ ] Logging system
     - [ ] API key system
     - [ ] Refactor API response system
+    - [ ] Write out API reference, folder structure
+    - [x] Unify frontend utils
+    - [ ] Swap env vars
+    - [ ] Create `.env.example`
+    - [ ] Config/system verification script (to ensure everything is running smoothly in prod)
 - [ ] Frontend
     - [ ] Move to typescript
     - [ ] Remove reused components (inputs, forms, etc)
