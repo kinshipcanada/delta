@@ -583,7 +583,7 @@ function BillingStep({
             const { error } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
-                    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/confirmation`,
+                    return_url: `${process.env.NEXT_PUBLIC_DOMAIN}/confirmation`,
                 },
             });
         

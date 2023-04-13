@@ -61,7 +61,7 @@ export default async function handler(req, res) {
             transaction_refunded: false,
             payment_method: formattedPaymentMethod,
             donation_causes: formattedCart,
-            livemode: process.env.LIVE_MODE === "true" ? true : false,
+            livemode: process.env.LIVEMODE === "true" ? true : false,
             address_line_address: address_line_address,
             address_country: address_country,
             address_postal_code: address_postal_code,
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
         )
         const donationObject = new Donation(
             donorObject,
-            process.env.LIVE_MODE === "true" ? true : false,
+            process.env.LIVEMODE === "true" ? true : false,
             new Date(formatted_donation.donation_created),
             formatted_donation.amount_in_cents,
             null,
