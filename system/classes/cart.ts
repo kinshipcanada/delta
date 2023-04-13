@@ -1,4 +1,4 @@
-import { CountryList } from "./utils";
+import { CurrencyList } from "./utils";
 
 export interface CauseMap {
     [key: string]: number
@@ -12,6 +12,6 @@ export interface CauseMap {
  */
 export interface Cart {
     total_amount_paid_in_cents: number
-    currency: CountryList
+    currency: CurrencyList
     causes: CauseMap
 }

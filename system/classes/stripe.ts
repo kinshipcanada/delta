@@ -15,3 +15,11 @@ export interface RawStripeTransactionObject {
     customer: Stripe.Customer,
     payment_method: Stripe.PaymentMethod
 }
+
+export const enum StripeMethods {
+    fetchPaymentIntentObject = "fetch_payment_intent_object",
+    fetchChargeObject = "fetch_charge_object",
+    fetchBalanceTransactionObject = "fetch_balance_transaction_object",
+    fetchSpecificPaymentMethod = "fetch_specific_payment_method",
+    fetchCustomerObject = "fetch_customer_object"
+}

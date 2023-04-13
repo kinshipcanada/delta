@@ -1,5 +1,7 @@
 // File to verify system integrity, config. Run this on startup.
-require('dotenv').config();
+import * as dotenv from 'dotenv' 
+
+dotenv.config()
 
 // Verify that all required environment variables are present.
 const required_env_vars = [

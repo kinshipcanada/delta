@@ -5,6 +5,7 @@ import { Donation } from '../classes/donation'
 import { DonationIdentifiers } from '../classes/utils'
 import { formatCartForDatabase, formatDonationForDatabase } from './formatting'
 import { logError } from '../utils/logger'
+import { DatabaseTable } from '../utils/constants'
 
 dotenv.config()
 
@@ -52,7 +53,7 @@ export function fetchDonorFromDatabase(donor_id: string): Promise<any> {
     }
 }
 
-export async function parameterizedDatabaseQuery(table, params): Promise<any> {
+export async function parameterizedDatabaseQuery(table: DatabaseTable, params): Promise<any> {
     const FUNCTION_NAME = 'parameterizedDatabaseQuery'
 
     const columns = Object.keys(params)

@@ -13,11 +13,11 @@ export type DonationIdentifiers = StripeTags & KinshipTags
  * @description Currencies supported by Kinship
  */
 export const enum CurrencyList {
-    CAD = 'CAD',
-    USD = 'USD',
-    EUR = 'EUR',
-    GBP = 'GBP',
-    AUD = 'AUD',
+    CAD = 'cad',
+    USD = 'usd',
+    EUR = 'eur',
+    GBP = 'gbp',
+    AUD = 'aud',
 }
 
 export const enum CountryList {
