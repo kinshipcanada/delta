@@ -32,7 +32,7 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
 
         for (const identifier of allowedIdentifiers) {
             if (donation_identifiers[identifier]) {
-                return database('donations').where(identifier, donation_identifiers[identifier]);
+                return database('donations').where(identifier, donation_identifiers[identifier]).first();
             }
         }
 
@@ -43,17 +43,21 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
     }
 }
 
-export function fetchDonorFromDatabase(donor_id: string): Promise<any> {
+export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): Promise<any> {
     const FUNCTION_NAME = 'fetchDonorFromDatabase'
 
+    if (donorId == null && donorEmail == null) {
+        throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
+    }
+
     try {
-        return database('donor_profiles').where('donor_id', donor_id);
+        return donorId ? database('donor_profiles').where('donor_id', donorId).first() : database('donor_profiles').where('donor_email', donorEmail).first()
     } catch (error) {
         logError(error, FILE_NAME, FUNCTION_NAME)
     }
 }
 
-export async function parameterizedDatabaseQuery(table: DatabaseTable, params): Promise<any> {
+export async function parameterizedDatabaseQuery(table: DatabaseTable, params, limitToFirstResult: boolean): Promise<any> {
     const FUNCTION_NAME = 'parameterizedDatabaseQuery'
 
     const columns = Object.keys(params)
@@ -63,6 +67,10 @@ export async function parameterizedDatabaseQuery(table: DatabaseTable, params): 
             for (const column of columns) {
                 if (params[column] != null) { query.andWhere(`${table}.${column}`, `${params[column]}`); }
             }
+        }
+
+        if (limitToFirstResult) {
+            return database(table).where(parameterizedQuery).first()
         }
 
         return database(table).where(parameterizedQuery)

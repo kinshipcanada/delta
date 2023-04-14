@@ -1,32 +1,44 @@
 import { Donation } from "./donation"
 import { Donor } from "./donor"
-import { SummaryStatement } from "./perks"
 
+export type APIStatus = 200 | 400 | 500
+/**
+ * @description Represents a response from the API
+ * @param status The status of the response
+ * @param endpoint_called The endpoint that was called. This is useful for debugging purposes.
+ */
 export interface BaseApiResponse {
-    status: 200 | 400 | 500,
+    status: APIStatus,
     endpoint_called: string
 }
 
-export interface SimpleMessageResponse extends BaseApiResponse {
+export interface ErroredResponse extends BaseApiResponse {
+    error: string
+}
+
+/**
+ * @description Represents a response from the API that contains a message, for example if we are checking if a donation already existed
+ */
+export interface MessageResponse extends BaseApiResponse {
     message: string
 }
 
-export interface DonorResponse extends BaseApiResponse {
-    donor: Donor
-}
-
-export interface DonationResponse extends BaseApiResponse {
+export interface FetchDonationResponse extends BaseApiResponse {
     donation: Donation
 }
 
-export interface BatchedDonationResponse extends BaseApiResponse {
+export interface FetchGroupOfDonationsResponse extends BaseApiResponse {
     donations: Donation[]
 }
 
-export interface BatchedSimpleDonationResponse extends BaseApiResponse {
-    donations: any[]
+export interface FetchDonorResponse extends BaseApiResponse {
+    donor: Donor
 }
 
-export interface DonationSummaryResponse extends BaseApiResponse {
-    summary: SummaryStatement
+export interface CreateDonationResponse extends BaseApiResponse {
+    donation: Donation,
+}
+
+export interface CreateDonorResponse extends BaseApiResponse {
+    donor: Donor,
 }

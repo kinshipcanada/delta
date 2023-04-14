@@ -1,6 +1,44 @@
-import { Donation } from "../../systems/classes/donation/Donation";
+import { CreateDonationResponse, ErroredResponse, FetchDonationResponse } from "../classes/api";
+import { Donation } from "../classes/donation";
+import { DonationIdentifiers } from "../classes/utils";
+import { fetchDonationFromDatabase } from "../utils/database";
+import { buildDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function fetchDonation(): Promise<Donation> {
-    return
+export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse | ErroredResponse> {
+    return void 0;
+}
+
+export async function fetchDonation(identifiers: DonationIdentifiers): Promise<FetchDonationResponse | ErroredResponse> {
+    try {
+        if (
+            identifiers.donation_id == null &&
+            identifiers.stripe_charge_id == null &&
+            identifiers.stripe_payment_intent_id == null
+        ) { throw new Error("No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.") }
+    
+        const donationFromDatabase = await fetchDonationFromDatabase(identifiers);
+    
+        if (donationFromDatabase) { 
+            return {
+                status: 200,
+                endpoint_called: 'fetchDonation',
+                donation: formatDonationFromDatabase(donationFromDatabase)
+            };
+        }
+    
+        // If the donation already exists in the database, return that, otherwise, fetch it from Stripe
+        return {
+            status: 200,
+            endpoint_called: 'fetchDonation',
+            donation: await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
+        }
+    } catch (error) {
+        return {
+            status: 500,
+            endpoint_called: 'fetchDonation',
+            error: error.message
+        }
+    }
 }
 

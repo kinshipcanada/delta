@@ -19,6 +19,10 @@ export function formatDonorFromDatabase(donor: any): Donor {
     throw new Error("Not implemented")
 }
 
+export function formatDonationFromDatabase(donation: any): Donation {
+    return
+}
+
 export function formatDonationFromRawStripeObject(stripeObject: RawStripeTransactionObject): Donation {
     throw new Error("Not implemented")
 }
@@ -27,10 +31,10 @@ export async function buildDonationFromRawStripeData(rawStripeObject: RawStripeT
 
     const donorFromDatabase = await parameterizedDatabaseQuery(DatabaseTable.DONOR_PROFILES, {
         email: rawStripeObject.customer.email
-    }); // Fetch donor from database using their email, if it exists.
+    }, true); // Fetch donor from database using their email, if it exists.
 
     const donor: Donor = {
-        donor_id: donorFromDatabase.lenth > 0 ? donorFromDatabase[0].id : null,
+        donor_id: donorFromDatabase ? donorFromDatabase.id : null,
         first_name: rawStripeObject.charge_object.metadata.first_name ? rawStripeObject.charge_object.metadata.first_name : rawStripeObject.customer.name.split(' ')[0] as string,
         last_name: rawStripeObject.charge_object.metadata.last_name ? rawStripeObject.charge_object.metadata.last_name : rawStripeObject.customer.name.split(' ')[1] as string,
         email: rawStripeObject.customer.email,

@@ -3,7 +3,7 @@ import { Cart } from "../classes/cart";
 import { Donation } from "../classes/donation";
 import { Donor } from "../classes/donor";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
-import { CountryList } from "../classes/utils";
+import { CountryList, DonationIdentifiers } from "../classes/utils";
 import { RawStripeTransactionObject, StripeMethods, StripeTags } from "../classes/stripe";
 
 const StripeClient = require('stripe');
@@ -60,7 +60,7 @@ export async function fetchStripeCustomerPaymentMethods(stripe_customer_id: stri
     )
 }
 
-export async function fetchFullDonationFromStripe(stripeTags: StripeTags): Promise<RawStripeTransactionObject> {
+export async function fetchFullDonationFromStripe(identifiers: DonationIdentifiers): Promise<RawStripeTransactionObject> {
     let rawStripeTransactionObject: RawStripeTransactionObject = {
         payment_intent_object: null,
         charge_object: null,
@@ -70,7 +70,7 @@ export async function fetchFullDonationFromStripe(stripeTags: StripeTags): Promi
     }
 
     let stripePromises = []
-    let { stripe_payment_intent_id, stripe_charge_id } = stripeTags
+    let { stripe_payment_intent_id, stripe_charge_id } = identifiers
 
     if (!stripe_payment_intent_id && !stripe_charge_id) {
         throw new Error('No payment intent or charge id provided to fetchFullDonationFromStripe')
