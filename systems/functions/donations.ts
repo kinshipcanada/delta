@@ -21,7 +21,7 @@ export async function _format_donation_from_database(donation_object: any) {
     const FUNCTION_NAME = "_format_donation_from_database" 
 
     try {
-        if (Object.keys(donation_object.payment_method).includes('type') && donation_object.payment_method.type == 'eTransfer') {
+        if (Object.keys(donation_object.payment_method).includes('type') && donation_object.payment_method.type == 'eTransfer' || donation_object.payment_method.type == 'cash') {
             const generatedDonorDetails: donor_details = {
                 first_name: donation_object.donor_object.first_name,
                 last_name: donation_object.donor_object.last_name,
@@ -48,11 +48,11 @@ export async function _format_donation_from_database(donation_object: any) {
                 stripe_cus_id: fetched_donor_from_stripe.id,
                 email: fetched_donor_from_stripe.email,
                 address: {
-                    line_address: fetched_donor_from_stripe.address.line1,
-                    postal_code: fetched_donor_from_stripe.address.postal_code,
-                    city: fetched_donor_from_stripe.address.city,
-                    state: fetched_donor_from_stripe.address.state,
-                    country: fetched_donor_from_stripe.address.country.toLowerCase(),
+                    line_address: donation_object.address_line_address ? donation_object.address_line_address : fetched_donor_from_stripe.address.line1,
+                    postal_code: donation_object.address_postal_code ? donation_object.address_postal_code : fetched_donor_from_stripe.address.postal_code,
+                    city: donation_object.address_city ? donation_object.address_city : fetched_donor_from_stripe.address.city,
+                    state: donation_object.address_state ? donation_object.address_state : fetched_donor_from_stripe.address.state,
+                    country: donation_object.address_country ? donation_object.address_country : fetched_donor_from_stripe.address.country.toLowerCase(),
                 }
             }
             

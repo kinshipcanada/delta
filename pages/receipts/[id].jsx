@@ -122,7 +122,7 @@ export default function Receipt() {
                         </span>
                         <span className = 'flex mb-1'>
                             <p  className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
-                            <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country.toLowerCase() == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
+                            <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country.toLowerCase() == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : receipt.donor.address.country.toLowerCase() == "canada" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
                         </span>
                     </div>
                     </main>
