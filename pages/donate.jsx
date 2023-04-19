@@ -13,7 +13,7 @@ import { countries, canadian_states, causes } from "../systems/helpers/constants
 import { useEffect } from "react";
 import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase } from "../systems/helpers/supabaseClient";
-import TextInput from "../components/core/TextInput";
+import TextInput from "../components/core/inputs/TextInput";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import ReactTooltip from "react-tooltip";
 import { SectionHeader } from "../components/core/Typography";

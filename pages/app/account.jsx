@@ -2,7 +2,7 @@ import AppLayout from "../../components/core/AppLayout";
 import { useState, useEffect } from "react";
 import { supabase } from "../../systems/helpers/supabaseClient";
 import PageHeader from "../../components/app/PageHeader";
-import TextInput from "../../components/core/TextInput";
+import TextInput from "../../components/core/inputs/TextInput";
 import { SecondaryButton } from "../../components/core/Buttons";
 import { callKinshipAPI } from "../../systems/functions/helpers";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/solid";
