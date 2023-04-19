@@ -1,0 +1,32 @@
+import { Donation } from "./donation"
+import { Donor } from "./donor"
+import { SummaryStatement } from "./perks"
+
+export interface BaseApiResponse {
+    status: 200 | 400 | 500,
+    endpoint_called: string
+}
+
+export interface SimpleMessageResponse extends BaseApiResponse {
+    message: string
+}
+
+export interface DonorResponse extends BaseApiResponse {
+    donor: Donor
+}
+
+export interface DonationResponse extends BaseApiResponse {
+    donation: Donation
+}
+
+export interface BatchedDonationResponse extends BaseApiResponse {
+    donations: Donation[]
+}
+
+export interface BatchedSimpleDonationResponse extends BaseApiResponse {
+    donations: any[]
+}
+
+export interface DonationSummaryResponse extends BaseApiResponse {
+    summary: SummaryStatement
+}

@@ -241,7 +241,7 @@ function Receipt({ donation }) {
                 <div className="w-full flex justify-end">
                     <SecondaryButton link = "/" text = "Download"  />
                     <div className="m-1" />
-                    <PrimaryButton link = {"https://receipts.kinshipcanada.com/" + donation.id} text = {<>View Receipt &rarr;</>} />
+                    <PrimaryButton link = {"https://kinshipcanada.com/receipts" + donation.id} text = {<>View Receipt &rarr;</>} />
                 </div>
             </div>
         </div>

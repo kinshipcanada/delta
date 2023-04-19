@@ -226,7 +226,6 @@ function ManuallyGenerateAndSend() {
             donation_method: paymentMethod
         });
         
-        console.log(response)
         if (response.status == 200) {
             toast.success(response.message, {
                 position: "top-right",
