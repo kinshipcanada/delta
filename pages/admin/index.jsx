@@ -4,10 +4,14 @@ import PageHeader from "../../components/app/PageHeader";
 import AdminLayout from "../../components/core/AdminLayout";
 import { ErrorAlert, LoadingAlert, SuccessAlert } from "../../components/core/Alerts";
 import { callKinshipAPI } from "../../systems/functions/helpers";
-import TextInput from "../../components/core/TextInput";
+import TextInput from "../../components/core/inputs/TextInput";
 import { PrimaryButton } from "../../components/core/Buttons";
 import { toast } from "react-hot-toast";
-
+import { FormHeader, Label, SectionHeader } from "../../components/core/Typography";
+import { BoxWithHeaderAndFooter } from "../../components/core/Box";
+import { SelectInput } from "../../components/core/inputs/SelectInput";
+import { canadian_states, countries, causes as KinshipCauses } from "../../systems/helpers/constants";
+import { validateEmail } from "../../systems/helpers/utils";
 export default function Index() {
 
     const [user, setUser] = useState(null)
@@ -47,7 +51,7 @@ export default function Index() {
             {(user && profile) ? 
             
                 <div>
-                    <PageHeader text={`Kinship Canada Admin Panel`} description={"View and manage donations, resend receipts, and more."} secondaryLinkHref={"#"} secondaryLinkText={"Lookup donation"} primaryLinkText="Resend Receipt" primaryLinkHref={"#"} />
+                    <PageHeader text={`Kinship Canada Admin Panel`} description={"View and manage donations, resend receipts, and more."}  />
                     <div className="mt-4" />
                     <ResendReceipt />
                     
@@ -141,50 +145,61 @@ function ResendReceipt() {
 
 function ManuallyGenerateAndSend() {
 
-    const [success, setSuccess] = useState(false)
-    const [error, setError] = useState(null)
-    const [errorMessage, setErrorMessage] = useState(null)
     const [loading, setLoading] = useState(false)
 
     const [date, setDate] = useState(null)
     const [email, setEmail] = useState(null)
-    const [amountInCents, setAmountInCents] = useState(null)
-    const [paymentMethod, setPaymentMethod] = useState(null)
-    const [causes, setCauses] = []
+    const [amount, setAmount] = useState(null)
+    const [paymentMethod, setPaymentMethod] = useState("etransfer")
+    const [cause, setCause] = useState("Anywhere")
     const [address, setAddress] = useState(null)
-    const [province, setProvince] = useState(null)
+    const [province, setProvince] = useState(canadian_states[0].code)
     const [city, setCity] = useState(null)
     const [postalCode, setPostalCode] = useState(null)
-    const [country, setCountry] = useState(null)
+    const [country, setCountry] = useState(countries[0].code)
     const [firstName, setFirstName] = useState(null)
     const [lastName, setLastName] = useState(null)
 
-    async function handleResendReceipt(e) {
-        e.preventDefault()
-
-        setError(null)
-        setSuccess(null)
+    async function handleReceiptGeneration() {
         setLoading(true)
 
-        if (!date || !email || !amountInCents|| !paymentMethod || !causes || !address || !province|| !city || !postalCode || !country|| !firstName || !lastName  ) {
-            setError("Please fill out all required fields.")
-            setErrorMessage("Cannot process your request to generate and send receipt without a donation ID. Please enter the donation ID, stripe charge ID (ch_xyzxyzxyz), or the payment-intent id (pi_xyzxyzxyz).")
+        if (!date || !email || !amount || !paymentMethod || !cause || !address || !province|| !city || !postalCode || !country|| !firstName || !lastName  ) {
+            toast.error("Please fill out all required fields.", {
+                position: "top-right",
+                autoClose: 5000,
+            })
+            setLoading(false)
+            return
+        }
+
+        if (validateEmail(email) === false) {
+            toast.error("Please enter a valid email address.", {
+                position: "top-right",
+                autoClose: 5000,
+            })
+            setLoading(false)
+            return
+        }
+
+        let amountInCents = 0
+
+        try {
+            amountInCents = Math.floor(parseFloat(amount.replace('$', '')) * 100)
+        } catch (error) {
+            toast.error("Please enter a valid amount.", {
+                position: "top-right",
+                autoClose: 5000,
+            })
             setLoading(false)
             return
         }
 
         let formattedCauses = {
             total_amount_paid_in_cents: amountInCents,
-            causes: {}
+            causes: { }
         }
 
-        if (len(causes) == 0) {
-            setCauses(["Anywhere"])
-        }
-
-        for (const cause of causes) {
-            formattedCauses.causes[cause] = Math.floor(amountInCents / len(causes))
-        }
+        formattedCauses.causes[cause] = amountInCents
 
         let formattedPaymentMethod = {
             type: paymentMethod
@@ -207,169 +222,168 @@ function ManuallyGenerateAndSend() {
                 first_name: firstName,
                 last_name: lastName,
                 middle_names: null,
-            }
-            
+            },
+            donation_method: paymentMethod
         });
-    
-        if (response.status === 500) {
-            setError("Error resending receipt.");
-            setErrorMessage(response.message);
+        
+        console.log(response)
+        if (response.status == 200) {
+            toast.success(response.message, {
+                position: "top-right",
+                autoClose: 5000,
+            })
             setLoading(false)
             return;
         } else {
-            console.log(response)
-            setSuccess("Receipt resent successfully!");
-            setSuccessMessage(response.message);
+            toast.error(`Error generating donation: ${response.message}`, {
+                position: "top-right",
+                autoClose: 5000,
+            })
             setLoading(false)
             return;
         }
+
     }
+
     return (
-        <div className="bg-white shadow border sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 leading-7">Create A New Receipt</h3>
-                <div className="mt-2 text-sm text-gray-500">
-                <form>
-                    <div>
-                        <h2 className="text-md mb-2 font-semibold leading-7 text-gray-900">Donor Information</h2>
-                        {/* <p className="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p> */}
-                    </div>
+        <BoxWithHeaderAndFooter 
+            loading={loading}
+            Header = {()=>(<SectionHeader text={"Create A New Donation"} />)} 
+            Footer = {()=>(<div className="flex justify-end"><PrimaryButton action={handleReceiptGeneration} text = {"Create donation and send receipt"} /></div>)} 
+        >
+            <FormHeader text={'Donation Details'} />
+                    
+            <div className="grid grid-cols-2 gap-4">
+                <TextInput
+                    label = "Amount in Cents"
+                    required={true}
+                    type='dollars'
+                    placeholder = "1000.00"
+                    setter={setAmount}
+                />
 
-                    <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-6 md:col-span-2">
-                        <div className="sm:col-span-3">
-                            <TextInput 
-                                label={'First Name'} 
-                                type={'text'} 
-                                required={true}
-                                setter={setFirstName}
-                                placeholder={'Ali'}
-                            />
-                        </div>
+                <div>
+                    <Label label="Date Of Donation" required={true} />
+                    <input 
+                        type="date"
+                        name="date"
+                        id="date"
+                        className="text-slate-900 mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        onChange={(e)=>setDate(e.target.value)}
+                    />
+                </div>
 
-                        <div className="sm:col-span-3">
-                            <TextInput 
-                                label={'Last Name'} 
-                                type={'text'} 
-                                required={true}
-                                setter={setLastName}
-                                placeholder={'Hussein'}
-                            />
-                        </div>
+                <div>
+                    <SelectInput
+                        label={'Causes'}
+                        options={KinshipCauses.map(cause => ({ label: cause.name, value: cause.name }))}
+                        setter={setCause}
+                    />
+                </div>
 
-                        <div className="sm:col-span-4">
-                            <TextInput 
-                                label={'Email'} 
-                                type={'email'} 
-                                required={true}
-                                setter={setLastName}
-                                placeholder={'Hussein'}
-                            />
-                        </div>
-
-                        <div className="sm:col-span-3">
-                        <label htmlFor="country" className="block text-sm font-medium leading-6 text-gray-900">
-                            Country
-                        </label>
-                        <div className="mt-2">
-                            <select
-                                id="country"
-                                name="country"
-                                autoComplete="country-name"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                            >
-                                <option>Canada</option>
-                                <option>United States</option>
-                                <option>Australia</option>
-                                <option>United Kingdom</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                        </div>
-
-                        <div className="col-span-full">
-                        <label htmlFor="street-address" className="block text-sm font-medium leading-6 text-gray-900">
-                            Street address
-                        </label>
-                        <div className="mt-2">
-                            <input
-                            type="text"
-                            name="street-address"
-                            id="street-address"
-                            autoComplete="street-address"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                        </div>
-
-                        <div className="sm:col-span-2 sm:col-start-1">
-                        <label htmlFor="city" className="block text-sm font-medium leading-6 text-gray-900">
-                            City
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                type="text"
-                                name="city"
-                                id="city"
-                                autoComplete="address-level2"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                        </div>
-
-                        <div className="sm:col-span-2">
-                        <label htmlFor="region" className="block text-sm font-medium leading-6 text-gray-900">
-                            State / Province
-                        </label>
-                        <div className="mt-2">
-                            <input
-                                type="text"
-                                name="region"
-                                id="region"
-                                autoComplete="address-level1"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                        </div>
-
-                        <div className="sm:col-span-2">
-                        <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
-                            ZIP / Postal code
-                        </label>
-                        <div className="mt-2">
-                            <input
-                            type="text"
-                            name="postal-code"
-                            id="postal-code"
-                            autoComplete="postal-code"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                        </div>
-                        <div className="mt-2">
-                            <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
-                                Amount Donated ($CAD)
-                            </label>
-                            <input
-                            type="text"
-                            name="amount"
-                            id="amount"
-                            autoComplete="amount"
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            />
-                        </div>
-                        <div className="mt-2">
-                            <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
-                                Date of donation
-                            </label>
-                            <input type="date" id="start" name="trip-start"
-                                value="2021-01-01"
-                                min="2021-01-01" max="2021-12-31"/>
-                        </div>
-                    </div>
-                    <PrimaryButton action={()=>{toast.error('Too Many Requests Made To Stripe. Please try again in 30 minutes.')}} text = {"Create donation and send receipt"} />
-                </form>
+                <div>
+                    <SelectInput
+                        label={'Payment Method'}
+                        options={[
+                            { label: 'eTransfer', value: 'etransfer' },
+                            { label: 'Cash', value: 'cash' },
+                        ]}
+                        setter={setPaymentMethod}
+                    />
                 </div>
             </div>
-        </div>
+            
+            <div className="mt-4" />
+
+            <FormHeader text={'Donor Details'} />
+
+            <div className="grid grid-cols-2 gap-4">
+                <TextInput 
+                    label={'First Name'} 
+                    type={'text'} 
+                    required={true}
+                    setter={setFirstName}
+                    placeholder={'Tiger'}
+                />
+
+                <TextInput 
+                    label={'Last Name'} 
+                    type={'text'} 
+                    required={true}
+                    setter={setLastName}
+                    placeholder={'Woods'}
+                />
+
+                <TextInput
+                    label = "Email"
+                    required={true}
+                    type='email'
+                    placeholder = "tiger@golf.com"
+                    setter={setEmail}
+                />
+            </div>
+
+            <div className="mt-4" />
+
+            <FormHeader text={'Donor Address Information'} />
+
+            <div className="grid grid-cols-2 gap-4">
+                <TextInput 
+                    label={'Address'} 
+                    type={'text'} 
+                    required={true}
+                    setter={setAddress}
+                    placeholder={'55 Golf Drive'}
+                />
+
+                <TextInput 
+                    label={'City'} 
+                    type={'text'} 
+                    required={true}
+                    setter={setCity}
+                    placeholder={'Pebble Beach'}
+                />
+
+                {
+                    country != undefined && country != null && country.toLowerCase() === 'ca' ? (
+                        <SelectInput
+                            label={'Province'}
+                            required={true}
+                            defaultValue={{ label: canadian_states[6].name, value: canadian_states[6].code }}
+                            options={canadian_states.map(state => ({ label: state.name, value: state.code }))}
+                            setter={setProvince}
+                        />
+
+                    ) : (
+                        <TextInput
+                            label = "State/Province"
+                            required={true}
+                            type='text'
+                            placeholder = "FL"
+                            setter={setProvince}
+                        />
+                    )
+                }
+
+                <TextInput
+                    label = "Postal Code"
+                    required={true}
+                    type='text'
+                    placeholder = "37172"
+                    setter={setPostalCode}
+                />
+
+                <SelectInput
+                    label={'Country'}
+                    options={countries.map(country => ({ label: country.name, value: country.code }))}
+                    setter={setCountry}
+                />
+
+            </div>
+            
+            
+
+
+        </BoxWithHeaderAndFooter>
     )
 }

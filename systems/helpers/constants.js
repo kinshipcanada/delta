@@ -6,7 +6,7 @@ export const countries = [
     {"name": "Albania", "code": "al"}, 
     {"name": "Algeria", "code": "dz"}, 
     {"name": "American Samoa", "code": "as"}, 
-    {"name": "AndorrA", "code": "ad"}, 
+    {"name": "Andorra", "code": "ad"}, 
     {"name": "Angola", "code": "ao"}, 
     {"name": "Anguilla", "code": "ai"}, 
     {"name": "Antarctica", "code": "aq"}, 
@@ -248,25 +248,25 @@ export const countries = [
 export const canadian_states = [
 	{
 		"name": "Alberta",
-		"code": "CA-AB",
+		"code": "AB",
 		"subdivision": "province",
 		"native": "Alberta"
 	},
 	{
 		"name": "British Columbia",
-		"code": "CA-BC",
+		"code": "BC",
 		"subdivision": "province",
 		"native": "Colombie-Britannique"
 	},
 	{
 		"name": "Manitoba",
-		"code": "CA-MB",
+		"code": "MB",
 		"subdivision": "province",
 		"native": "Manitoba"
 	},
 	{
 		"name": "New Brunswick",
-		"code": "CA-NB",
+		"code": "NB",
 		"subdivision": "province",
 		"native": "Nouveau-Brunswick"
 	},
@@ -278,49 +278,49 @@ export const canadian_states = [
 	},
 	{
 		"name": "Nova Scotia",
-		"code": "CA-NS",
+		"code": "NS",
 		"subdivision": "province",
 		"native": "Nouvelle-Écosse"
 	},
 	{
 		"name": "Ontario",
-		"code": "CA-ON",
+		"code": "ON",
 		"subdivision": "province",
 		"native": "Ontario"
 	},
 	{
 		"name": "Prince Edward Island",
-		"code": "CA-PE",
+		"code": "PE",
 		"subdivision": "province",
 		"native": "Île-du-Prince-Édouard"
 	},
 	{
 		"name": "Quebec",
-		"code": "CA-QC",
+		"code": "QC",
 		"subdivision": "province",
 		"native": "Québec"
 	},
 	{
 		"name": "Saskatchewan",
-		"code": "CA-SK",
+		"code": "SK",
 		"subdivision": "province",
 		"native": "Saskatchewan"
 	},
 	{
 		"name": "Northwest Territories",
-		"code": "CA-NT",
+		"code": "NT",
 		"subdivision": "territory",
 		"native": "Territoires du Nord-Ouest"
 	},
 	{
 		"name": "Nunavut",
-		"code": "CA-NU",
+		"code": "NU",
 		"subdivision": "territory",
 		"native": "Nunavut"
 	},
 	{
 		"name": "Yukon",
-		"code": "CA-YT",
+		"code": "YT",
 		"subdivision": "territory",
 		"native": "Yukon"
 	}

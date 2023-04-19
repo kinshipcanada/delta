@@ -6,8 +6,22 @@ export function Header({ text, color }) {
 
 export function SectionHeader({ text }) {
     return (
-        <h2 className="text-lg font-medium text-gray-900">
+        <h2 className="text-lg font-medium text-gray-900 leading-6">
             { text }
         </h2>
+    )
+}
+
+export function FormHeader({ text }) {
+    return (
+        <h2 className="text-md mb-1 font-semibold leading-7 text-gray-900">{ text }</h2>
+    )
+}
+
+export function Label({ label, required }) {
+    return (
+        <label htmlFor={label} className="block text-sm font-medium text-gray-700">
+            {label} { required && <span className="text-red-500">*</span> }
+        </label>
     )
 }

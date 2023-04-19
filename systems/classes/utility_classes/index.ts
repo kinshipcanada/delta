@@ -39,7 +39,7 @@ export interface donor_details {
 
 export interface FormattedCart {
     total_amount_paid_in_cents: number
-    causes: string[]
+    causes: string[] | object,
 }
 
 export const enum EventTypes {
@@ -429,14 +429,17 @@ export interface DatabaseDonation {
     address_country?: DonorAddress["country"],
     address_postal_code?: DonorAddress["postal_code"],
     address_city?: DonorAddress["city"],
-    address_state?: DonorAddress["state"]
+    address_state?: DonorAddress["state"],
+    donor_object?: any,
 }
 
 export const enum PaymentMethods {
     CARD = 'card',
     AFFIRM = 'affirm',
     ACSS_DEBIT = 'acss_debit',
-    CUSTOMER_BALANCE = 'customer_balance'
+    CUSTOMER_BALANCE = 'customer_balance',
+    ETRANSFER = 'etransfer',
+    CASH = 'cash',
 }
 
 /**

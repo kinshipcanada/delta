@@ -1,11 +1,8 @@
-import Stripe from "stripe";
-import { DonorAddress, KinshipDonation, PaymentMethods, StripeTags } from "../utility_classes";
+import { KinshipDonation, StripeTags } from "../utility_classes";
 import { Cart } from "../cart/Cart";
 import { Donor } from "../donors/Donor";
 import { DatabaseDonation, CountryList, CurrencyList, KinshipPaymentMethod } from "../utility_classes";
 import { v4 as uuidv4 } from 'uuid';
-import { format_kinship_payment_method } from "../../functions/stripe";
-
 export class Donation {
 
     donation_id: string;
