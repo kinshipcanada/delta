@@ -21,7 +21,7 @@ export const enum AdminNotificationType {
 /**
  * @description Represents the type of notification sent (for internal logging purposes)
  */
-export type NotificationType = UserNotificationType | AdminNotificationType
+export type NotificationType = UserNotificationType & AdminNotificationType
 
 export interface NotificationTemplate {
     email_subject: string;

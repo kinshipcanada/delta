@@ -1,34 +1,57 @@
 import { Donation } from "../classes/donation";
-import { Donor } from "../classes/donor";
-import { NotificationTemplate, NotificationType } from "../classes/notifications";
+import { AdminNotificationType, NotificationTemplate, NotificationType, UserNotificationType } from "../classes/notifications";
+import { CountryList } from "../classes/utils";
 
 export function generateNotificationTemplate(
   notificationType: NotificationType,
-  donor: Donor,
   donation: Donation
 ): NotificationTemplate {
-  const FUNCTION_NAME = "generateNotificationTemplate";
+    const donorCountry = donation.donor.address.country
+    const donationAmount = donation.amount_in_cents / 100
+    const donorFirstName = donation.donor.first_name
+    const donationUrl = `https://${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`
+    
+    switch (notificationType) {
+        case UserNotificationType.DONATION_MADE: {
+            return {
+                email_body: `
+                    Dear ${donorFirstName},
 
-  const donation_amount = donation.amount / 100;
-  const donation_date = donation.created_at;
-  const donation_id = donation.id;
-  const donation_status = donation.status;
-  const donation_type = donation.type;
+                    Thank you for your donation of ${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }.
 
-  const donor_first_name = donor.first_name;
-  const donor_last_name = donor.last_name;
-  const donor_email = donor.email;
-  const donor_phone_number = donor.phone_number;
+                    You can access your ${donorCountry == CountryList.CANADA ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                `,
+                email_subject: `Thank you for your donation on ${donation.date_donated}.`,
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }. Access your receipt of donation here: ${donationUrl}`
+            }
+        }
 
-  const donation_url = `${process.env.KINSHIP_URL}/donations/${donation_id}`;
+        case UserNotificationType.PROOF_AVAILABLE: {
+            return {
+                email_body: `
+                    Dear ${donorFirstName},
 
-  const email_subject = `Kinship Donation Receipt`;
-  const email_body = `Hello ${donor_first_name} ${donor_last_name},\n\nThank you for your donation of $${donation_amount} to Kinship. You can view your receipt here: ${donation_url}\n\nKinship`;
-  const sms_friendly_message = `Hello ${donor_first_name} ${donor_last_name},\n\nThank you for your donation of $${donation_amount} to Kinship. You can view your receipt here: ${donation_url}\n\nKinship`;
+                    Thank you for your donation of ${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }.
 
-  return {
-    email_subject,
-    email_body,
-    sms_friendly_message,
-  };
+                    You can access your ${donorCountry == CountryList.CANADA ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                `,
+                email_subject: `Thank you for your donation on ${donation.date_donated}.`,
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }. Access your receipt of donation here: ${donationUrl}`
+            }
+        }
+
+        case UserNotificationType.REFUND_ISSUED: {
+        }
+
+        case UserNotificationType.REFUND_PROCESSING: {
+        }
+
+        case AdminNotificationType.REPORT_GENERATED: {
+            throw new Error("Not implemented")
+        }
+
+        case AdminNotificationType.RECEIPT_MANUALLY_ISSUED: {
+            throw new Error("Not implemented")
+        }
+    }
 }
