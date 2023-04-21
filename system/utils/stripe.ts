@@ -86,11 +86,32 @@ export async function fetchFullDonationFromStripe(identifiers: DonationIdentifie
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(rawStripeTransactionObject.charge_object.payment_intent as string)
     }
 
-    console.log(rawStripeTransactionObject)
+    identifiers.stripe_balance_transaction_id = rawStripeTransactionObject.charge_object.balance_transaction as string
+    identifiers.stripe_customer_id = rawStripeTransactionObject.charge_object.customer as string
+    identifiers.stripe_payment_method_id = rawStripeTransactionObject.charge_object.payment_method as string
 
+    stripePromises.push(fetchStripeBalanceTransactionObject(rawStripeTransactionObject.charge_object.balance_transaction as string))
+    stripePromises.push(fetchSpecificStripePaymentMethod(rawStripeTransactionObject.charge_object.payment_method as string))
+    stripePromises.push(fetchStripeCustomerObject(rawStripeTransactionObject.charge_object.customer as string))
+    
 
+    const stripeResults = await Promise.all(stripePromises)
 
-    return 
+    for (const result of stripeResults) {
+        if (result.object == 'balance_transaction') {
+            rawStripeTransactionObject.balance_transaction_object = result
+        }
+
+        if (result.object == 'customer') {
+            rawStripeTransactionObject.customer = result
+        }
+
+        if (result.object == 'payment_method') {
+            rawStripeTransactionObject.payment_method = result
+        }
+    }
+
+    return rawStripeTransactionObject
 }
 
 export async function createStripeCustomer(
