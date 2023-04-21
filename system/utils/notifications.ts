@@ -1,5 +1,5 @@
 import { Donation } from "../classes/donation";
-import { AdminNotificationType, DeliveryMethod, NotificationTemplate, NotificationType, UserNotificationType } from "../classes/notifications";
+import { AdminNotificationType, DeliveryMethod, NotificationTemplate, UserNotificationType } from "../classes/notifications";
 import { CountryList } from "../classes/utils";
 import * as dotenv from 'dotenv' 
 import twilio from "twilio";
@@ -9,7 +9,7 @@ import { Donor } from "../classes/donor";
 dotenv.config()
 
 export function generateNotificationTemplate(
-  notificationType: NotificationType,
+  notificationType: UserNotificationType | AdminNotificationType,
   donation: Donation
 ): NotificationTemplate {
     const donorCountry = donation.donor.address.country
@@ -65,7 +65,7 @@ export function generateNotificationTemplate(
 }
 
 export async function sendNotification(
-    notificationType: NotificationType,
+    notificationType: UserNotificationType | AdminNotificationType,
     donation: Donation,
     deliveryMethod: DeliveryMethod,
 ) {

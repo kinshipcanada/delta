@@ -1,7 +1,59 @@
-import { MessageResponse } from "../classes/api";
+import { ErroredResponse, MessageResponse } from "../classes/api";
+import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
+import { fetchDonationFromDatabase } from "../utils/database";
+import { buildDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { sendNotification } from "../utils/notifications";
+import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<MessageResponse> {
-    return
+export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<MessageResponse | ErroredResponse> {
+    if (
+        identifiers.donation_id == null &&
+        identifiers.stripe_charge_id == null &&
+        identifiers.stripe_payment_intent_id == null
+    ) {
+        return {
+            status: 500,
+            endpoint_called: 'checkAndResendReceipt',
+            error: 'No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.'
+        }
+    }
+
+    try {
+        const donation = formatDonationFromDatabase(fetchDonationFromDatabase(identifiers))
+
+        if (donation) {
+            await sendNotification(
+                UserNotificationType.DONATION_MADE,
+                donation,
+                DeliveryMethod.EMAIL,
+            )
+
+            return {
+                status: 200,
+                endpoint_called: 'checkAndResendReceipt',
+                message: `Successfully resent receipt of donation to ${donation.donor.email}`
+            }
+        } else {
+            const donation = await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
+            await sendNotification(
+                UserNotificationType.DONATION_MADE,
+                donation,
+                DeliveryMethod.EMAIL,
+            )
+
+            return {
+                status: 200,
+                endpoint_called: 'checkAndResendReceipt',
+                message: `Successfully generated and sent receipt of donation to ${donation.donor.email}`
+            }
+        }
+    } catch (error) {
+        return {
+            status: 500,
+            endpoint_called: 'checkAndResendReceipt',
+            error: error.message
+        }
+    }
 }
 

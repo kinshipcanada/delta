@@ -1,12 +1,34 @@
 import { CreateDonationResponse, ErroredResponse, FetchDonationResponse } from "../classes/api";
 import { Donation } from "../classes/donation";
+import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
-import { fetchDonationFromDatabase } from "../utils/database";
+import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
 import { buildDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
 export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse | ErroredResponse> {
-    return void 0;
+    try {
+        const donation = await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
+        await uploadDonationToDatabase(donation);
+        await sendNotification(
+            UserNotificationType.DONATION_MADE,
+            donation,
+            DeliveryMethod.EMAIL,
+        )
+
+        return {
+            status: 200,
+            endpoint_called: 'createDonation',
+            donation: donation
+        }
+    } catch (error) {
+        return {
+            status: 500,
+            endpoint_called: 'createDonation',
+            error: error.message
+        }
+    }
 }
 
 export async function fetchDonation(identifiers: DonationIdentifiers): Promise<FetchDonationResponse | ErroredResponse> {
