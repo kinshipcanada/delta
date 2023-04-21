@@ -1,4 +1,5 @@
 import { Stripe } from "stripe";
+import { Address } from "../classes/address";
 import { Cart, CauseMap } from "../classes/cart";
 import { Donation } from "../classes/donation";
 import { Donor } from "../classes/donor";
@@ -96,4 +97,15 @@ function _buildCartFromStripeMetadata(stripeChargeObject: Stripe.Charge): Cart {
 
 function _getDonationIdFromStripeMetadata(stripeChargeObject: Stripe.Charge) {
     return stripeChargeObject.metadata ? stripeChargeObject.metadata.donation_id : null;
+}
+
+export function _convertKinshipAddressToStripeAddress(address: Address): Stripe.Address {
+    return {
+        city: address.city,
+        country: address.country,
+        line1: address.line_address,
+        line2: null,
+        postal_code: address.postal_code,
+        state: address.state
+    }
 }

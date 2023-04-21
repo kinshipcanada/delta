@@ -20,7 +20,7 @@ export const enum CurrencyList {
     AUD = 'aud',
 }
 
-export const enum CountryList {
+export enum CountryList {
     CANADA = 'ca',
     UNITED_STATES = 'us',
     AFGHANISTAN = 'af',

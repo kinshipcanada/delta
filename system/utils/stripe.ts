@@ -5,6 +5,8 @@ import { Donor } from "../classes/donor";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { CountryList, DonationIdentifiers } from "../classes/utils";
 import { RawStripeTransactionObject, StripeMethods, StripeTags } from "../classes/stripe";
+import { Address } from "../classes/address";
+import { _convertKinshipAddressToStripeAddress } from "./formatting";
 
 const StripeClient = require('stripe');
 const dotenv = require('dotenv')
@@ -89,5 +91,24 @@ export async function fetchFullDonationFromStripe(identifiers: DonationIdentifie
 
 
     return 
+}
+
+export async function createStripeCustomer(
+    email: string,
+    donorId: string,
+    firstName: string,
+    lastName: string,
+    address: Address,
+) {
+    return await stripe_client.customers.create({
+        email,
+        name: `${firstName} ${lastName}`,
+        metadata: {
+            user_id: donorId,
+            first_name: firstName,
+            last_name: lastName,
+        },
+        address: _convertKinshipAddressToStripeAddress(address)
+    })
 }
 
