@@ -2,7 +2,7 @@ import { ErroredResponse, MessageResponse } from "../classes/api";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
 import { fetchDonationFromDatabase } from "../utils/database";
-import { buildDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
@@ -20,7 +20,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
     }
 
     try {
-        const donation = formatDonationFromDatabase(fetchDonationFromDatabase(identifiers))
+        const donation = formatDonationFromDatabase(await fetchDonationFromDatabase(identifiers))
 
         if (donation) {
             await sendNotification(
@@ -35,7 +35,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
                 message: `Successfully resent receipt of donation to ${donation.donor.email}`
             }
         } else {
-            const donation = await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
+            const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
             await sendNotification(
                 UserNotificationType.DONATION_MADE,
                 donation,

@@ -3,13 +3,13 @@ import { Donation } from "../classes/donation";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
-import { buildDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
 export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse | ErroredResponse> {
     try {
-        const donation = await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
+        const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
         await uploadDonationToDatabase(donation);
         await sendNotification(
             UserNotificationType.DONATION_MADE,
@@ -53,7 +53,7 @@ export async function fetchDonation(identifiers: DonationIdentifiers): Promise<F
         return {
             status: 200,
             endpoint_called: 'fetchDonation',
-            donation: await buildDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
+            donation: await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
         }
     } catch (error) {
         return {
