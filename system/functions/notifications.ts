@@ -6,17 +6,13 @@ import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<MessageResponse | ErroredResponse> {
+export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<MessageResponse> {
     if (
         identifiers.donation_id == null &&
         identifiers.stripe_charge_id == null &&
         identifiers.stripe_payment_intent_id == null
     ) {
-        return {
-            status: 500,
-            endpoint_called: 'checkAndResendReceipt',
-            error: 'No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.'
-        }
+        throw new Error("No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.")
     }
 
     try {
@@ -49,11 +45,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
             }
         }
     } catch (error) {
-        return {
-            status: 500,
-            endpoint_called: 'checkAndResendReceipt',
-            error: error.message
-        }
+        throw new Error("Error checking if donation exists and resending receipt");
     }
 }
 

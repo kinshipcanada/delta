@@ -1,13 +1,14 @@
-import { CreateDonationResponse, ErroredResponse, FetchDonationResponse } from "../classes/api";
+import { CreateDonationResponse, ErroredResponse, FetchDonationResponse, FetchGroupOfDonationsResponse } from "../classes/api";
 import { Donation } from "../classes/donation";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
 import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { validateEmail } from "../utils/helpers";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse | ErroredResponse> {
+export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse> {
     try {
         const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
         await uploadDonationToDatabase(donation);
@@ -23,15 +24,11 @@ export async function createDonation(identifiers: DonationIdentifiers): Promise<
             donation: donation
         }
     } catch (error) {
-        return {
-            status: 500,
-            endpoint_called: 'createDonation',
-            error: error.message
-        }
+        throw new Error("Error creating donation");
     }
 }
 
-export async function fetchDonation(identifiers: DonationIdentifiers): Promise<FetchDonationResponse | ErroredResponse> {
+export async function fetchDonation(identifiers: DonationIdentifiers): Promise<FetchDonationResponse> {
     try {
         if (
             identifiers.donation_id == null &&
@@ -56,11 +53,16 @@ export async function fetchDonation(identifiers: DonationIdentifiers): Promise<F
             donation: await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
         }
     } catch (error) {
-        return {
-            status: 500,
-            endpoint_called: 'fetchDonation',
-            error: error.message
-        }
+        throw new Error("Error fetching donation");
     }
 }
 
+export async function fetchAllDonationsForDonor(donorEmail: string): Promise<FetchGroupOfDonationsResponse> {
+    try {
+        if (!validateEmail(donorEmail)) { throw new Error("Invalid email address provided.") }
+
+        throw new Error("Not implemented yet");
+    } catch (error) {
+        throw new Error("Error fetching all donations for donor");
+    }
+}

@@ -68,13 +68,9 @@ export async function createDonor(
     }
 }
 
-export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<FetchDonorResponse | ErroredResponse> {
+export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<FetchDonorResponse> {
     if (donorId == null && donorEmail == null) {
-        return {
-            status: 500,
-            endpoint_called: 'fetchDonor',
-            error: 'No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.'
-        }
+        throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
     }
 
     try {
@@ -84,10 +80,7 @@ export async function fetchDonor(donorId?: string, donorEmail?: string): Promise
             donor: formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
         }
     } catch (error) {
-        return {
-            status: 500,
-            endpoint_called: 'fetchDonor',
-            error: error.message
-        }
+        // We should internally log the error here. Not passing it to the client.
+        throw new Error("Error fetching donor from database.")
     }
 }
