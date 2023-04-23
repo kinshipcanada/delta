@@ -35,8 +35,9 @@ Charity should be powered by good software.
     - [ ] Notify on error and allow the rest to go through rather than returning 500
     - [ ] Logging system
     - [ ] API key system
-    - [ ] Refactor API response system
+    - [x] Refactor API response system
     - [ ] Write out API reference, folder structure
+    - [x] Move core functionality over
     - [x] Unify frontend utils
     - [x] Swap env vars
     - [x] Create `.env.example`
