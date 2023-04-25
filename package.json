@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"node api-server\"",
-    "dev:api": "nodemon api-server",
+    "dev": "next dev",
     "build": "next build",
-    "start": "concurrently \"next start\" \"node api-server\"",
-    "start:api": "node api-server"
+    "start": "next start"
   },
   "dependencies": {
     "@headlessui/react": "^1.6.6",
