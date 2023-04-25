@@ -83,4 +83,8 @@ export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): 
 
     return;
 }
+
+export function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
     

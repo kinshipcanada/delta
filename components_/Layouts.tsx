@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Navigation from '../components/core/Navigation';
 import Footer from '../components/core/Footer';
+import AppNavigation from './app/Navigation';
 
 export const Layout = ({ children }) => (
   <>
@@ -15,9 +16,11 @@ export const Layout = ({ children }) => (
   </>
 );
 
-export function AppLayout() {
+export function AppLayout({ children }) {
     return (
-        <div></div>
+        <div className='p-10 grid grid-cols-4 gap-12'>
+            <AppNavigation />
+        </div>
     )
 }
 
