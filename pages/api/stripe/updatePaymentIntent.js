@@ -1,9 +1,7 @@
-// This is your test secret API key.
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
   try {
-    // const causes = req.body.causes
     const { 
       payment_intent_id,
       first_name,

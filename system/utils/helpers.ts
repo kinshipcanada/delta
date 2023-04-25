@@ -50,6 +50,8 @@ export function generateIdentifiersFromStrings(strings: string[]): DonationIdent
         } else { continue; }
     }
 
+    verifyAtLeastOneParametersExists('No valid identifiers provided', identifiers.stripe_payment_intent_id, identifiers.stripe_charge_id, identifiers.donation_id)
+
     return identifiers;
 }
 
@@ -59,7 +61,7 @@ export function isValidCountryCode(countryCode: string): boolean {
 
 export function verifyAllParametersExist(errorMessage, ...args: any[]): void {
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === null) {
+        if (args[i] === null || args[i] === undefined) {
             throw new Error(errorMessage ? errorMessage : `Null parameter at index ${i}`);
         }
     }
@@ -69,7 +71,7 @@ export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): 
     let allAreNull = true;
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] !== null) {
+        if (args[i] !== null && args[i] !== undefined) {
             allAreNull = false;
             break;
         }
