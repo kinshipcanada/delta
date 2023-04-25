@@ -25,7 +25,7 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
 
         for (const identifier of allowedIdentifiers) {
             if (donation_identifiers[identifier]) {
-                return database('donations').where(identifier, donation_identifiers[identifier]).first();
+              return database('donations').where(identifier == "donation_id" ? "id" : identifier, donation_identifiers[identifier]).first();
             }
         }
 

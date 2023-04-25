@@ -6,20 +6,19 @@ import { fetchAllDonationsForDonor } from "../../../../system/functions/donation
  */
 export default async function handler(req, res) {
     try {
+        const { donor_email } = req.body
 
-        const { donorEmail } = req.body
-
-        if (!donorEmail) {
+        if (!donor_email) {
             throw new Error("No donor email provided");
         }
 
-        const donations = await fetchAllDonationsForDonor(donorEmail);
+        const donations = await fetchAllDonationsForDonor(donor_email);
+
         return donations ? res.status(200).send({
             status: 200,
             endpoint_called: `/api/donor/donations/fetch`,
             donations: donations
         }) : new Error("Something went wrong fetching your donations.");
-
     } catch (error) {
         res.status(500).send({
             status: 500,

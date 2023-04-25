@@ -56,3 +56,12 @@ export function generateIdentifiersFromStrings(strings: string[]): DonationIdent
 export function isValidCountryCode(countryCode: string): boolean {
     return (Object.values(CountryList) as string[]).includes(countryCode);
 }
+
+export function checkForNullParameters(...args: any[]): void {
+    for (let i = 0; i < args.length; i++) {
+        if (args[i] === null) {
+            throw new Error(`Parameter ${i} is null`);
+        }
+    }
+}
+    

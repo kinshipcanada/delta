@@ -2,8 +2,8 @@ import { Donation } from "../classes/donation";
 import { AdminNotificationType, DeliveryMethod, NotificationTemplate, UserNotificationType } from "../classes/notifications";
 import { CountryList } from "../classes/utils";
 import * as dotenv from 'dotenv' 
-import twilio from "twilio";
-import postmark from "postmark";
+const twilio = require('twilio')
+const postmark = require('postmark')
 import { Donor } from "../classes/donor";
 
 dotenv.config()
@@ -85,7 +85,6 @@ export async function sendNotification(
 async function _sendEmail(template: NotificationTemplate, donor: Donor): Promise<void> {
     try {
         const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
-
         await client.sendEmail({
             "From": process.env.FROM_EMAIL,
             "To": donor.email,

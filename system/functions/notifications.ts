@@ -45,7 +45,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
             }
         }
     } catch (error) {
-        throw new Error("Error checking if donation exists and resending receipt");
+        throw new Error(error);
     }
 }
 

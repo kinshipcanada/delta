@@ -2,6 +2,8 @@ import { CreateDonationResponse, ErroredResponse, FetchDonationResponse, FetchGr
 import { Donation } from "../classes/donation";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
+import { DatabaseTable } from "../utils/constants";
+import { parameterizedDatabaseQuery } from "../utils/database";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
 import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
 import { validateEmail } from "../utils/helpers";
@@ -60,9 +62,8 @@ export async function fetchDonation(identifiers: DonationIdentifiers): Promise<F
 export async function fetchAllDonationsForDonor(donorEmail: string): Promise<FetchGroupOfDonationsResponse> {
     try {
         if (!validateEmail(donorEmail)) { throw new Error("Invalid email address provided.") }
-
-        throw new Error("Not implemented yet");
-    } catch (error) {
-        throw new Error("Error fetching all donations for donor");
+        return (await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { email: donorEmail }, false)).map(donation => formatDonationFromDatabase(donation));
+    }    catch (error) {
+        throw new Error(error.message);
     }
 }
