@@ -10,7 +10,7 @@ import { validateEmail } from "../utils/helpers";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function createDonation(identifiers: DonationIdentifiers): Promise<CreateDonationResponse> {
+export async function createDonation(identifiers: DonationIdentifiers): Promise<Donation> {
     try {
         const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
         await uploadDonationToDatabase(donation);
@@ -20,17 +20,13 @@ export async function createDonation(identifiers: DonationIdentifiers): Promise<
             DeliveryMethod.EMAIL,
         )
 
-        return {
-            status: 200,
-            endpoint_called: 'createDonation',
-            donation: donation
-        }
+        return donation
     } catch (error) {
         throw new Error("Error creating donation");
     }
 }
 
-export async function fetchDonation(identifiers: DonationIdentifiers): Promise<FetchDonationResponse> {
+export async function fetchDonation(identifiers: DonationIdentifiers): Promise<Donation> {
     try {
         if (
             identifiers.donation_id == null &&
@@ -41,25 +37,17 @@ export async function fetchDonation(identifiers: DonationIdentifiers): Promise<F
         const donationFromDatabase = await fetchDonationFromDatabase(identifiers);
     
         if (donationFromDatabase) { 
-            return {
-                status: 200,
-                endpoint_called: 'fetchDonation',
-                donation: formatDonationFromDatabase(donationFromDatabase)
-            };
+            return formatDonationFromDatabase(donationFromDatabase)
         }
     
         // If the donation already exists in the database, return that, otherwise, fetch it from Stripe
-        return {
-            status: 200,
-            endpoint_called: 'fetchDonation',
-            donation: await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
-        }
+        return await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
     } catch (error) {
         throw new Error("Error fetching donation");
     }
 }
 
-export async function fetchAllDonationsForDonor(donorEmail: string): Promise<FetchGroupOfDonationsResponse> {
+export async function fetchAllDonationsForDonor(donorEmail: string): Promise<Donation[]> {
     try {
         if (!validateEmail(donorEmail)) { throw new Error("Invalid email address provided.") }
         return (await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { email: donorEmail }, false)).map(donation => formatDonationFromDatabase(donation));

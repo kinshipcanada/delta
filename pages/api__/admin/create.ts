@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
         if (!donation_id) {
             
-            res.status(500).send("No donation id provided");
+            res.status(500).send();
             return
         }
 

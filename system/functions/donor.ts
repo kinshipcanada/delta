@@ -20,22 +20,14 @@ export async function createDonor(
     city: string,
     state: string,
     country: string
-): Promise<CreateDonorResponse | ErroredResponse> {
+): Promise<Donor> {
 
     if (!isValidCountryCode(country)) {
-        return {
-            status: 500,
-            endpoint_called: 'createDonor',
-            error: 'Invalid country code provided. Please use a valid ISO 3166-1 alpha-2 country code.'
-        }
+        throw new Error("Invalid country code provided. Please use a valid ISO 3166-1 alpha-2 country code.")
     }
     
     if (!verifyUUID(donorId)) {
-        return {
-            status: 500,
-            endpoint_called: 'createDonor',
-            error: 'Invalid donor_id provided. Please provide a valid UUID v4.'
-        }
+        throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
     }
 
     const address: Address = {
@@ -61,24 +53,16 @@ export async function createDonor(
         ]
     }
 
-    return {
-        status: 200,
-        endpoint_called: 'createDonor',
-        donor: donor
-    }
+    return donor
 }
 
-export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<FetchDonorResponse> {
+export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<Donor> {
     if (donorId == null && donorEmail == null) {
         throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
     }
 
     try {
-        return {
-            status: 200,
-            endpoint_called: 'fetchDonor',
-            donor: formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
-        }
+        return formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
     } catch (error) {
         // We should internally log the error here. Not passing it to the client.
         throw new Error("Error fetching donor from database.")

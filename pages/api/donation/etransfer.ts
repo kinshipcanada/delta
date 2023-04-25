@@ -1,5 +1,4 @@
-import { ErroredResponse } from "../../../../system/classes/api";
-
+import { ErroredResponse } from "../../../system/classes/api";
 /**
  * @description Fetches all donations for a given donor
  */

@@ -21,7 +21,7 @@ export async function callKinshipAPI(url: string, data?: {}) {
         });
         return await response.json();
     } catch (error) {
-        throw new Error(error.message);
+        console.error(error);
     }
 }
 
@@ -57,11 +57,28 @@ export function isValidCountryCode(countryCode: string): boolean {
     return (Object.values(CountryList) as string[]).includes(countryCode);
 }
 
-export function checkForNullParameters(...args: any[]): void {
+export function verifyAllParametersExist(errorMessage, ...args: any[]): void {
     for (let i = 0; i < args.length; i++) {
         if (args[i] === null) {
-            throw new Error(`Parameter ${i} is null`);
+            throw new Error(errorMessage ? errorMessage : `Null parameter at index ${i}`);
         }
     }
+}
+
+export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): void {
+    let allAreNull = true;
+
+    for (let i = 0; i < args.length; i++) {
+        if (args[i] !== null) {
+            allAreNull = false;
+            break;
+        }
+    }
+
+    if (allAreNull) {
+        throw new Error(errorMessage ? errorMessage : `All parameters are null`);
+    }
+
+    return;
 }
     

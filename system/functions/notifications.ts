@@ -6,7 +6,7 @@ import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
 
-export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<MessageResponse> {
+export async function checkAndResendReceipt(identifiers: DonationIdentifiers): Promise<string> {
     if (
         identifiers.donation_id == null &&
         identifiers.stripe_charge_id == null &&
@@ -25,11 +25,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
                 DeliveryMethod.EMAIL,
             )
 
-            return {
-                status: 200,
-                endpoint_called: 'checkAndResendReceipt',
-                message: `Successfully resent receipt of donation to ${donation.donor.email}`
-            }
+            return `Successfully resent receipt of donation to ${donation.donor.email}`
         } else {
             const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
             await sendNotification(
@@ -38,11 +34,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
                 DeliveryMethod.EMAIL,
             )
 
-            return {
-                status: 200,
-                endpoint_called: 'checkAndResendReceipt',
-                message: `Successfully generated and sent receipt of donation to ${donation.donor.email}`
-            }
+            return `Successfully generated and sent receipt of donation to ${donation.donor.email}`
         }
     } catch (error) {
         throw new Error(error);

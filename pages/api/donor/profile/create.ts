@@ -3,7 +3,7 @@ import { ErroredResponse } from "../../../../system/classes/api";
 import { createStripeCustomer } from "../../../../system/utils/stripe";
 import { Address } from "../../../../system/classes/address";
 import { CountryList } from "../../../../system/classes/utils";
-import { checkForNullParameters } from "../../../../system/utils/helpers";
+import { verifyAllParametersExist } from "../../../../system/utils/helpers";
 import { SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
 
 /**
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     try {
         const { email, donor_id, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country } = req.body
 
-        checkForNullParameters(email, donor_id, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country);
+        verifyAllParametersExist("Not all parameters provided. You must provide an email, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country", email, donor_id, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country);
 
         const address: Address = {
             line_address: address_line_address,
