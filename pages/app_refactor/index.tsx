@@ -1,8 +1,12 @@
 import { DocumentIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { Badge } from "../../components_/Badge";
+import { Box } from "../../components_/Boxes";
 import Button from "../../components_/Button";
-import { ButtonStyle, SmallIconSizing, StandardIconSizing } from "../../components_/types";
-import { SectionHeader, Text } from "../../components_/Typography";
+import { PanelWithHeader, PanelWithHeaderAndFooter } from "../../components_/Panels";
+import { Spacer } from "../../components_/Spacer";
+import { ButtonStyle, EventColors, SmallIconSizing, SpacerSize, StandardIconSizing, Style } from "../../components_/types";
+import { PageHeader, SectionHeader, Text } from "../../components_/Typography";
 import { fetchDonor } from "../../system/functions/donor";
 import { callKinshipAPI, supabase } from "../../system/utils/helpers";
 
@@ -30,12 +34,29 @@ export default function AppRefactor() {
     }, [])
 
     return (
-        <div>
+        <Box>
+            <PageHeader>
+                App Refactor
+            </PageHeader>
             <SectionHeader>
                 App Refactor
             </SectionHeader>
+            <Spacer size={SpacerSize.Medium} />
+            <PanelWithHeaderAndFooter
+                header={<>Bruh</>}
+                footer={<>Footer</>}
+            >
+                <Text>
+                    This is a panel with a header.
+                </Text>
+            </PanelWithHeaderAndFooter>
             <Text>
                 This page is a playground for refactoring components.
+                <Badge
+                    text="Hello"
+                    style={Style.Outlined}
+                    color={EventColors.Warning}
+                />
             </Text>
             <Button
                 text="Click Me"
@@ -48,8 +69,9 @@ export default function AppRefactor() {
                         alert("Clicked!")
                     }, 1000);
                 }}
+                href="/"
                 icon={<DocumentIcon />}
             />
-        </div>
+        </Box>
     )
 }

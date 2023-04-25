@@ -1,21 +1,21 @@
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { LargeIconSizing, AlertType, AlertProps } from "./types";
+import { LargeIconSizing, EventColors, AlertProps } from "./types";
 import React from "react";
 
 export const Alert: React.FC<AlertProps> = ({ type, title, message }) => {
 
     const alertStyle = 
-        type === AlertType.Success ? "bg-green-50 text-green-800" : 
-        type === AlertType.Error ? "bg-red-50 text-red-800" : 
-        type === AlertType.Warning ? "bg-yellow-50 text-yellow-800" : 
-        type === AlertType.Info ? "bg-blue-50 text-blue-800" : 
+        type === EventColors.Success ? "bg-green-50 text-green-800" : 
+        type === EventColors.Error ? "bg-red-50 text-red-800" : 
+        type === EventColors.Warning ? "bg-yellow-50 text-yellow-800" : 
+        type === EventColors.Info ? "bg-blue-50 text-blue-800" : 
         "text-white bg-slate-600";
     
     const alertSecondaryTextStyle = 
-        type === AlertType.Success ? "text-green-700" :
-        type === AlertType.Error ? "text-red-700" :
-        type === AlertType.Warning ? "text-yellow-700" :
-        type === AlertType.Info ? "text-blue-700" :
+        type === EventColors.Success ? "text-green-700" :
+        type === EventColors.Error ? "text-red-700" :
+        type === EventColors.Warning ? "text-yellow-700" :
+        type === EventColors.Info ? "text-blue-700" :
         "text-white";
 
 
@@ -23,13 +23,13 @@ export const Alert: React.FC<AlertProps> = ({ type, title, message }) => {
         <div className={`rounded-md p-4 ${alertStyle}`}>
             <div className="flex">
                 <div className="flex-shrink-0">
-                    { type === AlertType.Success ? (
+                    { type === EventColors.Success ? (
                         <CheckCircleIcon className={`${LargeIconSizing}`} />
-                    ) : type === AlertType.Error ? (
+                    ) : type === EventColors.Error ? (
                         <XCircleIcon className={`${LargeIconSizing}`} />
-                    ) : type === AlertType.Warning ? (
+                    ) : type === EventColors.Warning ? (
                         <ExclamationTriangleIcon className={`${LargeIconSizing}`} />
-                    ) : type === AlertType.Info ? (
+                    ) : type === EventColors.Info ? (
                         <InformationCircleIcon className={`${LargeIconSizing}`} />
                     ) : (
                         <InformationCircleIcon className={`${LargeIconSizing}`} />

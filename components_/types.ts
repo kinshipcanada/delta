@@ -6,7 +6,8 @@ export const enum ButtonStyle {
 export interface ButtonProps {
     text: string;
     style: ButtonStyle;
-    onClick: () => void;
+    onClick?: () => void;
+    href?: string;
     isLoading?: boolean;
     icon?: React.ReactNode;
 }
@@ -21,17 +22,39 @@ export interface LoadingProps {
     color: LoadingColors;
 }
 
-export const enum AlertType {
-    Success = 'success',
-    Error = 'error',
-    Warning = 'warning',
-    Info = 'info',
+export const enum EventColors {
+    Neutral,
+    Error,
+    Warning,
+    Success,
+    Info,
 }
 
 export interface AlertProps {
-    type: AlertType;
+    type: EventColors;
     title: string;
     message: string;
+}
+
+export const enum Style {
+    Filled,
+    Outlined,
+}
+
+export interface BadgeProps {
+    color?: EventColors;
+    style?: Style;
+    text: string;
+}
+
+export const enum SpacerSize {
+    Small = 'small',
+    Medium = 'medium',
+    Large = 'large',
+}
+
+export interface SpacerProps {
+    size: SpacerSize
 }
 
 export const SmallIconSizing = "h-3 w-3 mr-2"
