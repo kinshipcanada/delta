@@ -1,6 +1,11 @@
+import { Donation } from "../system/classes/donation";
+import { Donor } from "../system/classes/donor";
+
 export const enum ButtonStyle {
-    Primary = "primary",
-    Secondary = "secondary"
+    Primary,
+    Secondary,
+    OutlineSelected,
+    OutlineUnselected,
 }
 
 export interface ButtonProps {
@@ -10,6 +15,7 @@ export interface ButtonProps {
     href?: string;
     isLoading?: boolean;
     icon?: React.ReactNode;
+    setter?: (value: any) => void;
 }
 
 export const enum LoadingColors {
@@ -57,6 +63,11 @@ export interface SpacerProps {
     size: SpacerSize
 }
 
+export interface AppPageProps {
+    donor: Donor,
+    donations: Donation[]
+}
+
 export const SmallIconSizing = "h-3 w-3 mr-2"
 export const StandardIconSizing = "h-4 w-4 mr-2"
-export const LargeIconSizing = "h-5 w-5 mr-2"
+export const LargeIconSizing = "h-5 w-5 mr-4"

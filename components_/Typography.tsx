@@ -12,6 +12,12 @@ export const SectionHeader = ({ children }) => {
 
 export const Text = ({ children }) => {
     return (
-        <p className="text-sm leading-6 text-slate-600">{ children }</p>
+        <p className="text-sm leading-6 text-slate-600 flex items-center">{ children }</p>
+    )
+}
+
+export const BoldText = ({ children }) => {
+    return (
+        <p className="text-sm leading-6 font-medium text-slate-600 flex items-center">{ children }</p>
     )
 }

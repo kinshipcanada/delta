@@ -87,4 +87,15 @@ export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
-    
+
+export function centsToDollars(amount: number | string) {
+    if (typeof amount === 'string') {
+        amount = parseFloat(amount);
+    }
+
+    return (amount / 100).toFixed(2);
+}
+
+export function parseFrontendDate(date: string | Date) {
+    return new Date(Date.parse(date as string)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}

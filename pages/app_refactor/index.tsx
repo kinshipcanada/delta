@@ -1,77 +1,99 @@
-import { DocumentIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { CalendarDaysIcon } from "@heroicons/react/20/solid";
+import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, EnvelopeIcon, CurrencyDollarIcon } from "@heroicons/react/24/solid";
+import React from "react";
+import { toast } from "react-hot-toast";
 import { Badge } from "../../components_/Badge";
-import { Box } from "../../components_/Boxes";
 import Button from "../../components_/Button";
-import { PanelWithHeader, PanelWithHeaderAndFooter } from "../../components_/Panels";
-import { Spacer } from "../../components_/Spacer";
-import { ButtonStyle, EventColors, SmallIconSizing, SpacerSize, StandardIconSizing, Style } from "../../components_/types";
-import { PageHeader, SectionHeader, Text } from "../../components_/Typography";
-import { fetchDonor } from "../../system/functions/donor";
-import { callKinshipAPI, supabase } from "../../system/utils/helpers";
+import { AppLayout } from "../../components_/Layouts";
+import { PanelWithFooter } from "../../components_/Panels";
+import { HorizontalSpacer, VerticalSpacer } from "../../components_/Spacer";
+import { AppPageProps, ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../components_/types";
+import { BoldText, PageHeader, Text, SectionHeader } from "../../components_/Typography";
+import { JustifyBetween, JustifyEnd } from "../../components_/Utils";
+import { Donation } from "../../system/classes/donation";
+import { CountryList } from "../../system/classes/utils";
+import { centsToDollars, parseFrontendDate } from "../../system/utils/helpers";
 
-export default function AppRefactor() {
-
-    const [buttonIsLoading, setButtonIsLoading] = useState(false);
-    const [user, setUser] = useState(null)
-
-    const fetchUser = async () => {
-        const loggedInUser = await supabase.auth.getUser() 
-
-        if (loggedInUser) {
-            const rep = await callKinshipAPI('/api/admin/test', {
-                donor_id: loggedInUser.data.user.id,
-            });
-            console.log(rep)
-            return
-        } else {
-            return
-        }
-    }
-
-    useEffect(()=>{
-        fetchUser()
-    }, [])
-
+export default function Index() {
     return (
-        <Box>
-            <PageHeader>
-                App Refactor
-            </PageHeader>
-            <SectionHeader>
-                App Refactor
-            </SectionHeader>
-            <Spacer size={SpacerSize.Medium} />
-            <PanelWithHeaderAndFooter
-                header={<>Bruh</>}
-                footer={<>Footer</>}
-            >
-                <Text>
-                    This is a panel with a header.
-                </Text>
-            </PanelWithHeaderAndFooter>
-            <Text>
-                This page is a playground for refactoring components.
-                <Badge
-                    text="Hello"
-                    style={Style.Outlined}
-                    color={EventColors.Warning}
-                />
-            </Text>
-            <Button
-                text="Click Me"
-                style={ButtonStyle.Secondary}
-                isLoading={buttonIsLoading}
-                onClick={() => {
-                    setButtonIsLoading(true);
-                    setTimeout(() => {
-                        setButtonIsLoading(false)
-                        alert("Clicked!")
-                    }, 1000);
-                }}
-                href="/"
-                icon={<DocumentIcon />}
-            />
-        </Box>
+        <AppLayout AppPage={AppHomePage} />
+    )
+}
+
+const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
+    return (
+        <div>
+            <JustifyBetween>
+                <PageHeader>{ donor.first_name }{ donor.first_name.endsWith('s') ? "'" : "'s" } Kinship Dashboard</PageHeader>
+                <Button text="Support" style={ButtonStyle.Secondary} href={"/support"}></Button>
+            </JustifyBetween>
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <SectionHeader>Your Donations</SectionHeader>
+            <VerticalSpacer size={SpacerSize.Small} />
+            <div className="space-y-4">
+                { donations.map((donation) => (
+                    <DonationPanel donation={donation} key={donation.identifiers.donation_id} />
+                )) }
+            </div>
+        </div> 
+    )
+}
+
+const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
+    return (
+        <PanelWithFooter
+            footer={
+                <JustifyEnd>
+                    <Button icon={<ArrowDownCircleIcon />} text="Download Receipt" style={ButtonStyle.Secondary} onClick={()=>{toast.error("Not Implemented. Blame the dev at hobbleabbas@gmail.com until its solved.", { position: "top-right"})}} />
+                    <HorizontalSpacer size={SpacerSize.Small} />
+                    <Button text="View Donation &rarr;" style={ButtonStyle.Primary} href={`http://${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`}></Button>
+                </JustifyEnd>
+            }
+        >
+            <dl className="divide-y space-y-4 divide-gray-100">
+                <div className="w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <UserCircleIcon className={`${StandardIconSizing} text-slate-600`} />
+                        Donor
+                    </BoldText>
+                    <Text>
+                        { donation.donor.first_name } { donation.donor.last_name }
+                    </Text>
+                </div>
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <CurrencyDollarIcon className={`${StandardIconSizing} text-slate-600`} />
+                        Amount Donated
+                    </BoldText>
+                    <Text>
+                        ${ centsToDollars(donation.amount_in_cents) }
+                        <HorizontalSpacer size={SpacerSize.Small} />
+                        <Badge text={donation.donor.address.country == CountryList.CANADA ? "Tax Receipt" : "Donation Receipt"} style={Style.Outlined} color={donation.donor.address.country == CountryList.CANADA ? EventColors.Success : EventColors.Neutral } />
+                    </Text>
+                </div>
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <EnvelopeIcon className={`${StandardIconSizing} text-slate-600`} />
+                        Status
+                    </BoldText>
+                    <Text>
+                        <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+                    </Text>
+                </div>
+                
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <CalendarDaysIcon className={`${StandardIconSizing} text-slate-600`} />
+                        Date Of Donation
+                    </BoldText>
+                    <Text>
+                        { parseFrontendDate(donation.date_donated) }
+                    </Text>
+                </div>
+            </dl>                
+
+        </PanelWithFooter>
     )
 }
