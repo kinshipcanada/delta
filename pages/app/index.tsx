@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { Badge } from "../../components_/Badge";
 import Button from "../../components_/Button";
 import { AppLayout } from "../../components_/Layouts";
+import { InlineLink } from "../../components_/Links";
 import { PanelWithFooter } from "../../components_/Panels";
 import { HorizontalSpacer, VerticalSpacer } from "../../components_/Spacer";
 import { AppPageProps, ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../components_/types";
@@ -29,8 +30,8 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
                 <Button text="Support" style={ButtonStyle.Secondary} href={"/support"}></Button>
             </JustifyBetween>
             <VerticalSpacer size={SpacerSize.Medium} />
-            <VerticalSpacer size={SpacerSize.Medium} />
             <SectionHeader>Your Donations</SectionHeader>
+            <Text><span>Any donations you have made will be listed below. If a donation, such as an eTransfer or Cash donation is missing, or if you need any help or have questions, you can contact support at <InlineLink href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`} text={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}/></span></Text>
             <VerticalSpacer size={SpacerSize.Small} />
             <div className="space-y-4">
                 { donations.map((donation) => (
@@ -40,6 +41,7 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
         </div> 
     )
 }
+
 
 const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
     return (

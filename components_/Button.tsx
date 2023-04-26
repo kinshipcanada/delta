@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { ButtonProps, ButtonStyle, LoadingColors, StandardIconSizing } from "./types";
+import { ButtonProps, ButtonSize, ButtonStyle, LoadingColors, SpacerSize, StandardIconSizing } from "./types";
 import { Loading } from "./Loading";
 import Link from "next/link";
+import { HorizontalSpacer } from "./Spacer";
 
-const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading = false, icon, setter }) => {
+const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading = false, icon, setter, size }) => {
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const filledButtonStyling = "justify-center transition delay-50 inline-flex border border-transparent py-2 px-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+  const buttonSizing = 
+    size === ButtonSize.Small ? "px-2.5 py-1.5 text-xs" : 
+    size === ButtonSize.Large ? "px-3 py-2 text-sm" : 
+    "px-4 py-2 text-sm"
+  
+  const filledButtonStyling = `${buttonSizing} justify-center transition delay-50 inline-flex border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
   const outlinedButtonStyling = "group px-3 py-2.5"
 
   const buttonStyle = 
@@ -34,6 +40,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
     >
         <span className={`flex cursor-pointer items-center rounded-md font-medium text-sm  ${buttonStyle}`}>
             {(icon && !isLoading) && <span className={StandardIconSizing}>{icon}</span>}
+            {(icon || isLoading) && <HorizontalSpacer size={SpacerSize.Small} />}
             {isLoading ? <Loading color = {style === ButtonStyle.Primary ? LoadingColors.White : LoadingColors.Slate} /> : null}
             { text }
         </span>

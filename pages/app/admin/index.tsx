@@ -1,0 +1,120 @@
+import React from "react"
+import { AppLayout } from "../../../components_/Layouts"
+import { VerticalSpacer } from "../../../components_/Spacer"
+import { ButtonSize, ButtonStyle, EventColors, ExtraLargeIconSizing, LargeIconSizing, SmallIconSizing, SpacerSize, StandardIconSizing, Style } from "../../../components_/types"
+import { BoldText, PageHeader, Text } from "../../../components_/Typography"
+import { Donation } from "../../../system/classes/donation"
+import { Donor } from "../../../system/classes/donor"
+import { PanelWithHeaderNoPadding } from "../../../components_/Panels"
+import { ArrowUpOnSquareIcon, DocumentDuplicateIcon, EnvelopeIcon, PlusCircleIcon } from "@heroicons/react/24/solid"
+import { JustifyEnd } from "../../../components_/Utils"
+import Button from "../../../components_/Button"
+import { Badge } from "../../../components_/Badge"
+import { Grid } from "../../../components_/Grid"
+
+export default function Index() {
+    return (
+        <AppLayout AppPage={AppAdminPage} />
+    )
+}
+  
+const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
+
+    const tools = [
+        {
+            name: 'Resend Receipt',
+            icon: EnvelopeIcon,
+            color: EventColors.Info,
+            description: 'Use this tool to find a donation and resend the donor their receipt.',
+            href: "/"
+        },
+        {
+            name: 'Manually Create Donation',
+            icon: PlusCircleIcon,
+            color: EventColors.Success,
+            description: 'Use this tool to record a cash or eTransfer donation. The donor will automatically be emailed a receipt.',
+            href: "/"
+        },
+        {
+            name: 'Upload Proof of Donation',
+            icon: ArrowUpOnSquareIcon,
+            color: EventColors.Warning,
+            description: 'Use this tool to filter donations by causes, and upload proof of donation easily. Donors are notified.',
+            href: "/app/admin/proof"
+        },
+        {
+            name: 'Generate Report',
+            icon: DocumentDuplicateIcon,
+            color: EventColors.Error,
+            description: `Use this tool to send ${process.env.NEXT_PUBLIC_SUPPORT_EMAIL} custom reports for causes or date ranges.`,
+            href: "/"
+        },
+    ]
+
+    // Admin functions
+    const resendReceipt = async() => {
+        return null
+    }
+
+    const manuallyCreateDonation = async() => {
+        return null
+    }
+
+    const generateReport = async() => {
+        return null
+    }
+
+    const [resendReceiptOpen, setResendReceiptOpen] = React.useState(false)
+    const [manuallyCreateDonationOpen, setManuallyCreateDonationOpen] = React.useState(false)
+    const [generateReportOpen, setGenerateReportOpen] = React.useState(false)
+
+    return (
+        <div>
+            <PageHeader>Kinship Canada Admin Panel</PageHeader>
+            <VerticalSpacer size={SpacerSize.Small} />
+            <Text><span>Any donations you have made will be listed below. If a donation, such as an eTransfer or Cash donation is missing, or if you need any help or have questions, you can contact support at</span></Text>
+            <VerticalSpacer size={SpacerSize.Medium} />
+                <Grid>
+                {tools.map((tool, toolIdx) => {
+                    const iconStyling = tool.color == EventColors.Success ? 'text-green-600' : tool.color == EventColors.Info ? 'text-blue-600' : tool.color == EventColors.Warning ? 'text-yellow-600' : tool.color == EventColors.Error ? 'text-red-600' : 'text-gray-500'
+
+                    return (
+                        <PanelWithHeaderNoPadding key={toolIdx} header={<div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+                                <span 
+                                    className={`h-12 w-12 flex items-center justify-center rounded-lg bg-white object-cover ring-1 ring-gray-900/10 ${iconStyling}`}
+                                >
+                                    <tool.icon className={ExtraLargeIconSizing} />
+                                </span>
+                                <BoldText>{tool.name}</BoldText>
+                                </div>}>
+                            <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6 space-y-4">
+                                <div>
+                                    <VerticalSpacer size={SpacerSize.Medium} />
+                                    <Text>
+                                        { tool.description }
+                                    </Text>
+                                </div>
+                                <div>
+                                    <VerticalSpacer size={SpacerSize.Medium} />
+                                    <div className="flex justify-between gap-x-4">
+                                        <dt className="text-gray-500">Access</dt>
+                                        <dd className="flex items-start gap-x-2">
+                                            <Badge style={Style.Outlined} text="Granted" color={EventColors.Success} />
+                                        </dd>
+                                    </div>
+                                </div>
+                                <JustifyEnd>
+                                    <div>
+                                        <VerticalSpacer size={SpacerSize.Medium} />
+                                        <Button text="Use Tool &rarr;" style={ButtonStyle.Secondary} size={ButtonSize.Small} href={tool.href}/>
+                                        <VerticalSpacer size={SpacerSize.Small} />
+                                    </div>
+                                </JustifyEnd>
+                            </dl>
+                        </PanelWithHeaderNoPadding>
+                    )})}
+                </Grid>
+        </div>
+    )
+}
+

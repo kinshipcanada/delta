@@ -1,4 +1,4 @@
-import { ArrowLeftOnRectangleIcon, ArrowPathIcon, ChatBubbleOvalLeftIcon, HomeIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftOnRectangleIcon, ArrowPathIcon, ChatBubbleOvalLeftIcon, Cog6ToothIcon, HomeIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { supabase } from "../../system/utils/helpers"
@@ -6,7 +6,7 @@ import Button from "../Button"
 import { ButtonStyle } from "../types"
 import { LargeIconSizing } from "../types"
 
-export default function AppNavigation() {
+export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnabled }) => {
     const router = useRouter()
     const path = router.asPath 
 
@@ -32,6 +32,14 @@ export default function AppNavigation() {
                     />
                 </>
             ))}
+            { adminEnabled && (
+                <Button
+                    text={"Admin Panel"}
+                    style={path == "/app/admin" ? ButtonStyle.OutlineSelected : ButtonStyle.OutlineUnselected}
+                    icon={<Cog6ToothIcon className={`${LargeIconSizing} text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 -mt-0.5`} />}
+                    href={'/app/admin'}
+                />
+            )}
             <Button
                 text="Logout"
                 style={ButtonStyle.OutlineUnselected}

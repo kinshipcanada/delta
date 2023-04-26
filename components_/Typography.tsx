@@ -1,12 +1,12 @@
 export const PageHeader = ({ children }) => {
     return (
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl">{ children }</h1>
+        <h1 className="text-2xl font-bold leading-7 tracking-tight text-gray-900 sm:truncate sm:text-3xl">{ children }</h1>
     )
 }
 
 export const SectionHeader = ({ children }) => {
     return (
-        <h4 className="text-base tracking-wide font-semibold leading-7 text-slate-900">{ children }</h4>
+        <h4 className="text-base tracking-tight font-semibold leading-7 text-slate-900">{ children }</h4>
     )
 }
 

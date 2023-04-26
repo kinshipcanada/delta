@@ -16,6 +16,13 @@ export interface ButtonProps {
     isLoading?: boolean;
     icon?: React.ReactNode;
     setter?: (value: any) => void;
+    size?: ButtonSize;
+}
+
+export const enum ButtonSize {
+    Small,
+    Standard,
+    Large,
 }
 
 export const enum LoadingColors {
@@ -68,6 +75,7 @@ export interface AppPageProps {
     donations: Donation[]
 }
 
-export const SmallIconSizing = "h-3 w-3 mr-2"
-export const StandardIconSizing = "h-4 w-4 mr-2"
-export const LargeIconSizing = "h-5 w-5 mr-4"
+export const SmallIconSizing = "h-3 w-3"
+export const StandardIconSizing = "h-4 w-4"
+export const LargeIconSizing = "h-5 w-5"
+export const ExtraLargeIconSizing = "h-6 w-6"

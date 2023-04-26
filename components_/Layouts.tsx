@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Navigation from '../components/core/Navigation';
 import Footer from '../components/core/Footer';
-import AppNavigation from './app/Navigation';
+import { AppNavigation } from './app/Navigation';
 import { useState, useEffect } from 'react';
 import { callKinshipAPI, supabase } from '../system/utils/helpers';
 import { useRouter } from 'next/router';
@@ -28,6 +28,7 @@ export function AppLayout({ AppPage }) {
   const [donor, setDonor] = useState(null);
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [adminEnabled, setAdminEnabled] = useState(false)
 
   const fetchUser = async () => {
     try {
@@ -44,6 +45,7 @@ export function AppLayout({ AppPage }) {
 
         setDonor(donorResponse.donor);
         setDonations(donationsResponse.donations)
+        setAdminEnabled(true)
       } else {
         router.push('/auth/login');
       }
@@ -63,7 +65,7 @@ export function AppLayout({ AppPage }) {
 
   return (
     <div className="p-10 grid grid-cols-4 gap-12">
-      <AppNavigation />
+      <AppNavigation adminEnabled={adminEnabled} />
       <div className="col-span-3">
         {loading ? (
           <CenterOfPageBox>

@@ -1,6 +1,7 @@
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { LargeIconSizing, EventColors, AlertProps } from "./types";
+import { LargeIconSizing, EventColors, AlertProps, SpacerSize } from "./types";
 import React from "react";
+import { HorizontalSpacer } from "./Spacer";
 
 export const Alert: React.FC<AlertProps> = ({ type, title, message }) => {
 
@@ -34,6 +35,7 @@ export const Alert: React.FC<AlertProps> = ({ type, title, message }) => {
                     ) : (
                         <InformationCircleIcon className={`${LargeIconSizing}`} />
                     )}
+                    <HorizontalSpacer size={SpacerSize.Medium} />
                 </div>
                 <div className="ml-3">
                     <h3 className="text-sm font-medium">{ title ? title : "Error"}</h3>
