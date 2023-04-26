@@ -26,14 +26,14 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             icon: EnvelopeIcon,
             color: EventColors.Info,
             description: 'Use this tool to find a donation and resend the donor their receipt.',
-            href: "/"
+            href: "/app/admin/resend"
         },
         {
             name: 'Manually Create Donation',
             icon: PlusCircleIcon,
             color: EventColors.Success,
             description: 'Use this tool to record a cash or eTransfer donation. The donor will automatically be emailed a receipt.',
-            href: "/"
+            href: "/app/admin/create"
         },
         {
             name: 'Upload Proof of Donation',
@@ -50,23 +50,6 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             href: "/"
         },
     ]
-
-    // Admin functions
-    const resendReceipt = async() => {
-        return null
-    }
-
-    const manuallyCreateDonation = async() => {
-        return null
-    }
-
-    const generateReport = async() => {
-        return null
-    }
-
-    const [resendReceiptOpen, setResendReceiptOpen] = React.useState(false)
-    const [manuallyCreateDonationOpen, setManuallyCreateDonationOpen] = React.useState(false)
-    const [generateReportOpen, setGenerateReportOpen] = React.useState(false)
 
     return (
         <div>

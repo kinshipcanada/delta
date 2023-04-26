@@ -75,6 +75,17 @@ export interface AppPageProps {
     donations: Donation[]
 }
 
+
+export interface Tab {
+    name: string;
+    component: React.ReactElement;
+}
+
+export interface TabsProps {
+    tabs: Tab[];
+}
+
+
 export const SmallIconSizing = "h-3 w-3"
 export const StandardIconSizing = "h-4 w-4"
 export const LargeIconSizing = "h-5 w-5"
