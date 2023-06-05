@@ -25,29 +25,33 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             name: 'Resend Receipt',
             icon: EnvelopeIcon,
             color: EventColors.Info,
-            description: 'Use this tool to find a donation and resend the donor their receipt.',
-            href: "/app/admin/resend"
+            description: 'Use this tool to find a donation and resend the donor their receipt. Donor will receive an email.',
+            href: "/app/admin/resend",
+            toolEnabled: true,
         },
         {
             name: 'Manually Create Donation',
             icon: PlusCircleIcon,
             color: EventColors.Success,
             description: 'Use this tool to record a cash or eTransfer donation. The donor will automatically be emailed a receipt.',
-            href: "/app/admin/create"
+            href: "/app/admin/create",
+            toolEnabled: true,
         },
         {
             name: 'Upload Proof of Donation',
             icon: ArrowUpOnSquareIcon,
             color: EventColors.Warning,
             description: 'Use this tool to filter donations by causes, and upload proof of donation easily. Donors are notified.',
-            href: "/app/admin/proof"
+            href: "/app/admin/proof",
+            toolEnabled: false
         },
         {
             name: 'Generate Report',
             icon: DocumentDuplicateIcon,
             color: EventColors.Error,
             description: `Use this tool to send ${process.env.NEXT_PUBLIC_SUPPORT_EMAIL} custom reports for causes or date ranges.`,
-            href: "/"
+            href: "/app/admin/reports",
+            toolEnabled: false
         },
     ]
 
@@ -82,14 +86,27 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
                                     <div className="flex justify-between gap-x-4">
                                         <dt className="text-gray-500">Access</dt>
                                         <dd className="flex items-start gap-x-2">
-                                            <Badge style={Style.Outlined} text="Granted" color={EventColors.Success} />
+                                            { tool.toolEnabled ? 
+                                                <Badge style={Style.Outlined} text="Granted" color={EventColors.Success} />
+
+                                                :
+
+                                                <Badge style={Style.Outlined} text="Unavailable" color={EventColors.Error} />
+                                            }
                                         </dd>
                                     </div>
                                 </div>
                                 <JustifyEnd>
                                     <div>
                                         <VerticalSpacer size={SpacerSize.Medium} />
-                                        <Button text="Use Tool &rarr;" style={ButtonStyle.Secondary} size={ButtonSize.Small} href={tool.href}/>
+                                        { tool.toolEnabled ?
+
+                                            <Button text="Use Tool &rarr;" style={ButtonStyle.Secondary} size={ButtonSize.Small} href={tool.href}/>
+
+                                            :
+
+                                            <Button text="Unavailable" style={ButtonStyle.Disabled} size={ButtonSize.Small} href={"#"}/>
+                                        }
                                         <VerticalSpacer size={SpacerSize.Small} />
                                     </div>
                                 </JustifyEnd>

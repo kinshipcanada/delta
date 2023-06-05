@@ -41,6 +41,43 @@ export function formatCartForDatabase(donation: Donation): DatabaseTypings["publ
     } as DatabaseTypings["public"]["Tables"]["kinship_carts"]["Row"]
 }
 
+export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]["kinship_carts"]["Row"]): Donation {
+
+    const donor: Donor = {
+        donor_id: cart.donor,
+        first_name: cart.first_name,
+        last_name: cart.last_name,
+        email: cart.email,
+        address: {
+            line_address: cart.address_line_address,
+            city: cart.address_city,
+            state: cart.address_state,
+            postal_code: cart.address_postal_code,
+            country: cart.address_country as CountryList
+        },
+        stripe_customer_ids: []
+    }
+
+    const constructedCart: Cart = {
+        total_amount_paid_in_cents: 50,
+        currency: CurrencyList.CAD,
+        causes: {}
+    }
+    
+    return {
+        identifiers: {
+            donation_id: cart.id,
+        },
+        donor: donor,
+        causes: constructedCart,
+        live: cart.livemode,
+        amount_in_cents: cart.amount_in_cents,
+        fees_covered: 0,
+        fees_charged_by_stripe: 0,
+        date_donated: new Date(cart.donation_logged)
+    } as Donation
+}
+
 export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables"]["donor_profiles"]["Row"]): Donor {
     return {
         donor_id: donor.id,
@@ -74,12 +111,6 @@ export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["
         } as Address,
         stripe_customer_ids: [ donation.stripe_customer_id as string ]
     }
-    const cart: Cart = {
-        causes: donation.donation_causes.causes as CauseMap,
-        // This is a bad implementation, needs to be fixed immediately
-        currency: donation.address_country as CurrencyList,
-        total_amount_paid_in_cents: donation.donation_causes.total_amount_paid_in_cents as number
-    }
 
     return {
         identifiers: {
@@ -91,7 +122,6 @@ export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["
             stripe_customer_id: donation.stripe_customer_id,
         } as DonationIdentifiers,
         donor: donor,
-        causes: cart,
         live: donation.livemode,
         amount_in_cents: donation.amount_in_cents,
         fees_covered: donation.fees_covered,
@@ -169,6 +199,10 @@ function _buildCartFromStripeMetadata(stripeChargeObject: Stripe.Charge): Cart {
 
 function _getDonationIdFromStripeMetadata(stripeChargeObject: Stripe.Charge) {
     return stripeChargeObject.metadata ? stripeChargeObject.metadata.donation_id : null;
+}
+
+function _checkAndConvertCartFormats(cart: any): Cart {
+    return null
 }
 
 export function _convertKinshipAddressToStripeAddress(address: Address): Stripe.Address {

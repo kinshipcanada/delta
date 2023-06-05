@@ -57,7 +57,7 @@ const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
             <dl className="divide-y space-y-4 divide-gray-100">
                 <div className="w-full sm:grid sm:grid-cols-2 sm:gap-4">
                     <BoldText>
-                        <UserCircleIcon className={`${StandardIconSizing} text-slate-600`} />
+                        <UserCircleIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
                         Donor
                     </BoldText>
                     <Text>
@@ -66,7 +66,7 @@ const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
                     <BoldText>
-                        <CurrencyDollarIcon className={`${StandardIconSizing} text-slate-600`} />
+                        <CurrencyDollarIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
                         Amount Donated
                     </BoldText>
                     <Text>
@@ -77,7 +77,7 @@ const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
                     <BoldText>
-                        <EnvelopeIcon className={`${StandardIconSizing} text-slate-600`} />
+                        <EnvelopeIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
                         Status
                     </BoldText>
                     <Text>
@@ -87,7 +87,7 @@ const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
                 
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
                     <BoldText>
-                        <CalendarDaysIcon className={`${StandardIconSizing} text-slate-600`} />
+                        <CalendarDaysIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
                         Date Of Donation
                     </BoldText>
                     <Text>

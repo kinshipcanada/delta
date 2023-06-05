@@ -35,7 +35,7 @@ export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnable
             { adminEnabled && (
                 <Button
                     text={"Admin Panel"}
-                    style={path == "/app/admin" ? ButtonStyle.OutlineSelected : ButtonStyle.OutlineUnselected}
+                    style={["/app/admin", "/app/admin#", "/app/admin/create", "/app/admin/proof", "/app/admin/reports", "/app/admin/resend"].includes(path) ? ButtonStyle.OutlineSelected : ButtonStyle.OutlineUnselected}
                     icon={<Cog6ToothIcon className={`${LargeIconSizing} text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 -mt-0.5`} />}
                     href={'/app/admin'}
                 />

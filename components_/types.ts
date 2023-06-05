@@ -6,6 +6,7 @@ export const enum ButtonStyle {
     Secondary,
     OutlineSelected,
     OutlineUnselected,
+    Disabled
 }
 
 export interface ButtonProps {
@@ -85,6 +86,23 @@ export interface TabsProps {
     tabs: Tab[];
 }
 
+export interface TableProps {
+    headers: string[]
+    rows: { [key: string]: any }[];
+}
+
+export interface TextInputProps {
+    placeholder: string,
+    type: string,
+    name: string,
+    id: string,
+    value: string,
+    onChange: any,
+    required: boolean,
+    inputCustomization: "dollars" | "none",
+    button?: ButtonProps
+    label?: string,
+}
 
 export const SmallIconSizing = "h-3 w-3"
 export const StandardIconSizing = "h-4 w-4"

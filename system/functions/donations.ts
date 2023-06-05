@@ -5,7 +5,7 @@ import { DonationIdentifiers } from "../classes/utils";
 import { DatabaseTable } from "../utils/constants";
 import { parameterizedDatabaseQuery } from "../utils/database";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
-import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
+import { formatDonationFromRawStripeData, formatDonationFromDatabase, formatCartFromDatabase } from "../utils/formatting";
 import { validateEmail } from "../utils/helpers";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "../utils/stripe";
@@ -52,6 +52,15 @@ export async function fetchAllDonationsForDonor(donorEmail: string): Promise<Don
         if (!validateEmail(donorEmail)) { throw new Error("Invalid email address provided.") }
         return (await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { email: donorEmail }, false)).map(donation => formatDonationFromDatabase(donation));
     }    catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export async function fetchKinshipCart(cartId: string): Promise<Donation> {
+    try {
+        const cart =  formatCartFromDatabase(await parameterizedDatabaseQuery(DatabaseTable.KINSHIP_CARTS, { id: cartId }, true));
+        return cart
+    } catch (error) {
         throw new Error(error.message);
     }
 }

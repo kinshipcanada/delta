@@ -21,3 +21,11 @@ export const BoldText = ({ children }) => {
         <p className="text-sm leading-6 font-medium text-slate-600 flex items-center">{ children }</p>
     )
 }
+
+export const Label = ({ label, required }) => {
+    return (
+        <label htmlFor={label} className="block text-sm font-medium text-gray-700">
+            {label} { required && <span className="text-red-500">*</span> }
+        </label>
+    )
+}

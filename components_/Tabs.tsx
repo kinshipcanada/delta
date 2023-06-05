@@ -60,7 +60,7 @@ export const Tabs: React.FC<TabsProps> = ({ tabs }) => {
                         <button
                             className={
                                 classNames(
-                                    selected ? 'bg-gray-100 text-gray-700 border' : 'text-gray-500 hover:text-gray-700',
+                                    selected ? 'outline-none bg-gray-100 text-gray-700 border' : 'text-gray-500 hover:text-gray-700',
                                     'rounded-md px-3 py-2 text-sm font-medium'
                                 )
                             }

@@ -5,7 +5,7 @@ import { ErroredResponse } from "../../../system/classes/api";
 export default async function handler(req, res) {
     res.status(500).send({
         status: 500,
-        endpoint_called: `/api/donor/profile/update`,
+        endpoint_called: `/api/donation/createManually`,
         error: 'Method has not been implemented yet.'
     } as ErroredResponse);
 };
