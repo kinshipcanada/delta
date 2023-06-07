@@ -2,11 +2,10 @@
 import React from "react";
 import Button from "../../components_/Button";
 import { AppLayout } from "../../components_/Layouts";
-import { InlineLink } from "../../components_/Links";
-import {  VerticalSpacer } from "../../components_/Spacer";
-import { AppPageProps, ButtonStyle, LargeIconSizing, SpacerSize, StandardIconSizing } from "../../components_/types";
-import { PageHeader, Text, SectionHeader } from "../../components_/Typography";
-import { JustifyBetween, JustifyCenter } from "../../components_/Utils";
+import { VerticalSpacer } from "../../components_/Spacer";
+import { AppPageProps, ButtonStyle, SpacerSize } from "../../components_/types";
+import { SectionHeader } from "../../components_/Typography";
+import { JustifyCenter } from "../../components_/Utils";
 export default function Index() {
     return (
         <AppLayout AppPage={AppHomePage} />

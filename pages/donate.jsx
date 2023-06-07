@@ -250,7 +250,7 @@ export function AmountStep({ set_active_step, options, setOptions, setClientSecr
                     causes.push(cause.name)
                 }
 
-                await fetch("/api/donation/stripe/createPaymentIntent", {
+                await fetch("/api/stripe/createPaymentIntent", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ causes: causes, amount: amount*100 }),

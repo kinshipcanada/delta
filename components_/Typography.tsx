@@ -28,9 +28,9 @@ export const BoldText = ({ children }) => {
     )
 }
 
-export const Label = ({ label, required }) => {
+export const Label = ({ label, required, htmlFor }) => {
     return (
-        <label htmlFor={label} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700">
             {label} { required && <span className="text-red-500">*</span> }
         </label>
     )
