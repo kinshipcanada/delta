@@ -2,7 +2,7 @@ import { ErroredResponse } from "../../../../system/classes/api";
 import { DonationIdentifiers } from "../../../../system/classes/utils";
 import { checkAndResendReceipt } from "../../../../system/functions/notifications";
 import { verifyAtLeastOneParametersExists } from "../../../../system/utils/helpers";
-import { SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
+import { MessageResponse } from "../../../../system/classes/api"
 
 /**
  * @description Resends a donation receipt to a donor, given the donation's identifiers
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
             status: 200,
             endpoint_called: `/api/donor/donations/resend`,
             message: receiptResentResponse
-        } as SimpleMessageResponse);
+        } as MessageResponse);
     } catch (error) {
         res.status(500).send({
             status: 500,

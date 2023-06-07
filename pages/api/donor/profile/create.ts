@@ -4,7 +4,7 @@ import { createStripeCustomer } from "../../../../system/utils/stripe";
 import { Address } from "../../../../system/classes/address";
 import { CountryList } from "../../../../system/classes/utils";
 import { verifyAllParametersExist } from "../../../../system/utils/helpers";
-import { SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
+import { MessageResponse } from "../../../../system/classes/api"; 
 
 /**
  * @description Creates a Stripe customer profile, given a donor's details
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         return stripeCustomer ? res.status(200).send({
             status: 200,
             endpoint_called: `/api/donor/profile/create`,
-        } as SimpleMessageResponse) : new Error("Something went wrong creating your donor profile");
+        } as MessageResponse) : new Error("Something went wrong creating your donor profile");
     } catch (error) {
         res.status(500).send({
             status: 500,

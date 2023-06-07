@@ -1,5 +1,4 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef } from "react";
@@ -7,8 +6,8 @@ import { useEffect } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import CopyableInput from "../components/core/CopyableInput";
-import Loading, { LargeLoading } from "../components/core/Loading";
-import { callKinshipAPI } from "../systems/functions/helpers";
+import Loading from "../components/core/Loading";
+import { callKinshipAPI } from "../system/utils/helpers";
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
 

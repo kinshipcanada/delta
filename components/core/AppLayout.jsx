@@ -1,13 +1,12 @@
 import { HomeIcon, DocumentDuplicateIcon, UserCircleIcon, ArrowLeftOnRectangleIcon, ChatBubbleOvalLeftIcon } from '@heroicons/react/24/outline'
 import { ArrowPathIcon, ArrowRightCircleIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
-import { Router, useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { supabase } from '../../systems/helpers/supabaseClient'
-import { callKinshipAPI } from '../../systems/functions/helpers'
+import { supabase, callKinshipAPI } from '../../system/utils/helpers'
 import { BlueLoading } from './Loaders'
-import { countries, canadian_states } from '../../systems/helpers/constants'
+import { countries, canadian_states } from '../../system/utils/constants'
 import Loading from './Loading'
 
 function classNames(...classes) {

@@ -4,8 +4,8 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { supabase } from '../../systems/helpers/supabaseClient'
 import Loading from './Loading'
+import { supabase } from '../../system/utils/helpers'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

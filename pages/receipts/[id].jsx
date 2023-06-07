@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { callKinshipAPI } from "../../systems/functions/helpers";
+import { callKinshipAPI } from "../../system/utils/helpers";
 import Head from "next/head";
 import Link from "next/link";
-import { SecondaryButton } from "../../components/core/Buttons";
-import { DocumentIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 import Loading from "../../components/core/Loading";
 
 export default function Receipt() {

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { PrimaryButton, SecondaryButton } from './Buttons'
-import { supabase } from '../../systems/helpers//supabaseClient';
+import { supabase } from '../../system/utils/helpers'
 import { Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
