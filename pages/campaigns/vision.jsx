@@ -1,18 +1,9 @@
 import { DocumentIcon } from "@heroicons/react/24/outline"
 import { CheckCircleIcon } from "@heroicons/react/20/solid"
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons"
+import Button from "../../components_/Button"
 import Link from "next/link"
-
-const stats = [
-  { label: 'Transactions every 24 hours', value: '44 million' },
-  { label: 'Assets under holding', value: '$119 trillion' },
-  { label: 'New users annually', value: '46,000' },
-]
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
+import { ButtonSize, ButtonStyle } from "../../components_/types"
 
 const families = [
   {
@@ -36,54 +27,53 @@ function FamilyCard({ family }) {
     return (
       <Link href = '/donate'><a href={'/donate'}>
         <div
-                className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
-              >
-                <div className="sm:col-span-4 md:col-span-5 md:row-span-2 md:row-end-2">
-                  <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-50">
-                    <img src={family.imageSrc} alt={family.imageAlt} className="object-cover object-center" />
-                  </div>
-                </div>
-                <div className="mt-6 sm:col-span-7 sm:mt-0 md:row-end-1">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {family.name}
-                  </h3>
-                  <p className="mt-1 font-medium text-gray-900">Goal: ${(family.amount_needed).toFixed(2)} CAD</p>
-                  <p className="mt-3 text-gray-500">{family.description}</p>
-                </div>
-                <div className="sm:col-span-12 md:col-span-7">
-                  <dl className="grid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
-                    <div>
-                      <dt className="font-medium text-gray-900">Family will recieve</dt>
-                      <dd className="mt-3 text-gray-500">
-                        { family.receives.map((item) => (
-                          <span className="flex items-center">
-                            <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
-                            {item}
-                          </span>
-                        )) }
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="mt-6 font-medium text-gray-900 md:mt-5 flex items-center">
-                    <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
-                    Tax receipt eligible
-                  </p>
-                  {/* <div className="mt-6">
-                    <div className="overflow-hidden rounded-full bg-gray-200">
-                      <div
-                        className="h-2 rounded-full bg-blue-600"
-                        style={{ width: `calc((${family.amount_raised} / ${family.amount_needed}))` }}
-                      />
-                    </div>
-                    <div className="mt-6 font-medium text-gray-600">
-                      <div className="text-blue-600">Raised: ${(family.amount_raised).toFixed(2)} CAD / ${(family.amount_needed).toFixed(2)} CAD Goal</div>
-                    </div>
-                  </div> */}
-                </div>
-              </div>
-              </a>
-              </Link>
-          
+          className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
+        >
+          <div className="sm:col-span-4 md:col-span-5 md:row-span-2 md:row-end-2">
+            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-50">
+            <img src={family.imageSrc} alt={family.imageAlt} className="object-cover object-center" />
+            </div>
+            </div>
+            <div className="mt-6 sm:col-span-7 sm:mt-0 md:row-end-1">
+            <h3 className="text-lg font-medium text-gray-900">
+            {family.name}
+            </h3>
+            <p className="mt-1 font-medium text-gray-900">Goal: ${(family.amount_needed).toFixed(2)} CAD</p>
+          <p className="mt-3 text-gray-500">{family.description}</p>
+        </div>
+        <div className="sm:col-span-12 md:col-span-7">
+        <dl className="grid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
+        <div>
+          <dt className="font-medium text-gray-900">Family will recieve</dt>
+          <dd className="mt-3 text-gray-500">
+            { family.receives.map((item) => (
+              <span className="flex items-center">
+                <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+                {item}
+              </span>
+            )) }
+          </dd>
+        </div>
+        </dl>
+        <p className="mt-6 font-medium text-gray-900 md:mt-5 flex items-center">
+        <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+        Tax receipt eligible
+        </p>
+        {/* <div className="mt-6">
+        <div className="overflow-hidden rounded-full bg-gray-200">
+          <div
+            className="h-2 rounded-full bg-blue-600"
+            style={{ width: `calc((${family.amount_raised} / ${family.amount_needed}))` }}
+          />
+        </div>
+        <div className="mt-6 font-medium text-gray-600">
+          <div className="text-blue-600">Raised: ${(family.amount_raised).toFixed(2)} CAD / ${(family.amount_needed).toFixed(2)} CAD Goal</div>
+        </div>
+        </div> */}
+        </div>
+        </div>
+        </a>
+      </Link>
     )
 }
 
@@ -150,7 +140,7 @@ export default function Vision() {
                     <CheckDetail title="Tuition and book stipend" />
                   </div>                      
                   <div className="mt-8">
-                    <PrimaryButton link = "/donate" text = "Make A Donation &rarr;" />
+                    <Button text="Make A Donation &rarr;" style={ButtonStyle.Primary} size={ButtonSize.Standard} href={"/donate"} />
                     <div className="inline-block ml-2" />
                     <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" />
                   </div>

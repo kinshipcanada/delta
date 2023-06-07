@@ -12,7 +12,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
     size === ButtonSize.Large ? "px-3 py-2 text-sm" : 
     "px-4 py-2 text-sm"
   
-  const filledButtonStyling = `${buttonSizing} justify-center transition delay-50 inline-flex shrink-0 border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
+  const filledButtonStyling = `${buttonSizing} justify-center transition delay-50 inline-flex border border-transparent shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`
   const outlinedButtonStyling = "group px-3 py-2.5"
 
   const buttonStyle = 
@@ -35,17 +35,19 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
 
   return (
     <Component 
-        href={href ? href : undefined}
-        onClick={href ? undefined : handleClick} 
-        disabled={isLoading || isDisabled}
+      href={href ? href : undefined}
+      onClick={href ? undefined : handleClick} 
+      disabled={isLoading || isDisabled}
+      className="w-full"
     >
-        <span className={`flex cursor-pointer items-center rounded-md font-medium text-sm  ${buttonStyle}`}>
-            {(icon && !isLoading) && <><span className={StandardIconSizing}>{icon}</span><HorizontalSpacer size={SpacerSize.Small} /></>}
-            {isLoading ? <><Loading color = {style === ButtonStyle.Primary ? LoadingColors.White : LoadingColors.Slate} />{(icon || isLoading) && <HorizontalSpacer size={SpacerSize.Small} />}</> : null}
-            { text }
-        </span>
+      <span className={`flex cursor-pointer items-center rounded-md font-medium text-sm ${buttonStyle}`}>
+          {(icon && !isLoading) && <><span className={StandardIconSizing}>{icon}</span><HorizontalSpacer size={SpacerSize.Small} /></>}
+          {isLoading ? <><Loading color = {style === ButtonStyle.Primary ? LoadingColors.White : LoadingColors.Slate} />{(icon || isLoading) && <HorizontalSpacer size={SpacerSize.Small} />}</> : null}
+          { text }
+      </span>
     </Component>
   );
 };
 
 export default Button;
+

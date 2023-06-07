@@ -22,15 +22,13 @@ export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnable
     return (
         <nav className="space-y-2 col-span-1" aria-label="Sidebar">
             {navigation.map((item) => (
-                <>
-                    <Button
-                        key={item.name}
-                        text={item.name}
-                        style={item.current ? ButtonStyle.OutlineSelected : ButtonStyle.OutlineUnselected}
-                        icon={<item.icon className={`${LargeIconSizing} text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 -mt-0.5`} />}
-                        href={item.link}
-                    />
-                </>
+                <Button
+                    key={item.name}
+                    text={item.name}
+                    style={item.current ? ButtonStyle.OutlineSelected : ButtonStyle.OutlineUnselected}
+                    icon={<item.icon className={`${LargeIconSizing} text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 -mt-0.5`} />}
+                    href={item.link}
+                />
             ))}
             { adminEnabled && (
                 <Button

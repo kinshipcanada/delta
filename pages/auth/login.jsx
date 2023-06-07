@@ -13,7 +13,6 @@ export default function Register() {
 	const cancelButtonRef = useRef(null)
 
 	const [loading, setLoading] = useState(false)
-	const [message, setMessage] = useState(null)
 	const [email, setEmail] = useState(null)
 	const [password, setPassword] = useState(null)
 	const [error, setError] = useState(null)
