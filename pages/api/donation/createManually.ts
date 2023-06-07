@@ -1,6 +1,6 @@
 import { ErroredResponse } from "../../../system/classes/api";
 /**
- * @description Fetches all donations for a given donor
+ * @description Manually creates a donation. Used by admin panel.
  */
 export default async function handler(req, res) {
     res.status(500).send({

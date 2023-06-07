@@ -1,6 +1,6 @@
 import { ErroredResponse } from "../../../system/classes/api";
 /**
- * @description Fetches all donations for a given donor
+ * @description Creates a PDF of a donation receipt, and returns it to the frontend
  */
 export default async function handler(req, res) {
     res.status(500).send({

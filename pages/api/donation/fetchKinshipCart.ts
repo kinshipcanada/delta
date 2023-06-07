@@ -3,7 +3,7 @@ import { Donation } from "../../../system/classes/donation";
 import { fetchKinshipCart } from "../../../system/functions/donations";
 import { verifyAllParametersExist } from "../../../system/utils/helpers";
 /**
- * @description Fetches all donations for a given donor
+ * @description Fetches a Kinship Cart object from the database. This is used to display instructions to the user on how to complete their donation, or for admin panel use
  */
 export default async function handler(req, res) {
     try {
