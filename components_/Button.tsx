@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
       href={href ? href : undefined}
       onClick={href ? undefined : handleClick} 
       disabled={isLoading || isDisabled}
-      className="w-full"
+      className="inline-block"
     >
       <span className={`flex cursor-pointer items-center rounded-md font-medium text-sm ${buttonStyle}`}>
           {(icon && !isLoading) && <><span className={StandardIconSizing}>{icon}</span><HorizontalSpacer size={SpacerSize.Small} /></>}
@@ -50,4 +50,3 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
 };
 
 export default Button;
-

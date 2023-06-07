@@ -10,6 +10,9 @@ import { PanelWithLeftText } from "../../components_/Panels";
 import { TextInput } from "../../components_/Inputs";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Donor } from "../../system/classes/donor";
+import { toast } from "react-hot-toast";
+import { callKinshipAPI } from "../../system/utils/helpers";
+import { ErroredResponse, FetchDonorResponse } from "../../system/classes/api";
 
 export default function Index() {
     return (
@@ -19,23 +22,61 @@ export default function Index() {
 
 const AppHomePage: React.FC<AppPageProps> = ({ donor }) => {
 
+    const [globalDonor, setGlobalDonor] = useState<Donor>(donor)
+
     return (
         <div>
             <JustifyBetween>
                 <PageHeader>Your Kinship Account</PageHeader>
             </JustifyBetween>
             <VerticalSpacer size={SpacerSize.Medium} />
-            <AccountInformationPanel donor = {donor} />
+            <AccountInformationPanel donor = {globalDonor} setGlobalDonor={setGlobalDonor} />
             <VerticalSpacer size={SpacerSize.Medium} />
-            <AddressInformationPanel donor = {donor} />
+            <AddressInformationPanel donor = {globalDonor} setGlobalDonor={setGlobalDonor} />
         </div>
     )
 }
 
-const AccountInformationPanel: React.FC<{ donor: Donor }> = ({ donor }) => {
+const AccountInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: Donor) => void }> = ({ donor, setGlobalDonor }) => {
+    const [loading, setLoading] = useState<boolean>(false)
     const [firstName, setFirstName] = useState<string>(donor.first_name)
     const [lastName, setLastName] = useState<string>(donor.last_name)
     const [email, setEmail] = useState<string>(donor.email)
+
+    const handleSaveChanges = async () => {
+        setLoading(true)
+
+        if (firstName === donor.first_name && lastName === donor.last_name && email === donor.email) {
+            setLoading(false)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
+            return
+        }
+
+        const response: FetchDonorResponse = await callKinshipAPI('/api/donor/profile/update', {
+            donor_id: donor.donor_id,
+            existing_donor_object: donor,
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            address_line_address: donor.address.line_address,
+            address_city: donor.address.city,
+            address_state: donor.address.state,
+            address_country: donor.address.country,
+            address_postal_code: donor.address.postal_code
+        })
+
+        if (response.status == 500) { 
+            toast.error("Error updating your profile, please try again later", { position: "top-right" })
+        } else if (response.status == 200) {
+            setGlobalDonor(response.donor)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
+        } else {
+            toast.error("An unknown error occurred", { position: "top-right" })
+        }
+
+        setLoading(false)
+        return
+    }
 
     return (
         <PanelWithLeftText
@@ -79,25 +120,69 @@ const AccountInformationPanel: React.FC<{ donor: Donor }> = ({ donor }) => {
                 name="emailAddress" 
                 id="emailAddress" 
                 value={email}
-                onChange={(e)=>{ setLastName(e.target.value) }} 
+                onChange={(e)=>{ setEmail(e.target.value) }} 
                 required={false} 
                 inputCustomization="none"
             />
             <VerticalSpacer size={SpacerSize.Medium} />
             <JustifyEnd>
-                <Button text="Save Changes" icon={<CheckIcon />} style={ButtonStyle.Secondary} size={ButtonSize.Small} href={"/support"} />
+                <Button 
+                    text="Save Changes" 
+                    isLoading={loading} 
+                    icon={<CheckIcon />} 
+                    style={ButtonStyle.Secondary}
+                    size={ButtonSize.Small} 
+                    onClick={handleSaveChanges}
+                />
             </JustifyEnd>
         </PanelWithLeftText>
     )
 }
 
-const AddressInformationPanel: React.FC<{ donor: Donor }> = ({ donor }) => {
+const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: Donor) => void }> = ({ donor, setGlobalDonor }) => {
+
+    const [loading, setLoading] = useState<boolean>(false)
 
     const [lineAddress, setLineAddress] = useState<string>(donor.address.line_address)
     const [city, setCity] = useState<string>(donor.address.city)
     const [state, setState] = useState<string>(donor.address.state)
     const [country, setCountry] = useState<string>(donor.address.country)
     const [postalCode, setPostalCode] = useState<string>(donor.address.postal_code)
+
+    const handleSaveChanges = async () => {
+        setLoading(true)
+
+        if (lineAddress === donor.address.line_address && city === donor.address.city && state === donor.address.state && country === donor.address.country && postalCode === donor.address.postal_code) {
+            setLoading(false)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
+            return
+        }
+
+        const response: FetchDonorResponse = await callKinshipAPI('/api/donor/profile/update', {
+            donor_id: donor.donor_id,
+            existing_donor_object: donor,
+            first_name: donor.first_name,
+            last_name: donor.last_name,
+            email: donor.email,
+            address_line_address: lineAddress,
+            address_city: city,
+            address_state: state,
+            address_country: country,
+            address_postal_code: postalCode
+        })
+
+        if (response.status == 500) { 
+            toast.error("Error updating your profile, please try again later", { position: "top-right" })
+        } else if (response.status == 200) {
+            setGlobalDonor(response.donor)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
+        } else {
+            toast.error("An unknown error occurred", { position: "top-right" })
+        }
+
+        setLoading(false)
+        return
+    }
 
     return (
         <PanelWithLeftText
@@ -169,7 +254,14 @@ const AddressInformationPanel: React.FC<{ donor: Donor }> = ({ donor }) => {
             </div>
             <VerticalSpacer size={SpacerSize.Medium} />
             <JustifyEnd>
-                <Button text="Save Changes" icon={<CheckIcon />} style={ButtonStyle.Secondary} size={ButtonSize.Small} href={"/support"}></Button>
+                <Button 
+                    text="Save Changes" 
+                    isLoading={loading} 
+                    icon={<CheckIcon />} 
+                    style={ButtonStyle.Secondary}
+                    size={ButtonSize.Small} 
+                    onClick={handleSaveChanges}
+                />
             </JustifyEnd>
         </PanelWithLeftText>
     )

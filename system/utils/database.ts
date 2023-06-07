@@ -61,6 +61,37 @@ export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): P
   }
 }
 
+export function updateDonorInDatabase(
+  donorId: string, 
+  firstName: string, 
+  lastName: string, 
+  email: string, 
+  address_line_address: string,
+  address_postal_code: string,
+  address_city: string,
+  address_state: string,
+  address_country: string
+): Promise<any> {
+  const database = _createDatabase()
+
+  try {
+    return database('donor_profiles').where('id', donorId).update({
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      address_line_address: address_line_address,
+      address_postal_code: address_postal_code,
+      address_city: address_city,
+      address_state: address_state,
+      address_country: address_country
+    })
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    (destoryFunc => database.destroy())
+  }
+}
+
 export async function parameterizedDatabaseQuery(table: DatabaseTable, params, limitToFirstResult: boolean): Promise<any> {
   const columns = Object.keys(params)
   const database = _createDatabase()
