@@ -2,17 +2,17 @@ import { CalendarDaysIcon } from "@heroicons/react/20/solid";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon, EnvelopeIcon, CurrencyDollarIcon } from "@heroicons/react/24/solid";
 import React from "react";
-import { Donation } from "../../system/classes/donation";
-import { CountryList } from "../../system/classes/utils";
-import { centsToDollars, parseFrontendDate } from "../../system/utils/helpers";
+import { Donation } from "../../../system/classes/donation";
+import { CountryList } from "../../../system/classes/utils";
+import { centsToDollars, parseFrontendDate } from "../../../system/utils/helpers";
 import { toast } from "react-hot-toast";
-import { Badge } from "../Badge";
-import Button from "../Button";
-import { PanelWithFooter } from "../Panels";
-import { HorizontalSpacer } from "../Spacer";
-import { ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../types";
-import { BoldText, Text } from "../Typography";
-import { JustifyEnd } from "../Utils";
+import { Badge } from "../../primitives/Badge";
+import Button from "../../primitives/Button";
+import { PanelWithFooter } from "../../primitives/Panels";
+import { HorizontalSpacer } from "../../primitives/Spacer";
+import { ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../primitives/types";
+import { BoldText, Text } from "../../primitives/Typography";
+import { JustifyEnd } from "../../primitives/Utils";
 
 export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
     return (

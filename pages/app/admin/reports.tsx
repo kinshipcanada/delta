@@ -1,12 +1,12 @@
 import React from "react"
-import { AppLayout } from "../../../components_/Layouts"
-import { VerticalSpacer } from "../../../components_/Spacer"
-import { EventColors, SpacerSize, Tab } from "../../../components_/types"
-import { PageHeader, Text } from "../../../components_/Typography"
+import { AppLayout } from "../../../components_/prebuilts/Layouts"
+import { VerticalSpacer } from "../../../components_/primitives/Spacer"
+import { EventColors, SpacerSize, Tab } from "../../../components_/primitives/types"
+import { PageHeader, Text } from "../../../components_/primitives/Typography"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
-import { Tabs } from "../../../components_/Tabs"
-import { Alert } from "../../../components_/Alerts"
+import { Tabs } from "../../../components_/primitives/Tabs"
+import { Alert } from "../../../components_/primitives/Alerts"
 
 export default function Index() {
     return (

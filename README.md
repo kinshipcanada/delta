@@ -45,3 +45,5 @@ Charity should be powered by good software.
 - [ ] Frontend
     - [ ] Move to typescript
     - [ ] Remove reused components (inputs, forms, etc)
+    - [ ] Purge
+        - [ ] Navigation, Footer.tsx

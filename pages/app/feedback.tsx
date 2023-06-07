@@ -1,12 +1,12 @@
 
 import React from "react";
-import Button from "../../components_/Button";
-import { AppLayout } from "../../components_/Layouts";
-import { VerticalSpacer } from "../../components_/Spacer";
-import { AppPageProps, ButtonSize, ButtonStyle, SpacerSize } from "../../components_/types";
-import { PageHeader, Text } from "../../components_/Typography";
-import { JustifyEnd } from "../../components_/Utils";
-import { CheckboxInput, Textarea } from "../../components_/Inputs";
+import Button from "../../components_/primitives/Button";
+import { AppLayout } from "../../components_/prebuilts/Layouts";
+import { VerticalSpacer } from "../../components_/primitives/Spacer";
+import { AppPageProps, ButtonSize, ButtonStyle, SpacerSize } from "../../components_/primitives/types";
+import { PageHeader, Text } from "../../components_/primitives/Typography";
+import { JustifyEnd } from "../../components_/primitives/Utils";
+import { CheckboxInput, Textarea } from "../../components_/primitives/Inputs";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 import { ErroredResponse, MessageResponse } from "../../system/classes/api";

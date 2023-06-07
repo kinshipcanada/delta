@@ -1,6 +1,26 @@
+import { TextAlignment, TextColor, TextLineHeight, TextProps, TextSize, TextTracking, TextWeight } from "./types";
+
 export const PageHeader = ({ children }) => {
     return (
         <h1 className="text-2xl font-bold leading-7 tracking-tight text-slate-800 sm:truncate sm:text-3xl">{ children }</h1>
+    )
+}
+
+export const AnyText: React.FC<TextProps> = ({ 
+    size = TextSize.Medium,
+    color = TextColor.StandardSlate,
+    weight = TextWeight.Normal,
+    alignment = TextAlignment.Left,
+    tracking = TextTracking.Normal,
+    lineHeight = TextLineHeight.Normal,
+    children
+}) => {
+
+    const textStyling = `${size} ${color} ${weight} ${alignment} ${tracking} ${lineHeight}`
+    const Component = size === TextSize.Small ? "p" : size === TextSize.Medium ? "p" : size === TextSize.Large ? "h2" : size === TextSize.XLarge ? "h2" : size === TextSize.XXLarge ? "h1" : "p";
+
+    return (
+        <Component className={textStyling}>{ children }</Component>
     )
 }
 

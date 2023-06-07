@@ -1,14 +1,14 @@
 import Head from 'next/head';
-import Navigation from '../components/core/Navigation';
-import Footer from '../components/core/Footer';
+import Navigation from './Navigation';
+import Footer from './Footer';
 import { AppNavigation } from './app/Navigation';
 import { useState, useEffect } from 'react';
-import { callKinshipAPI, supabase } from '../system/utils/helpers';
+import { callKinshipAPI, supabase } from '../../system/utils/helpers';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
-import { Loading } from './Loading';
-import { LoadingColors } from './types';
-import { CenterOfPageBox } from './Boxes';
+import { Loading } from '../primitives/Loading';
+import { LoadingColors } from '../primitives/types';
+import { CenterOfPageBox } from '../primitives/Boxes';
 
 export const Layout = ({ children }) => (
   <>

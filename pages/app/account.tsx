@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import Button from "../../components_/Button";
-import { AppLayout } from "../../components_/Layouts";
-import { VerticalSpacer } from "../../components_/Spacer";
-import { AppPageProps, ButtonSize, ButtonStyle, LargeIconSizing, SpacerSize, StandardIconSizing } from "../../components_/types";
-import { PageHeader, Text, BaseHeader } from "../../components_/Typography";
-import { JustifyBetween, JustifyEnd } from "../../components_/Utils";
-import { PanelWithLeftText } from "../../components_/Panels";
-import { TextInput } from "../../components_/Inputs";
+import Button from "../../components_/primitives/Button";
+import { AppLayout } from "../../components_/prebuilts/Layouts";
+import { VerticalSpacer } from "../../components_/primitives/Spacer";
+import { AppPageProps, ButtonSize, ButtonStyle, LargeIconSizing, SpacerSize, StandardIconSizing } from "../../components_/primitives/types";
+import { PageHeader, Text, BaseHeader } from "../../components_/primitives/Typography";
+import { JustifyBetween, JustifyEnd } from "../../components_/primitives/Utils";
+import { PanelWithLeftText } from "../../components_/primitives/Panels";
+import { TextInput } from "../../components_/primitives/Inputs";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Donor } from "../../system/classes/donor";
 import { toast } from "react-hot-toast";

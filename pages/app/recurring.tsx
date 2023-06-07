@@ -1,7 +1,7 @@
 
 import React from "react";
 import Button from "../../components_/Button";
-import { AppLayout } from "../../components_/Layouts";
+import { AppLayout } from "../../components_/prebuilts/Layouts";
 import { VerticalSpacer } from "../../components_/Spacer";
 import { AppPageProps, ButtonStyle, SpacerSize } from "../../components_/types";
 import { SectionHeader } from "../../components_/Typography";

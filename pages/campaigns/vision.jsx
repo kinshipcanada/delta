@@ -1,9 +1,9 @@
 import { DocumentIcon } from "@heroicons/react/24/outline"
 import { CheckCircleIcon } from "@heroicons/react/20/solid"
 import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons"
-import Button from "../../components_/Button"
+import Button from "../../components_/primitives/Button"
 import Link from "next/link"
-import { ButtonSize, ButtonStyle } from "../../components_/types"
+import { ButtonSize, ButtonStyle } from "../../components_/primitives/types"
 
 const families = [
   {

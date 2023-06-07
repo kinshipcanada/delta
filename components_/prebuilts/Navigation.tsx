@@ -1,11 +1,17 @@
 import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import { PrimaryButton, SecondaryButton } from './Buttons'
+import { PrimaryButton, SecondaryButton } from '../../components/core/Buttons'
 import { supabase } from '../../system/utils/helpers'
 import { Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
+
+interface PageLink {
+    name: string
+    link: string
+    current: boolean
+}
 
 export default function Navigation() {
     const router = useRouter()
@@ -13,24 +19,24 @@ export default function Navigation() {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
 
-    const pages = [
+    const pages: PageLink[] = [
       { name: "Home", link: "/", current: router.asPath == "/" },
       { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" },
       { name: "Vision Kinship Campaign", link: "/campaigns/vision", current: router.asPath == "/campaigns/vision" },
       { name: "About", link: "/about", current: router.asPath == "/about" }
     ]
 
-    useEffect(async () => {
-        const loggedInUser = await supabase.auth.getUser()
+    useEffect(() => {
+        (async () => {
+            const loggedInUser = await supabase.auth.getUser()
 
-        if (loggedInUser) {
-            setUser(loggedInUser.data.user)
-            setLoading(false)
-            return
-        } else {
-            setLoading(false)
-            return
-        }
+            if (loggedInUser) {
+                setUser(loggedInUser.data.user)
+                setLoading(false)
+            } else {
+                setLoading(false)
+            }
+        })();
     }, [supabase])
 
     return (

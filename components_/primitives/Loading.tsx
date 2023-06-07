@@ -1,7 +1,5 @@
-import React, { FC } from "react"
-import { LargeIconSizing, LoadingColors, LoadingProps, StandardIconSizing } from "./types"
-
-
+import React from "react"
+import { LoadingColors, LoadingProps, StandardIconSizing } from "./types"
 
 export const Loading: React.FC<LoadingProps> = ({ color }) => {
 

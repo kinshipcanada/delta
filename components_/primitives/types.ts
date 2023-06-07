@@ -1,5 +1,5 @@
-import { Donation } from "../system/classes/donation";
-import { Donor } from "../system/classes/donor";
+import { Donation } from "../../system/classes/donation";
+import { Donor } from "../../system/classes/donor";
 
 export const enum ButtonStyle {
     Primary,
@@ -108,3 +108,56 @@ export const SmallIconSizing = "h-3 w-3"
 export const StandardIconSizing = "h-4 w-4"
 export const LargeIconSizing = "h-5 w-5"
 export const ExtraLargeIconSizing = "h-6 w-6"
+
+export const enum TextSize {
+    Small = "text-sm",
+    Medium = "text-md",
+    Large = "text-lg",
+    XLarge = "text-xl",
+    XXLarge = "text-2xl",
+}
+
+export const enum TextColor {
+    StandardSlate = "text-slate-900",
+    LightSlate = "text-slate-500",
+    Blue = "text-blue-600",
+    Red = "text-red-600",
+}
+
+export const enum TextWeight {
+    Normal = "font-normal",
+    Medium = "font-medium",
+    Semibold = "font-semibold",
+    Bold = "font-bold",
+}
+
+export const enum TextAlignment {
+    Left = "text-left",
+    Center = "text-center",
+    Right = "text-right",
+}
+
+export const enum TextTracking {
+    Tight = "tracking-tight",
+    Normal = "tracking-normal",
+    Wide = "tracking-wide",
+}
+
+export const enum TextLineHeight {
+    None = "leading-none",
+    Tight = "leading-tight",
+    Snug = "leading-snug",
+    Normal = "leading-normal",
+    Relaxed = "leading-relaxed",
+    Loose = "leading-loose",
+}
+
+export interface TextProps {
+    size?: TextSize;
+    color?: TextColor;
+    weight?: TextWeight;
+    alignment?: TextAlignment;
+    tracking?: TextTracking;
+    lineHeight?: TextLineHeight;
+    children: React.ReactNode;
+}
