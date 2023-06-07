@@ -119,6 +119,18 @@ export async function parameterizedDatabaseQuery(table: DatabaseTable, params, l
   return result
 }
 
+export function uploadFeedbackToDatabase(feedback: string, donor_id?: string): Promise<any> {
+  const database = _createDatabase()
+
+  try {
+    return database('feedback').insert({ feedback: feedback, donor_id: donor_id })
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    (destoryFunc => database.destroy())
+  }
+}
+
 export type Json =
   | string
   | number
