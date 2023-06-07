@@ -45,7 +45,7 @@ export function AppLayout({ AppPage }) {
 
         setDonor(donorResponse.donor);
         setDonations(donationsResponse.donations)
-        setAdminEnabled(true)
+        setAdminEnabled(donorResponse.donor.admin)
       } else {
         router.push('/auth/login');
       }
@@ -67,7 +67,7 @@ export function AppLayout({ AppPage }) {
     <div className="p-10 grid grid-cols-4 gap-12">
       <AppNavigation adminEnabled={adminEnabled} />
       <div className="col-span-3">
-        {loading ? (
+        {(loading || !donor) ? (
           <CenterOfPageBox>
             <Loading color={LoadingColors.Blue} />
           </CenterOfPageBox>

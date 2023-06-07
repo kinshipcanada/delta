@@ -47,6 +47,7 @@ export async function createDonor(
         last_name: lastName,
         email: email,
         phone_number: phoneNumber,
+        admin: false,
         address: address,
         stripe_customer_ids: [
             stripeCustomer.data.user.id

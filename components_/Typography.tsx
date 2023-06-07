@@ -1,6 +1,12 @@
 export const PageHeader = ({ children }) => {
     return (
-        <h1 className="text-2xl font-bold leading-7 tracking-tight text-gray-900 sm:truncate sm:text-3xl">{ children }</h1>
+        <h1 className="text-2xl font-bold leading-7 tracking-tight text-slate-800 sm:truncate sm:text-3xl">{ children }</h1>
+    )
+}
+
+export const BaseHeader = ({ children }) => {
+    return (
+        <h2 className="text-lg font-medium leading-6 text-slate-900">{ children }</h2>
     )
 }
 

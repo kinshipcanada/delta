@@ -55,6 +55,7 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
             postal_code: cart.address_postal_code,
             country: cart.address_country as CountryList
         },
+        admin: false,
         stripe_customer_ids: []
     }
 
@@ -75,7 +76,7 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
         fees_covered: 0,
         fees_charged_by_stripe: 0,
         date_donated: new Date(cart.donation_logged)
-    } as Donation
+    }
 }
 
 export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables"]["donor_profiles"]["Row"]): Donor {
@@ -92,8 +93,9 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
             postal_code: donor.address_postal_code,
             country: donor.address_country as CountryList
         } as Address,
+        admin: donor.admin,
         stripe_customer_ids: donor.stripe_customer_ids as string[]
-    } as Donor
+    }
 }
 
 export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]): Donation {
@@ -109,6 +111,7 @@ export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["
             state: donation.address_state,
             country: donation.address_country as CountryList
         } as Address,
+        admin: false,
         stripe_customer_ids: [ donation.stripe_customer_id as string ]
     }
 
@@ -149,6 +152,7 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
             state: rawStripeObject.customer.address.state,
             country: rawStripeObject.customer.address.country
         },
+        admin: donorFromDatabase.admin,
         stripe_customer_ids: [
             rawStripeObject.customer.id
         ]

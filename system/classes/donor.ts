@@ -20,5 +20,6 @@ export interface Donor {
     email: string;
     phone_number?: number;
     address: Address;
+    admin: boolean;
     stripe_customer_ids: string[];
 }

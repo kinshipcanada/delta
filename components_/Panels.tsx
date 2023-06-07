@@ -51,3 +51,17 @@ export function PanelWithHeaderNoPadding({ header, children }) {
   )
 }
   
+export function PanelWithLeftText({ header, children }) {
+  return (
+    <div className="bg-white border border-gray-200 px-4 py-5 sm:rounded-lg sm:p-6">
+      <div className="md:grid md:grid-cols-3 md:gap-6">
+        <div className="md:col-span-1">
+          { header }
+        </div>
+        <div className="mt-5 md:mt-0 md:col-span-2">
+          { children }
+        </div>
+      </div>
+    </div>
+  )
+}
