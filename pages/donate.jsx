@@ -1,6 +1,6 @@
 import { ChevronRightIcon, LockClosedIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import Loading from "../components/core/Loading";
+import { Loading } from "../components_/primitives/Loading";
 import { Tab } from '@headlessui/react'
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -11,18 +11,93 @@ import {
 import { Elements } from "@stripe/react-stripe-js";
 import { countries, canadian_states, causes} from "../system/utils/constants";
 import { useEffect } from "react";
-import { MakeDonationHeader } from "../components/DonateForm";
 import { supabase, callKinshipAPI } from "../system/utils/helpers";
-import TextInput from "../components/core/inputs/TextInput";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import ReactTooltip from "react-tooltip";
-import { SectionHeader } from "../components/core/Typography";
 import { useRouter } from "next/router";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
+}
+
+export function Label({ label, required }) {
+    return (
+        <label htmlFor={label} className="block text-sm font-medium text-gray-700">
+            {label} { required && <span className="text-red-500">*</span> }
+        </label>
+    )
+}
+
+export function TextInput({ label, type, required, defaultValue, setter, placeholder }) {
+  return (
+    <div className="mt-1">
+      <Label label={label} required={required} />
+      { 
+        type == "dollars" ?
+
+        <div className="relative mt-2 rounded-md shadow-sm">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span className="text-gray-500 sm:text-sm">$</span>
+          </div>
+          <input
+            type={"text"}
+            id={label}
+            name={label}
+            autoComplete={type}
+            required={required}
+            placeholder={placeholder}
+            onChange={(e) => { setter(e.target.value) }}
+            defaultValue={defaultValue}
+            className="py-1.5 pl-7 pr-12 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm sm:leading-6"
+          />
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <span className="text-gray-500 sm:text-sm" id="price-currency">
+              CAD
+            </span>
+          </div>
+        </div>
+
+        :
+
+        <div className="mt-2">
+          <input
+            type={type}
+            id={label}
+            name={label}
+            autoComplete={type}
+            required={required}
+            placeholder={placeholder}
+            onChange={(e) => { setter(e.target.value) }}
+            defaultValue={defaultValue}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          />
+        </div>
+      }
+      
+    </div>
+  )
+}
+
+
+export function SectionHeader({ text }) {
+    return (
+        <h2 className="text-lg font-medium text-gray-900 leading-6">
+            { text }
+        </h2>
+    )
+}
+
+
+export function MakeDonationHeader() {
+    return (
+        <div className="my-10 flex">
+            <h2 className="text-2xl font-bold leading-7 text-slate-800 sm:truncate sm:text-3xl sm:tracking-tight">
+                Make A Donation
+            </h2>
+        </div>
+    )
 }
 
 export default function Donate() {

@@ -4,7 +4,7 @@ import { callKinshipAPI } from "../../system/utils/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import Loading from "../../components/core/Loading";
+import { Loading } from "../../components_/primitives/Loading";
 
 export default function Receipt() {
     const [loading, setLoading] = useState(true)

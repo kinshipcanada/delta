@@ -1,6 +1,5 @@
 import { DocumentIcon } from "@heroicons/react/24/outline"
 import { CheckCircleIcon } from "@heroicons/react/20/solid"
-import { PrimaryButton, SecondaryButton } from "../../components/core/Buttons"
 import Button from "../../components_/primitives/Button"
 import Link from "next/link"
 import { ButtonSize, ButtonStyle } from "../../components_/primitives/types"
@@ -142,7 +141,7 @@ export default function Vision() {
                   <div className="mt-8">
                     <Button text="Make A Donation &rarr;" style={ButtonStyle.Primary} size={ButtonSize.Standard} href={"/donate"} />
                     <div className="inline-block ml-2" />
-                    <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" />
+                    {/* <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" /> */}
                   </div>
                 </div>
                 <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">
@@ -374,7 +373,7 @@ export function DownloadPaperCTA() {
               lay out in depth how exactly we plan to help each family.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-              <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" />
+              {/* <SecondaryButton download={true} link = "/papers/vision.pdf" fileName={"Vision Kinship: The Path To Self Sufficiency"} iconRight={DocumentIcon} text = "Download Full Vision Paper" /> */}
             </div>
           </div>
           <div className="relative mt-16 h-80 lg:mt-8">

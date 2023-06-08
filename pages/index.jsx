@@ -1,5 +1,4 @@
 import { ArrowRightIcon } from "@heroicons/react/20/solid"
-import { PrimaryButton, SecondaryButton } from '../components/core/Buttons';
 import {
   AcademicCapIcon,
   BuildingLibraryIcon,
@@ -77,9 +76,9 @@ export function Hero() {
                   </p>
                   <div className='m-4' />
                   <div className='flex'>
-                    <PrimaryButton link = "/donate" text = "Make A Donation" iconRight = {ArrowRightIcon} />
+                    {/* <PrimaryButton link = "/donate" text = "Make A Donation" iconRight = {ArrowRightIcon} /> */}
                     <div className='m-1' />
-                    <SecondaryButton link = "/about" text= "About Kinship" />
+                    {/* <SecondaryButton link = "/about" text= "About Kinship" /> */}
                   </div>
                 </div>
               </div>
@@ -267,7 +266,7 @@ function CTA () {
             >
             </a>
           </div>
-          <PrimaryButton link = "/donate" text = {<>Donate Now &rarr;</>} />
+          {/* <PrimaryButton link = "/donate" text = {<>Donate Now &rarr;</>} /> */}
         </div>
       </div>
     </div>

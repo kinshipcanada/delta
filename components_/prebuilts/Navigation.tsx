@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import { PrimaryButton, SecondaryButton } from '../../components/core/Buttons'
 import { supabase } from '../../system/utils/helpers'
 import { Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
@@ -76,33 +75,34 @@ export default function Navigation() {
                     {
                         loading ? null :
 
-                        user ?
+                        user ? null
 
-                        <SecondaryButton 
-                            link = "/app"
-                            text = "Dashboard"
-                        />
+                        // <SecondaryButton 
+                        //     link = "/app"
+                        //     text = "Dashboard"
+                        // />
 
                         : !user ?
 
-                        <SecondaryButton 
-                            link = "/auth/login"
-                            text = "Login"
-                        />
+                        // <SecondaryButton 
+                        //     link = "/auth/login"
+                        //     text = "Login"
+                        // />
+                        null 
 
-                        : 
+                        : null
                         
-                        <SecondaryButton 
-                            link = "/auth/login"
-                            text = "Login"
-                        />
+                        // <SecondaryButton 
+                        //     link = "/auth/login"
+                        //     text = "Login"
+                        // />
                     }
 
                     <div className='m-1' />
-                    <PrimaryButton
+                    {/* <PrimaryButton
                         link = "/donate"
                         text = "Donate"
-                    />
+                    /> */}
                 </div>
 
 

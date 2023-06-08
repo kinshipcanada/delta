@@ -2,7 +2,6 @@ import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 // Highlighted principles. These get mapped automatically.
 const principles = [

@@ -21,7 +21,7 @@ export default function Register() {
 		event.preventDefault()
 		setLoading(true)
 
-		const { user, session, error } = await supabase.auth.signInWithPassword({
+		const { error } = await supabase.auth.signInWithPassword({
 			email: email,
 			password: password,
 		})
