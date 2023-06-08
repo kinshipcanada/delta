@@ -1,6 +1,6 @@
 import { ChevronRightIcon, LockClosedIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import { Loading } from "../components_/primitives/Loading";
+import { Loading } from "../components/primitives/Loading";
 import { Tab } from '@headlessui/react'
 import { loadStripe } from "@stripe/stripe-js";
 import {

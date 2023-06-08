@@ -1,18 +1,12 @@
 
 import React, { useState } from "react";
-import Button from "../../components_/primitives/Button";
-import { AppLayout } from "../../components_/prebuilts/Layouts";
-import { VerticalSpacer } from "../../components_/primitives/Spacer";
-import { AppPageProps, ButtonSize, ButtonStyle, LargeIconSizing, SpacerSize, StandardIconSizing } from "../../components_/primitives/types";
-import { PageHeader, Text, BaseHeader } from "../../components_/primitives/Typography";
-import { JustifyBetween, JustifyEnd } from "../../components_/primitives/Utils";
-import { PanelWithLeftText } from "../../components_/primitives/Panels";
-import { TextInput } from "../../components_/primitives/Inputs";
+import { AppLayout } from "../../components/prebuilts/Layouts";
+import { Button, VerticalSpacer, PanelWithLeftText, TextInput, JustifyBetween, JustifyEnd, PageHeader, Text, BaseHeader,  AppPageProps, ButtonSize, ButtonStyle, SpacerSize  } from "../../components/primitives";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Donor } from "../../system/classes/donor";
 import { toast } from "react-hot-toast";
 import { callKinshipAPI } from "../../system/utils/helpers";
-import { ErroredResponse, FetchDonorResponse } from "../../system/classes/api";
+import { FetchDonorResponse } from "../../system/classes/api";
 
 export default function Index() {
     return (

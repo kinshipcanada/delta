@@ -1,13 +1,8 @@
 
 import React from "react";
-import Button from "../../components_/primitives/Button";
-import { AppLayout } from "../../components_/prebuilts/Layouts";
-import { InlineLink } from "../../components_/primitives/Links";
-import {  VerticalSpacer } from "../../components_/primitives/Spacer";
-import { AppPageProps, ButtonStyle, SpacerSize } from "../../components_/primitives/types";
-import { PageHeader, Text, SectionHeader } from "../../components_/primitives/Typography";
-import { JustifyBetween } from "../../components_/primitives/Utils";
-import { DonationPanel } from "../../components_/prebuilts/app/DonationPanel";
+import { AppLayout } from "../../components/prebuilts/Layouts";
+import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween } from  "../../components/primitives";
+import { DonationPanel } from "../../components/prebuilts/app/DonationPanel";
 
 export default function Index() {
     return (

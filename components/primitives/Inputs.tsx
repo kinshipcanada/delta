@@ -38,7 +38,7 @@ export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, i
     )
 }
 
-export const Textarea: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label }) => {
+export const TextArea: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label }) => {
     const panelStyling = "mt-2"
     const inputStyling = "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
 

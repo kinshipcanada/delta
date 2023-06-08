@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout } from '../components_/prebuilts/Layouts';
+import { Layout } from '../components/prebuilts/Layouts';
 import '../styles/globals.css';
 import ReactTooltip from 'react-tooltip';
 import { Toaster } from 'react-hot-toast';

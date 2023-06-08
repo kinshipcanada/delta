@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Loading } from "../components_/primitives/Loading";
+import { Loading } from "../components/primitives/Loading";
 import toast from "react-hot-toast";
 import { callKinshipAPI } from "../system/utils/helpers";
 let Globe = () => null;

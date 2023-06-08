@@ -1,16 +1,9 @@
 import React from "react"
-import { AppLayout } from "../../../components_/prebuilts/Layouts"
-import { VerticalSpacer } from "../../../components_/primitives/Spacer"
-import { ButtonSize, ButtonStyle, EventColors, ExtraLargeIconSizing,SpacerSize, Style } from "../../../components_/primitives/types"
-import { BoldText, PageHeader, Text } from "../../../components_/primitives/Typography"
+import { AppLayout } from "../../../components/prebuilts/Layouts"
+import { Button, JustifyEnd, Badge, Grid, PanelWithHeaderNoPadding, BoldText, PageHeader, Text, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, ExtraLargeIconSizing,SpacerSize, Style, } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
-import { PanelWithHeaderNoPadding } from "../../../components_/primitives/Panels"
 import { ArrowUpOnSquareIcon, DocumentDuplicateIcon, EnvelopeIcon, PlusCircleIcon } from "@heroicons/react/24/solid"
-import { JustifyEnd } from "../../../components_/primitives/Utils"
-import Button from "../../../components_/primitives/Button"
-import { Badge } from "../../../components_/primitives/Badge"
-import { Grid } from "../../../components_/primitives/Grid"
 
 export default function Index() {
     return (

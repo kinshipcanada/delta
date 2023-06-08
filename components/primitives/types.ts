@@ -161,3 +161,8 @@ export interface TextProps {
     lineHeight?: TextLineHeight;
     children: React.ReactNode;
 }
+
+export interface InlineLinkProps {
+    href: string;
+    text: string;
+}

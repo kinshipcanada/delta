@@ -1,4 +1,4 @@
-import { PageHeader } from "../components_/primitives/Typography";
+import { PageHeader } from "../components/primitives/Typography";
 
 export default function Developers() {
     return (
