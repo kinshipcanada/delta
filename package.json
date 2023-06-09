@@ -51,7 +51,8 @@
     "tailwind-merge": "^1.13.1",
     "tailwindcss-animate": "^1.0.6",
     "three-globe": "^2.24.10",
-    "twilio": "^3.83.0"
+    "twilio": "^3.83.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^8.17.1",

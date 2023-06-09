@@ -15,7 +15,6 @@ export default function Receipt() {
     const { id } = router.query;
 
     async function fetchDonation(donation_id) {
-
         const response = await callKinshipAPI('/api/donation/fetch', {
             donation_id: donation_id,
         });
@@ -90,7 +89,7 @@ export default function Receipt() {
                         </div>
                         <div>
                             <p className="font-medium text-gray-700 mb-1">Signed By Vice President</p>
-                            <img src = '/signature.png' className = 'w-40' />
+                            <img src = '/signature.png' className = 'w-12' />
                         </div>
                     </div>
                     <div className="px-4 py-5 sm:p-6">

@@ -1,4 +1,4 @@
-import { CreateDonationResponse, ErroredResponse, FetchDonationResponse, FetchGroupOfDonationsResponse } from "../classes/api";
+import { v4 as uuidv4 } from 'uuid';
 import { Donation } from "../classes/donation";
 import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
@@ -23,6 +23,22 @@ export async function createDonation(identifiers: DonationIdentifiers): Promise<
         return donation
     } catch (error) {
         throw new Error("Error creating donation");
+    }
+}
+
+export async function createManualDonation(donation: Donation): Promise<Donation> {
+    try {
+        const donationId = uuidv4();
+        donation.identifiers.donation_id = donationId;
+        await uploadDonationToDatabase(donation);
+        await sendNotification(
+            UserNotificationType.DONATION_MADE,
+            donation,
+            DeliveryMethod.EMAIL,
+        )
+        return donation
+    } catch (error) {
+        throw new Error(error.message);
     }
 }
 

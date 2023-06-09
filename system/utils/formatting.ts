@@ -12,8 +12,35 @@ import { DatabaseTypings, parameterizedDatabaseQuery } from "./database";
  * @description Formats a donation object into one that can be uploaded into the database
  * @param donation The donation to be formatted into a database donation object
  */
-export function formatDonationForDatabase(donation: Donation): DatabaseTypings["public"]["Tables"]["donor_profiles"]["Row"] {
-    throw new Error("Not implemented")
+export function formatDonationForDatabase(donation: Donation): DatabaseTypings["public"]["Tables"]["donations"]["Row"] {
+    return {
+        address_city: donation.donor.address.city,
+        address_country: "ca",
+        address_line_address: donation.donor.address.line_address,
+        address_postal_code: donation.donor.address.postal_code,
+        address_state: donation.donor.address.state,
+        amount_in_cents: donation.amount_in_cents,
+        donation_causes: null,
+        donation_created: new Date().toDateString(),
+        donation_logged: new Date().toDateString(),
+        donation_method: "etransfer",
+        donor: donation.donor.donor_id ? donation.donor.donor_id : null,
+        donor_object: donation.donor,
+        email: donation.donor.email,
+        fees_charged_by_stripe: donation.fees_charged_by_stripe,
+        fees_covered: donation.fees_covered,
+        id: donation.identifiers.donation_id,
+        livemode: donation.live,
+        payment_method: null,
+        phone_number: null,
+        proof_available: false,
+        stripe_balance_transaction_id: null,
+        stripe_charge_id: null,
+        stripe_customer_id: null,
+        stripe_payment_intent_id: null,
+        transaction_refunded: false,
+        transaction_successful: true
+    }
 }
 
 /**

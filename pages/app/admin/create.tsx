@@ -176,14 +176,24 @@ const CreateFromScratch: React.FC = () => {
                 return
             }
     
-            const response: MessageResponse = await callKinshipAPI('/api/donor/profile/update', {
-                
+            const response = await callKinshipAPI('/api/donation/createManually', {
+                first_name: firstName,
+                last_name: lastName, 
+                email: email,
+                address_line_address: lineAddress,
+                address_state: state,
+                address_city: city,
+                address_postal_code: postalCode,
+                address_country: country,
+                amount_in_cents: dollarsToCents(unconvertedAmount),
+                date_donated: new Date()
             })
     
             if (response.status == 500) { 
-                toast.error("Error updating your profile, please try again later", { position: "top-right" })
+                console.error(response)
+                toast.error(response.error, { position: "top-right" })
             } else if (response.status == 200) {
-                toast.success(response.message, { position: "top-right" })
+                toast.success(`Created donation with ID: ${response.message}`, { position: "top-right" })
             } else {
                 toast.error("An unknown error occurred", { position: "top-right" })
             }
