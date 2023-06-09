@@ -92,7 +92,6 @@ const AccountInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={firstName}
                     onChange={(e)=>{ setFirstName(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
                 <TextInput 
                     placeholder="Last Name" 
@@ -103,7 +102,6 @@ const AccountInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={lastName}
                     onChange={(e)=>{ setLastName(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
             </div>
             <VerticalSpacer size={SpacerSize.Medium} />
@@ -116,7 +114,6 @@ const AccountInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                 value={email}
                 onChange={(e)=>{ setEmail(e.target.value) }} 
                 required={false} 
-                inputCustomization="none"
             />
             <VerticalSpacer size={SpacerSize.Medium} />
             <JustifyEnd>
@@ -197,7 +194,6 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                 value={lineAddress}
                 onChange={(e)=>{ setLineAddress(e.target.value) }} 
                 required={false} 
-                inputCustomization="none"
             />
             <VerticalSpacer size={SpacerSize.Medium} />
             <div className="grid sm:grid-cols-2 gap-4">
@@ -210,7 +206,6 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={city}
                     onChange={(e)=>{ setCity(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
                 <TextInput 
                     placeholder="State" 
@@ -221,7 +216,6 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={state}
                     onChange={(e)=>{ setState(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
                 <TextInput 
                     placeholder="Postal Code" 
@@ -232,7 +226,6 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={postalCode}
                     onChange={(e)=>{ setPostalCode(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
                 <TextInput 
                     placeholder="Country" 
@@ -243,7 +236,6 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     value={country}
                     onChange={(e)=>{ setCountry(e.target.value) }} 
                     required={false} 
-                    inputCustomization="none"
                 />
             </div>
             <VerticalSpacer size={SpacerSize.Medium} />

@@ -96,6 +96,14 @@ export function centsToDollars(amount: number | string) {
     return (amount / 100).toFixed(2);
 }
 
+export function dollarsToCents(amount: number | string): string {
+    if (typeof amount === 'string') {
+        amount = parseFloat(amount);
+    }
+
+    return (amount * 100).toFixed(0);
+}
+
 export function parseFrontendDate(date: string | Date) {
     return new Date(Date.parse(date as string)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }

@@ -59,6 +59,14 @@ export interface BadgeProps {
     color?: EventColors;
     style?: Style;
     text: string;
+    borderEnabled?: boolean;
+    size?: BadgeSize;
+}
+
+export const enum BadgeSize {
+    Small,
+    Standard,
+    Large,
 }
 
 export const enum SpacerSize {
@@ -96,12 +104,17 @@ export interface TextInputProps {
     type: string,
     name: string,
     id: string,
-    value: string,
+    value: string | number,
     onChange: any,
     required: boolean,
-    inputCustomization: "dollars" | "none",
+    inputCustomization?: InputCustomizations,
     button?: ButtonProps
     label?: string,
+}
+
+export const enum InputCustomizations {
+    Dollars = "dollars",
+    None = "none",
 }
 
 export const SmallIconSizing = "h-3 w-3"
@@ -115,6 +128,8 @@ export const enum TextSize {
     Large = "text-lg",
     XLarge = "text-xl",
     XXLarge = "text-2xl",
+    XXXLarge = "text-3xl",
+    XXXXLarge = "text-4xl",
 }
 
 export const enum TextColor {
@@ -129,6 +144,7 @@ export const enum TextWeight {
     Medium = "font-medium",
     Semibold = "font-semibold",
     Bold = "font-bold",
+    Extrabold = "font-extrabold",
 }
 
 export const enum TextAlignment {

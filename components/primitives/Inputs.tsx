@@ -1,27 +1,89 @@
 import React from "react"
 import { Label } from "./Typography"
-import { TextInputProps } from "./types"
+import { InputCustomizations, TextInputProps } from "./types"
 import Button from "./Button"
+
+"use client"
+
+import { format } from "date-fns"
+
+import { cn } from "../../lib/utils"
+import { Button as ShadButton } from "../ui/button"
+import { Calendar } from "../ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../ui/popover"
+import { CalendarDaysIcon } from "@heroicons/react/20/solid"
+
+export function DatePicker() {
+  const [date, setDate] = React.useState<Date>()
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <ShadButton
+          variant={"outline"}
+          className={cn(
+            "w-[280px] justify-start text-left font-normal",
+            !date && "text-muted-foreground"
+          )}
+        >
+          <CalendarDaysIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
+        </ShadButton>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 
 export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label, button }) => {
 
     const panelStyling = (button != null && button != undefined) ? "flex  mt-2" : "mt-2"
-    const inputStyling = (button != null && button != undefined) ? "flex-grow mr-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-auto sm:text-sm border-gray-300 rounded-md" : "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-    const customizationStyling = (inputCustomization != null && inputCustomization != undefined) ? (inputCustomization == "dollars" ? "" : "") : ""
-    return (
+    const inputStyling = (button != null && button != undefined) ? "flex-grow mr-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-auto sm:text-sm border-gray-300 rounded-md " : "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md "
+    const customization = (inputCustomization == null || inputCustomization == undefined) ? "" : 
+        inputCustomization === InputCustomizations.Dollars ? "pl-7 pr-12" :
+        inputCustomization === InputCustomizations.None ? "" : ""
+
+        return (
         <div>
             {label && <Label label={label} htmlFor={name} required={required} />}
+            
             <div className={panelStyling}>
-                <input
-                    placeholder={placeholder}
-                    type={(type == null || type == undefined) ? "text" : type}
-                    name={name}
-                    id={id}
-                    value={value}
-                    onChange={onChange}
-                    required={required}
-                    className={inputStyling}
-                />
+                <div className="relative mt-2 rounded-md shadow-sm">
+                    { inputCustomization === InputCustomizations.Dollars && 
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                    }
+                    <input
+                        placeholder={placeholder}
+                        type={(type == null || type == undefined) ? "text" : type}
+                        name={name}
+                        id={id}
+                        value={value}
+                        onChange={onChange}
+                        required={required}
+                        className={inputStyling + customization}
+                    />
+                    { inputCustomization === InputCustomizations.Dollars && 
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span className="text-gray-500 sm:text-sm" id="price-currency">
+                                CAD
+                            </span>
+                        </div>
+                    }
+                </div>
                 { button && <Button 
                     text={button.text}
                     style={button.style}
@@ -37,6 +99,16 @@ export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, i
         </div>
     )
 }
+//<div className="relative mt-2 rounded-md shadow-sm">
+{/* 
+
+<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span className="text-gray-500 sm:text-sm" id="price-currency">
+  USD
+</span>
+</div>
+</div>
+</div> */}
 
 export const TextArea: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label }) => {
     const panelStyling = "mt-2"

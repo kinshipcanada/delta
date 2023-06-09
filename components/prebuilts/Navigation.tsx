@@ -1,15 +1,16 @@
 import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import { supabase } from '../../system/utils/helpers'
+import { classNames, supabase } from '../../system/utils/helpers'
 import { Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
+import { Button, ButtonSize, ButtonStyle } from '../primitives';
 
 interface PageLink {
-    name: string
-    link: string
-    current: boolean
+  name: string
+  link: string
+  current: boolean
 }
 
 export default function Navigation() {
@@ -40,24 +41,22 @@ export default function Navigation() {
 
     return (
         <Popover className="relative bg-white z-10">
-            {/* Desktop Navbar */}
             <div className="flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10 border border-gray-300">
-                {/* Logo */}
                 <div>
-                    <a href="#" className="flex items-center">
-                        <span className="sr-only">Kinship Canada</span>
-                        <img
-                        className="h-8 w-auto sm:h-10"
-                        loading='eager'
-                        src="/logo.png"
-                        alt=""
-                        />
-                        <a href = '/developers'>
-                            <span className="hidden sm:block flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
-                                Beta V1.0.0
-                            </span>
-                        </a>
-                    </a>
+                  <a href="#" className="flex items-center">
+                      <span className="sr-only">Kinship Canada</span>
+                      <img
+                      className="h-8 w-auto sm:h-10"
+                      loading='eager'
+                      src="/logo.png"
+                      alt=""
+                      />
+                      <Link href = '/developers'>
+                          <span className="hidden sm:block flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
+                              Open Source
+                          </span>
+                      </Link>
+                  </a>
                 </div>
 
                 {/* Menu */}
@@ -75,34 +74,42 @@ export default function Navigation() {
                     {
                         loading ? null :
 
-                        user ? null
+                        user ? 
 
-                        // <SecondaryButton 
-                        //     link = "/app"
-                        //     text = "Dashboard"
-                        // />
+                        <Button 
+                            text = "Dashboard"
+                            href = "/app"
+                            style={ButtonStyle.Secondary}
+                            size={ButtonSize.Standard}
+                        />
 
                         : !user ?
 
-                        // <SecondaryButton 
-                        //     link = "/auth/login"
-                        //     text = "Login"
-                        // />
-                        null 
+                        <Button 
+                            text = "Login"
+                            href = "/auth/login"
+                            style={ButtonStyle.Secondary}
+                            size={ButtonSize.Standard}
+                        />
 
-                        : null
+                        : 
                         
-                        // <SecondaryButton 
-                        //     link = "/auth/login"
-                        //     text = "Login"
-                        // />
+                        <Button 
+                          text = "Login"
+                          href = "/auth/login"
+                          style={ButtonStyle.Secondary}
+                          size={ButtonSize.Standard}
+                        />
                     }
 
                     <div className='m-1' />
-                    {/* <PrimaryButton
-                        link = "/donate"
-                        text = "Donate"
-                    /> */}
+
+                    <Button 
+                      text = "Donate"
+                      href = "/donate"
+                      style={ButtonStyle.Primary}
+                      size={ButtonSize.Standard}
+                    />
                 </div>
 
 
@@ -114,32 +121,27 @@ export default function Navigation() {
 export function MenuLink({ text, link, current }) {
     return (
         <Link href={link}>
-            <a className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}>
-                { text }
-            </a>
+          <a className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}>
+              { text }
+          </a>
         </Link>
     )
 }
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}  
-
 
 function Support() {
 
     const solutions = [
         {
-        name: 'Send A Support Ticket',
-        description: 'Get support from the Kinship team. We try to respond within 24 hours',
-        href: '/support',
-        icon: TicketIcon,
+          name: 'Send A Support Ticket',
+          description: 'Get support from the Kinship team. We try to respond within 24 hours',
+          href: '/support',
+          icon: TicketIcon,
         },
         {
-        name: 'Frequently Asked Questions',
-        description: 'Questions we frequently get. If you have other questions, please send us a support ticket',
-        href: '/support/faq',
-        icon: LifebuoyIcon,
+          name: 'Frequently Asked Questions',
+          description: 'Questions we frequently get. If you have other questions, please send us a support ticket',
+          href: '/support/faq',
+          icon: LifebuoyIcon,
         }
     ]
     const callsToAction = [
