@@ -64,7 +64,6 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor }) => {
                 value={feedback}
                 onChange={(e)=>{ setFeedback(e.target.value) }} 
                 required={false} 
-                inputCustomization="none"
             />
             <VerticalSpacer size={SpacerSize.Small} />
             <CheckboxInput label="Stay Anonymous" checked={stayAnonymous} required={false} onChange={(e)=>{ setStayAnonymous(e.target.checked) }} />
