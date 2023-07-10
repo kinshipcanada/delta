@@ -7,6 +7,8 @@ import { Donor } from "../../system/classes/donor";
 import { toast } from "react-hot-toast";
 import { callKinshipAPI } from "../../system/utils/helpers";
 import { FetchDonorResponse } from "../../system/classes/api";
+import { SelectionInput } from "../../components/primitives/Inputs";
+import { countries } from "../../system/utils/constants";
 
 export default function Index() {
     return (
@@ -227,15 +229,19 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     onChange={(e)=>{ setPostalCode(e.target.value) }} 
                     required={false} 
                 />
-                <TextInput 
-                    placeholder="Country" 
-                    type="text" 
+                <SelectionInput
                     label="Country"
-                    name="country" 
-                    id="country" 
+                    name="country"
+                    id="country"
                     value={country}
-                    onChange={(e)=>{ setCountry(e.target.value) }} 
-                    required={false} 
+                    onChange={(e)=>{ setCountry(e.target.value) }}
+                    required={false}
+                    options={countries.map((country) => {
+                        return {
+                            label: country.name,
+                            value: country.name
+                        }
+                    })}
                 />
             </div>
             <VerticalSpacer size={SpacerSize.Medium} />

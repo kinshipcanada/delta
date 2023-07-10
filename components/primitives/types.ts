@@ -117,6 +117,21 @@ export const enum InputCustomizations {
     None = "none",
 }
 
+export interface SelectOption {
+    value: string | number,
+    label: string,
+}
+
+export interface SelectProps {
+    options: SelectOption[],
+    name: string,
+    id: string,
+    value: string | number,
+    onChange: any,
+    required: boolean,
+    label?: string,
+}
+
 export const SmallIconSizing = "h-3 w-3"
 export const StandardIconSizing = "h-4 w-4"
 export const LargeIconSizing = "h-5 w-5"

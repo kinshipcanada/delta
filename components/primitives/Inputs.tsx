@@ -1,6 +1,6 @@
 import React from "react"
 import { Label } from "./Typography"
-import { InputCustomizations, TextInputProps } from "./types"
+import { InputCustomizations, SelectProps, TextInputProps } from "./types"
 import Button from "./Button"
 
 export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label, button }) => {
@@ -55,16 +55,27 @@ export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, i
         </div>
     )
 }
-//<div className="relative mt-2 rounded-md shadow-sm">
-{/* 
 
-<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-<span className="text-gray-500 sm:text-sm" id="price-currency">
-  USD
-</span>
-</div>
-</div>
-</div> */}
+export const SelectionInput: React.FC<SelectProps> = ({ options, name, id, value, onChange, required, label }) => {
+  return (
+    <div>
+      {label && <Label label={label} htmlFor={name} required={required} />}
+      <select
+        id={id}
+        name={name}
+        onChange={onChange}
+        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+        defaultValue={value}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
 
 export const TextArea: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label }) => {
     const panelStyling = "mt-2"

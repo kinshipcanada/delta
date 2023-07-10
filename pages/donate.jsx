@@ -645,7 +645,7 @@ function BillingStep({
                 city: city,
                 state_or_province: state_or_province,
                 postal_code: postal_code,
-                country: country.code != undefined ? country.code : (country != null && country != undefined) ? country : "ca",
+                country: country.value != undefined ? country.value : (country != null && country != undefined) ? country : "ca",
                 fees_covered: coverFees == true ? (parseFloat(amount) * 0.029 * 100).toFixed(0): 0,
             })
         })
@@ -714,7 +714,7 @@ function BillingStep({
                       className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                       defaultValue={country}
                       onChange={(e)=>{
-                        set_country(countries[e.target.value].code)
+                        set_country(countries[e.target.value].value)
                       }}
                     >
                       {countries.map((country, countryIdx)=>(
@@ -731,7 +731,7 @@ function BillingStep({
                 <div>
                  
                   <div className="mt-1">
-                    { country == "ca" || country.code == "ca" ?
+                    { country == "ca" || country.value == "ca" ?
 
                         <div>
                             <label htmlFor="state" className="block text-sm font-medium text-gray-700">
