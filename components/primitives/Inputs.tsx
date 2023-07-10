@@ -3,50 +3,6 @@ import { Label } from "./Typography"
 import { InputCustomizations, TextInputProps } from "./types"
 import Button from "./Button"
 
-"use client"
-
-import { format } from "date-fns"
-
-import { cn } from "../../lib/utils"
-import { Button as ShadButton } from "../ui/button"
-import { Calendar } from "../ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/popover"
-import { CalendarDaysIcon } from "@heroicons/react/20/solid"
-
-export function DatePicker() {
-  const [date, setDate] = React.useState<Date>()
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <ShadButton
-          variant={"outline"}
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarDaysIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </ShadButton>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-
 export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label, button }) => {
 
     const panelStyling = (button != null && button != undefined) ? "flex  mt-2" : "mt-2"

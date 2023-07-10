@@ -7,9 +7,7 @@ import { EnvelopeIcon } from "@heroicons/react/24/outline"
 import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
 import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../system/utils/helpers"
-import { MessageResponse } from "../../../system/classes/api"
 import { InputCustomizations } from "../../../components/primitives/types"
-import { DatePicker } from "../../../components/primitives/Inputs"
 
 export default function Index() {
     return (
@@ -238,7 +236,6 @@ const CreateFromScratch: React.FC = () => {
                     <div>
                         <Label htmlFor="donationDate" label="Donation Date" required={true} />
                         <VerticalSpacer size={SpacerSize.Small} />
-                        <DatePicker />
                     </div>
                 </div>
 
