@@ -83,6 +83,7 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
             country: cart.address_country as CountryList
         },
         admin: false,
+        set_up: true,
         stripe_customer_ids: []
     }
 
@@ -121,6 +122,7 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
             country: donor.address_country as CountryList
         } as Address,
         admin: donor.admin,
+        set_up: donor.donor_set_up,
         stripe_customer_ids: donor.stripe_customer_ids as string[]
     }
 }
@@ -139,6 +141,7 @@ export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["
             country: donation.address_country as CountryList
         } as Address,
         admin: false,
+        set_up: true,
         stripe_customer_ids: [ donation.stripe_customer_id as string ]
     }
 
@@ -180,6 +183,7 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
             country: rawStripeObject.customer.address.country
         },
         admin: donorFromDatabase.admin,
+        set_up: donorFromDatabase.donor_set_up,
         stripe_customer_ids: [
             rawStripeObject.customer.id
         ]

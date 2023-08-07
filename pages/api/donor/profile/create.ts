@@ -5,9 +5,10 @@ import { Address } from "../../../../system/classes/address";
 import { CountryList } from "../../../../system/classes/utils";
 import { verifyAllParametersExist } from "../../../../system/utils/helpers";
 import { MessageResponse } from "../../../../system/classes/api"; 
+import { createDonor } from "../../../../system/functions/donor";
 
 /**
- * @description Creates a Stripe customer profile, given a donor's details
+ * @description Creates a Stripe customer profile, given a donor's details, and setups up their Kinship profile in the database.
  */
 export default async function handler(req, res) {
     try {
@@ -15,23 +16,19 @@ export default async function handler(req, res) {
 
         verifyAllParametersExist("Not all parameters provided. You must provide an email, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country", email, donor_id, first_name, last_name, address_line_address, address_postal_code, address_city, address_state, address_country);
 
-        const address: Address = {
-            line_address: address_line_address,
-            postal_code: address_postal_code,
-            city: address_city,
-            state: address_state,
-            country: address_country as CountryList
-        }
-
-        const stripeCustomer = await createStripeCustomer(
-            email,
+        const completedDonorProfile = await createDonor(
             donor_id,
             first_name,
             last_name,
-            address,
-        );
+            email,
+            address_line_address,
+            address_postal_code,
+            address_city,
+            address_state,
+            address_country
+        )
 
-        return stripeCustomer ? res.status(200).send({
+        return completedDonorProfile ? res.status(200).send({
             status: 200,
             endpoint_called: `/api/donor/profile/create`,
         } as MessageResponse) : new Error("Something went wrong creating your donor profile");

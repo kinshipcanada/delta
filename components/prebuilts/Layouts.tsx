@@ -28,7 +28,8 @@ export function AppLayout({ AppPage }) {
   const [donor, setDonor] = useState(null);
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [adminEnabled, setAdminEnabled] = useState(false)
+  const [adminEnabled, setAdminEnabled] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false); // New state
 
   const fetchUser = async () => {
     try {
@@ -43,9 +44,15 @@ export function AppLayout({ AppPage }) {
           }),
         ]);
 
+        if (donorResponse.donor.set_up == false && router.pathname != '/app/setup') {
+          setShouldRedirect(true); // Set the redirect state
+          router.push('/app/setup');
+        } else {
+          setShouldRedirect(false);
+        }
         setDonor(donorResponse.donor);
-        setDonations(donationsResponse.donations)
-        setAdminEnabled(donorResponse.donor.admin)
+        setDonations(donationsResponse.donations);
+        setAdminEnabled(donorResponse.donor.admin_enabled);
       } else {
         router.push('/auth/login');
       }
@@ -63,6 +70,8 @@ export function AppLayout({ AppPage }) {
     }
   }, [supabase, donor]);
 
+  if (shouldRedirect) return null; // Don't render anything if we should redirect
+
   return (
     <div className="p-10 grid grid-cols-4 gap-12">
       <AppNavigation adminEnabled={adminEnabled} />
@@ -72,7 +81,7 @@ export function AppLayout({ AppPage }) {
             <Loading color={LoadingColors.Blue} />
           </CenterOfPageBox>
         ) : (
-          <AppPage donor={donor} donations={donations} />
+          <AppPage donor={donor} donations={donations} parentIsLoading={loading} />
         )}
       </div>
     </div>

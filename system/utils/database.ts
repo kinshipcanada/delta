@@ -92,6 +92,39 @@ export function updateDonorInDatabase(
   }
 }
 
+export async function setupDonorInDatabase(
+  donorId: string, 
+  firstName: string, 
+  lastName: string, 
+  address_line_address: string,
+  address_postal_code: string,
+  address_city: string,
+  address_state: string,
+  address_country: string,
+  stripe_customer_id: string
+): Promise<any> {
+  const database = _createDatabase()
+
+  try {
+    return database('donor_profiles').where('id', donorId).update({
+      first_name: firstName,
+      last_name: lastName,
+      address_line_address: address_line_address,
+      address_postal_code: address_postal_code,
+      address_city: address_city,
+      address_state: address_state,
+      address_country: address_country,
+      donor_set_up: true,
+      payment_methods: JSON.stringify([]),
+      stripe_customer_ids: JSON.stringify([stripe_customer_id])
+    })
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    (destoryFunc => database.destroy())
+  }
+}
+
 export async function parameterizedDatabaseQuery(table: DatabaseTable, params, limitToFirstResult: boolean): Promise<any> {
   const columns = Object.keys(params)
   const database = _createDatabase()
@@ -124,6 +157,18 @@ export function uploadFeedbackToDatabase(feedback: string, donor_id?: string): P
 
   try {
     return database('feedback').insert({ feedback: feedback, donor_id: donor_id })
+  } catch (error) {
+    throw new Error(error)
+  } finally {
+    (destoryFunc => database.destroy())
+  }
+}
+
+export function uploadLogToDatabase(error_message: string, file_name: string, function_name: string): Promise<any> {
+  const database = _createDatabase()
+
+  try {
+    return database('logs').insert({ error_message: error_message, file_name: file_name, function_name: function_name })
   } catch (error) {
     throw new Error(error)
   } finally {
@@ -228,6 +273,14 @@ export interface DatabaseTypings {
           transaction_refunded?: boolean | null
           transaction_successful?: boolean | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "donations_donor_fkey"
+            columns: ["donor"]
+            referencedRelation: "donor_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       donor_profiles: {
         Row: {
@@ -238,6 +291,7 @@ export interface DatabaseTypings {
           address_state: string | null
           admin: boolean | null
           created_at: string | null
+          donor_set_up: boolean | null
           email: string | null
           first_name: string | null
           id: string
@@ -255,9 +309,10 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
+          donor_set_up?: boolean | null
           email?: string | null
           first_name?: string | null
-          id: string
+          id?: string
           last_name?: string | null
           partner?: boolean | null
           payment_methods?: Json | null
@@ -272,6 +327,7 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
+          donor_set_up?: boolean | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -281,6 +337,7 @@ export interface DatabaseTypings {
           phone_number?: number | null
           stripe_customer_ids?: Json | null
         }
+        Relationships: []
       }
       events: {
         Row: {
@@ -304,6 +361,35 @@ export interface DatabaseTypings {
           identifiers?: Json | null
           message?: string | null
         }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          created_at: string | null
+          donor_id: string | null
+          feedback: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string | null
+          donor_id?: string | null
+          feedback?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string | null
+          donor_id?: string | null
+          feedback?: string | null
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_donor_id_fkey"
+            columns: ["donor_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       kinship_carts: {
         Row: {
@@ -319,7 +405,7 @@ export interface DatabaseTypings {
           donor: string | null
           email: string | null
           first_name: string | null
-          id: string | null
+          id: string
           last_name: string | null
           livemode: boolean | null
           phone_number: number | null
@@ -360,6 +446,31 @@ export interface DatabaseTypings {
           livemode?: boolean | null
           phone_number?: number | null
         }
+        Relationships: []
+      }
+      logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          file_name: string | null
+          function_name: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string | null
+          function_name?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string | null
+          function_name?: string | null
+          id?: number
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -622,3 +733,4 @@ export interface DatabaseTypings {
     }
   }
 }
+

@@ -81,7 +81,7 @@ export interface SpacerProps {
 
 export interface AppPageProps {
     donor: Donor,
-    donations: Donation[]
+    donations: Donation[],
 }
 
 

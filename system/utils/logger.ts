@@ -1,7 +1,9 @@
-export function logError(
-    error: Error,
+import { uploadLogToDatabase } from "./database";
+
+export async function logError(
+    error_message: string,
+    function_called: string,
     file_name: string,
-    function_name: string
 ) {
-    console.log("Implement: ", error)
+    return await uploadLogToDatabase(error_message, function_called, file_name)
 }

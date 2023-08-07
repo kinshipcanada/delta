@@ -2,6 +2,7 @@ import { supabase } from '../../system/utils/helpers'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { toast } from "react-hot-toast"
 
 export default function Register() {
 
@@ -9,32 +10,54 @@ export default function Register() {
 
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState(null)
-	const [password, setPassword] = useState(null)
-    const [confirmPassword, setConfirmPassword] = useState(null)
+	const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
 	const [error, setError] = useState(null)
 
 	const register = async (event) => {
 		event.preventDefault()
-		setLoading(true)
 
-        if (password != confirmPassword) {
-            setError("Passwords do not match")
-            setLoading(false)
-            return
-        }
+		try {
+			setLoading(true)
 
-		const { user, session, error } = await supabase.auth.signUp({
-			email: email,
-			password: password,
-		})
+			if (password != confirmPassword) {
+				setError("Passwords do not match")
+				setLoading(false)
+				return
+			}
+			
+			const { data, error } = await supabase.auth.signUp({
+				email: email,
+				password: password,
+			})
 
-		if (error) {
-			setError(error.message)
-		} else {
-			router.push('/app')
+			if (error) {
+				setError(error.message)
+				setLoading(false)
+				return
+			} else {
+				const { error } = await supabase
+					.from('donor_profiles')
+					.insert({ 
+						id: data.user.id,
+						email: email,
+					})
+				
+				if (error) {
+					setError(`Error creating your profile - please contact ${process.env.NEXT_PUBLIC_SUPPORT_EMAIL} for assistance`)
+					setLoading(false)
+					return
+				} else {
+					router.push('/app')
+				}
+			}
+
+		} catch (error) {
+			toast.error(`Error: ${error.message}`, { position: "top-right" })
+		} finally {
+			setLoading(false)
+			return
 		}
-
-		setLoading(false)
 	}
 
 	return (

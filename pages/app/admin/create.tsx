@@ -3,7 +3,7 @@ import { AppLayout } from "../../../components/prebuilts/Layouts"
 import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
-import { EnvelopeIcon } from "@heroicons/react/24/outline"
+import { CalendarDaysIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
 import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../system/utils/helpers"
@@ -184,7 +184,7 @@ const CreateFromScratch: React.FC = () => {
                 address_postal_code: postalCode,
                 address_country: country,
                 amount_in_cents: dollarsToCents(unconvertedAmount),
-                date_donated: new Date()
+                date_donated: dateDonated,
             })
     
             if (response.status == 500) { 
@@ -236,6 +236,19 @@ const CreateFromScratch: React.FC = () => {
                     <div>
                         <Label htmlFor="donationDate" label="Donation Date" required={true} />
                         <VerticalSpacer size={SpacerSize.Small} />
+                        <div className="relative rounded-md shadow-sm">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <CalendarDaysIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            </div>
+                            <input
+                                className="block align-center w-full rounded-md border-0 py-1 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                type = "date" 
+                                name = "donationDate"
+                                id = "donationDate"
+                                onChange = {(e)=>{ setDateDonated(new Date(e.target.value)) }}
+                                required = {true}
+                            />
+                        </div>
                     </div>
                 </div>
 

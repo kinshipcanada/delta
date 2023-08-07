@@ -40,7 +40,8 @@ export default async function handler(req, res) {
             email: email,
             address: donorAddress,
             admin: false,
-            stripe_customer_ids: []
+            stripe_customer_ids: [],
+            set_up: true
         }
 
         const donation: Donation = {
