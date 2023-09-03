@@ -24,3 +24,24 @@ export interface Donation {
     fees_charged_by_stripe: number;
     date_donated: Date;
 }
+
+export function isDonation(obj: any): obj is Donation {
+    return (
+        typeof obj === 'object' &&
+        'identifiers' in obj &&
+        'donor' in obj &&
+        'causes' in obj &&
+        'live' in obj &&
+        'amount_in_cents' in obj &&
+        'fees_covered' in obj &&
+        'fees_charged_by_stripe' in obj &&
+        'date_donated' in obj &&
+        obj.identifiers !== null && // You can add more specific checks for sub-properties
+        obj.donor !== null &&
+        obj.causes !== null &&
+        typeof obj.live === 'boolean' &&
+        typeof obj.amount_in_cents === 'number' &&
+        typeof obj.fees_covered === 'number' &&
+        typeof obj.fees_charged_by_stripe === 'number'
+    );
+}

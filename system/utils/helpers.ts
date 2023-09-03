@@ -2,6 +2,7 @@ import { CountryList } from "../classes/utils";
 import { createClient } from '@supabase/supabase-js'
 import { DonationIdentifiers } from '../classes/utils';
 import { isValidUUIDV4 as verifyUUID } from 'is-valid-uuid-v4';
+import Stripe from "stripe";
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
@@ -106,4 +107,46 @@ export function dollarsToCents(amount: number | string): string {
 
 export function parseFrontendDate(date: string | Date) {
     return new Date(Date.parse(date as string)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+export function isFloatOrInteger(input: any): boolean {
+    if (typeof input === 'number') {
+        // Check if it's a whole number (integer)
+        if (Number.isInteger(input)) {
+        return true;
+        }
+        
+        // Check if it's a finite value (not NaN or Infinity)
+        if (isFinite(input)) {
+        return true;
+        }
+    } else if (typeof input === 'string') {
+        // Use regular expressions to match a valid float or integer
+        const floatRegex = /^-?\d+\.\d+$/;
+        const integerRegex = /^-?\d+$/;
+
+        if (floatRegex.test(input) || integerRegex.test(input)) {
+        return true;
+        }
+    } else if (typeof input === 'boolean') {
+        return true;
+    }
+
+    return false;
+}
+
+export function convertChildrenToStrings(parentObject: object) {
+    const result: Stripe.MetadataParam = {};
+
+    for (const key in parentObject) {
+        let value = parentObject[key]
+
+        if (typeof(value) == "object") {
+            value = JSON.stringify(value)
+        }
+
+        result[key] = value
+    }
+
+    return result
 }

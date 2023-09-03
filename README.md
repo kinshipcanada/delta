@@ -24,6 +24,8 @@ Charity should be powered by good software.
 - `stripe`: stripe engine and helper classes, including building objects from stripe
 
 ## API Reference
+// We could also potentially simplify partially setups users setup process by saving these details and autofilling later 
+// By checking for profiles with the same email during profile setup
 
 **Get Requests (e.g. fetching donations, donors, etc)**
 - **GET** `/donation/[id]` - Fetches an individual donation from it's Kinship ID, Stripe charge ID, or Stripe payment intent id

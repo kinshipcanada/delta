@@ -48,7 +48,7 @@ export default async function handler(req, res) {
             identifiers: {},
             donor: donor,
             causes: null,
-            live: process.env.LIVEMODE === "true",
+            live: process.env.NEXT_PUBLIC_LIVEMODE === "true",
             amount_in_cents: amount_in_cents,
             fees_covered: 0,
             fees_charged_by_stripe: 0,

@@ -14,4 +14,8 @@ export interface Cart {
     total_amount_paid_in_cents: number
     currency: CurrencyList
     causes: CauseMap
+    // Kinship specific identifiers for religious obligations
+    is_imam_donation: boolean
+    is_sadat_donation: boolean
+    is_sadaqah: boolean
 }

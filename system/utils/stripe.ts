@@ -1,18 +1,16 @@
 import { Stripe } from "stripe";
-import { Cart } from "../classes/cart";
-import { Donation } from "../classes/donation";
-import { Donor } from "../classes/donor";
-import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
-import { CountryList, DonationIdentifiers } from "../classes/utils";
-import { RawStripeTransactionObject, StripeMethods, StripeTags } from "../classes/stripe";
+import { DonationIdentifiers } from "../classes/utils";
+import { RawStripeTransactionObject, StripeMethods } from "../classes/stripe";
 import { Address } from "../classes/address";
 import { _convertKinshipAddressToStripeAddress } from "./formatting";
+import { Donor } from "../classes/donor";
 
-const StripeClient = require('stripe');
 const dotenv = require('dotenv')
 dotenv.config();
 
-const stripe_client = StripeClient(process.env.STRIPE_SECRET_KEY);
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-08-16"
+})
 
 /**
  * 
@@ -37,29 +35,23 @@ export async function fetchStripeObject(identifier: string, method: StripeMethod
 }
 
 export async function fetchStripeChargeObject(charge_id: string) : Promise<Stripe.Charge> {
-    return stripe_client.charges.retrieve(charge_id)
+    return stripeClient.charges.retrieve(charge_id)
 }
 
 export async function fetchStripePaymentIntentObject(payment_intent_id: string) : Promise<Stripe.PaymentIntent> {
-    return stripe_client.paymentIntents.retrieve(payment_intent_id)
+    return stripeClient.paymentIntents.retrieve(payment_intent_id)
 }
 
 export async function fetchStripeBalanceTransactionObject(balance_transaction_id: string) : Promise<Stripe.BalanceTransaction>  {
-    return stripe_client.balanceTransactions.retrieve(balance_transaction_id)
+    return stripeClient.balanceTransactions.retrieve(balance_transaction_id)
 }
 
 export async function fetchStripeCustomerObject(stripe_customer_id: string) : Promise<Stripe.Customer> {
-    return stripe_client.customers.retrieve(stripe_customer_id) as Promise<Stripe.Customer>
+    return stripeClient.customers.retrieve(stripe_customer_id) as Promise<Stripe.Customer>
 }
 
 export async function fetchSpecificStripePaymentMethod(payment_method_id: string) : Promise<Stripe.PaymentMethod>  {
-    return stripe_client.paymentMethods.retrieve(payment_method_id) as Promise<Stripe.PaymentMethod>
-}
-
-export async function fetchStripeCustomerPaymentMethods(stripe_customer_id: string) {
-    return stripe_client.paymentMethods.list(
-        stripe_customer_id,
-    )
+    return stripeClient.paymentMethods.retrieve(payment_method_id) as Promise<Stripe.PaymentMethod>
 }
 
 export async function fetchFullDonationFromStripe(identifiers: DonationIdentifiers): Promise<RawStripeTransactionObject> {
@@ -80,7 +72,7 @@ export async function fetchFullDonationFromStripe(identifiers: DonationIdentifie
 
     if (stripe_payment_intent_id) {
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(stripe_payment_intent_id)
-        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(rawStripeTransactionObject.payment_intent_object.charges.data[0].id)
+        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(typeof (rawStripeTransactionObject.payment_intent_object.latest_charge) == "string" ? rawStripeTransactionObject.payment_intent_object.latest_charge : rawStripeTransactionObject.payment_intent_object.latest_charge.id)
     } else {
         rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(stripe_charge_id)
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(rawStripeTransactionObject.charge_object.payment_intent as string)
@@ -120,8 +112,8 @@ export async function createStripeCustomer(
     firstName: string,
     lastName: string,
     address: Address,
-) {
-    return await stripe_client.customers.create({
+): Promise<Stripe.Customer> {
+    return await stripeClient.customers.create({
         email,
         name: `${firstName} ${lastName}`,
         metadata: {
@@ -133,3 +125,29 @@ export async function createStripeCustomer(
     })
 }
 
+export async function fetchStripeCustomerFromEmail(email: string) {
+    const donors = await stripeClient.customers.list({
+        limit: 1,
+        email: email.toLowerCase()
+    });
+
+    const [firstAvailableStripeProfile] = donors.data
+
+    return firstAvailableStripeProfile
+}
+
+// Implement
+export async function updateStripeCustomerWithId() {}
+
+export async function createStripeCustomerIfNotExists(donor: Donor): Promise<string> {
+    const existingProfile = await fetchStripeCustomerFromEmail(donor.email)
+
+    if (existingProfile) { 
+        return existingProfile.id;
+    }
+
+    // Create a new profile from the donor if there is none
+    const createdStripeCustomer = await createStripeCustomer(donor.email, donor.donor_id, donor.first_name, donor.last_name, donor.address)
+
+    return createdStripeCustomer.id
+}

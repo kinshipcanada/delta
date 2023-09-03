@@ -42,3 +42,8 @@ export interface CreateDonationResponse extends BaseApiResponse {
 export interface CreateDonorResponse extends BaseApiResponse {
     donor: Donor,
 }
+
+export interface StripeCreatePaymentIntentResponse extends BaseApiResponse {
+    clientSecret?: string,
+    message?: string
+}

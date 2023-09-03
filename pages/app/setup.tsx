@@ -1,12 +1,13 @@
 
 import React, { useState } from "react";
 import { AppLayout } from "../../components/prebuilts/Layouts";
-import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween, PanelWithLeftText, BaseHeader, TextInput, JustifyEnd, ButtonSize, Label } from  "../../components/primitives";
-import { DonationPanel } from "../../components/prebuilts/app/DonationPanel";
+import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween, BaseHeader, TextInput, JustifyEnd, ButtonSize, Label } from  "../../components/primitives";
 import { callKinshipAPI } from "../../system/utils/helpers";
 import { toast } from "react-hot-toast";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
+import { SelectionInput } from "../../components/primitives/Inputs";
+import { SelectOption } from "../../components/primitives/types";
+import { countries, states_and_provinces } from "../../system/utils/constants";
 
 export default function Index() {
     return (
@@ -42,8 +43,8 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
     const [lastName, setLastName] = useState<string>("")
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
-    const [state, setState] = useState<string>("")
-    const [country, setCountry] = useState<string>("")
+    const [state, setState] = useState<string>("on")
+    const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
     const handleSaveChanges = async () => {
@@ -138,16 +139,32 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
                     onChange={(e)=>{ setCity(e.target.value) }} 
                     required={true} 
                 />
-                <TextInput 
-                    placeholder="State" 
-                    type="text" 
-                    label="State"
-                    name="state" 
-                    id="state" 
-                    value={state}
-                    onChange={(e)=>{ setState(e.target.value) }} 
-                    required={true} 
-                />
+                {states_and_provinces[country] === null || states_and_provinces[country] === undefined ? (
+                    <TextInput
+                        placeholder="State or Province"
+                        type="text"
+                        label="State or Province"
+                        name="state_or_province"
+                        id="state_or_province"
+                        value={state}
+                        onChange={(e) => {
+                            setState(e.target.value);
+                        }}
+                        required={true}
+                    />
+                ) : (
+                    <SelectionInput
+                        label="State or Province"
+                        name="state_or_province"
+                        id="state_or_province"
+                        value={state}
+                        options={states_and_provinces[country]}
+                        onChange={(e) => {
+                            setState(e.target.value);
+                        }}
+                        required={true}
+                    />
+                )}
                 <TextInput 
                     placeholder="Postal Code" 
                     type="text" 
@@ -158,15 +175,15 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
                     onChange={(e)=>{ setPostalCode(e.target.value) }} 
                     required={true} 
                 />
-                <TextInput 
-                    placeholder="Country" 
-                    type="text" 
+
+                <SelectionInput
                     label="Country"
                     name="country" 
                     id="country" 
-                    value={country}
-                    onChange={(e)=>{ setCountry(e.target.value) }} 
-                    required={true} 
+                    options={countries}
+                    value="ca"
+                    onChange={(e)=>{ setCountry(e.target.value) }}
+                    required={true}
                 />
             </div>
             <VerticalSpacer size={SpacerSize.Medium} />

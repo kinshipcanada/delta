@@ -87,3 +87,41 @@ export function AppLayout({ AppPage }) {
     </div>
   );
 }
+
+// Opinionated dynamic user rendering - comment on this
+export function GenericPageLayout({ ChildPage }) {
+
+  const [loading, setLoading] = useState(null);
+  const [donor, setDonor] = useState(null);
+
+  const fetchUser = async () => {
+      setLoading(true)
+      try {
+          const loggedInUser = await supabase.auth.getUser();
+
+          if (loggedInUser.data.user) {
+            const donorResponse = await callKinshipAPI('/api/donor/profile/fetch', {
+                donor_id: loggedInUser.data.user.id,
+            })
+
+            setDonor(donorResponse.donor);
+          }
+      } catch (error) {
+          // Log error
+          console.error(error)
+      }
+
+      setLoading(false)
+      return
+};
+
+useEffect(() => {
+  if (!donor) {
+    fetchUser();
+  }
+}, [supabase, donor]);
+
+return (
+  <ChildPage donor={donor} parentIsLoading={loading} />
+);
+}

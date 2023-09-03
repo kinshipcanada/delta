@@ -24,3 +24,24 @@ export interface Donor {
     set_up: boolean;
     stripe_customer_ids: string[];
 }
+
+export function isDonor(obj: any): obj is Donor {
+    return (
+        typeof obj === 'object' &&
+        'first_name' in obj &&
+        'last_name' in obj &&
+        'email' in obj &&
+        'address' in obj &&
+        'admin' in obj &&
+        'set_up' in obj &&
+        'stripe_customer_ids' in obj &&
+        obj.first_name !== null &&
+        obj.last_name !== null &&
+        obj.email !== null &&
+        obj.address !== null &&
+        typeof obj.admin === 'boolean' &&
+        typeof obj.set_up === 'boolean' &&
+        Array.isArray(obj.stripe_customer_ids) &&
+        obj.stripe_customer_ids.every((id) => typeof id === 'string')
+    );
+}

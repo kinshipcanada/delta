@@ -19,7 +19,7 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
             </JustifyBetween>
             <VerticalSpacer size={SpacerSize.Medium} />
             <SectionHeader>Your Donations</SectionHeader>
-            <Text><span>Any donations you have made will be listed below. If a donation, such as an eTransfer or Cash donation is missing, or if you need any help or have questions, you can contact support at <InlineLink href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`} text={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}/></span></Text>
+            <Text><span>Any donations you have made will be listed below. If a donation, such as an eTransfer or Cash donation is missing, or if you need any help or have questions, you can contact support at <InlineLink href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`} text={`${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}/></span></Text>
             <VerticalSpacer size={SpacerSize.Small} />
             <div className="space-y-4">
                 { donations.map((donation) => (
