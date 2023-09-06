@@ -40,10 +40,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             metadata: { ...convertChildrenToStrings({ ...donation }), causes: JSON.stringify([]) },
             customer: stripeCustomerId,
             currency: 'cad',
-            // Implement save this payment method, and recurring billing
-            // setup_future_usage: {},
-            automatic_payment_methods: {
-                enabled: true,
+            receipt_email: donation.donor.email,
+            payment_method_types: ['acss_debit', 'card'],
+            payment_method_options: {
+                acss_debit: {
+                    mandate_options: {
+                        // IMPLEMENT: UPDAET THIS IF SAVE PAYMNET METHOD
+                        payment_schedule: 'sporadic',
+                        transaction_type: 'personal',
+                    },
+                },
             },
         });
 
@@ -53,6 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             message: null
         } as StripeCreatePaymentIntentResponse);
     } catch (error) {
+        console.error('error x', error)
         res.status(500).json({ status: 500, message: error.message, clientSecret: null } as StripeCreatePaymentIntentResponse);
     }
 }

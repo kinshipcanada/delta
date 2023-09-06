@@ -1,65 +1,36 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import Stripe from 'stripe';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { extractStripePaymentIntentFromClientSecret } from '../../../system/utils/helpers';
+import { BaseApiResponse, StripeCreatePaymentIntentResponse } from '../../../system/classes/api';
 
-export default async function handler(req, res) {
-  try {
-    const { 
-      payment_intent_id,
-      first_name,
-      last_name,
-      email,
-      address,
-      suite,
-      city,
-      state_or_province,
-      postal_code,
-      country,
-      stripe_customer_id,
-      fees_covered,
-    } = req.body
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+            apiVersion: "2023-08-16"
+        })
 
-    let customer_id = stripe_customer_id
+        const { clientSecret } = req.body;
 
-    if (customer_id === null) {
-        const customer = await stripe.customers.create({
-            name: first_name + ' ' + last_name,
-            email: email,
-            address: {
-                line1: address,
-                line2: suite,
-                city: city,
-                state: state_or_province,
-                postal_code: postal_code,
-                country: country
-            }
-        });
+        // Extract payment intent id from client secret
+        const paymentIntentId = extractStripePaymentIntentFromClientSecret(clientSecret);
 
-        customer_id = customer.id
+        await stripe.paymentIntents.update(
+            paymentIntentId,
+            { payment_method_options: { 
+                card: {
+                    setup_future_usage: 'off_session'
+                },
+                acss_debit: {
+                    setup_future_usage: 'off_session'
+                }
+            }}
+        );
+
+        res.send({
+            status: 200
+        } as BaseApiResponse);
+    } catch (error) {
+        // Implement: log error here
+        res.status(500).json({ status: 500 } as BaseApiResponse);
     }
-
-
-    // Create a PaymentIntent with the order amount and currency
-    const paymentIntent = await stripe.paymentIntents.update(payment_intent_id, 
-        {
-          metadata: { 
-            address: address,
-            suite: suite,
-            city: city,
-            state_or_province: state_or_province,
-            postal_code: postal_code,
-            country: country,
-            first_name: first_name,
-            last_name: last_name,
-            email: email,
-            fees_covered: fees_covered,
-          },
-          customer: customer_id,
-        }
-    );
-
-    res.send({
-      status: "success",
-    });
-  } catch (error) {
-    res.status(500).json({ statusCode: 500, status: "error", error: error.message });
-  }
-};
+}

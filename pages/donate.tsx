@@ -1,9 +1,8 @@
 import { ButtonSize, ButtonStyle, EventColors, GenericPageProps, InputCustomizations, SpacerSize } from '../components/primitives/types';
 import { GenericPageLayout } from '../components/prebuilts/Layouts';
-import { FC, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { Donor } from '../system/classes/donor';
-import { Alert, BaseHeader, Button, HorizontalSpacer, TextInput, VerticalSpacer } from '../components/primitives';
-import { CheckboxInput, SelectionInput } from '../components/primitives/Inputs';
+import { Alert, BaseHeader, Button, HorizontalSpacer, TextInput, VerticalSpacer, CheckboxInput, SelectionInput } from '../components/primitives';
 import { countries, states_and_provinces } from '../system/utils/constants';
 import { toast } from 'react-hot-toast';
 import { callKinshipAPI, isFloatOrInteger, validateEmail } from '../system/utils/helpers';
@@ -17,7 +16,7 @@ import {
     useElements,
 } from "@stripe/react-stripe-js";
 import { v4 as uuidv4 } from 'uuid'
-import { CurrencyList, DonationIdentifiers } from '../system/classes/utils';
+import { CurrencyList } from '../system/classes/utils';
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -30,7 +29,7 @@ export default function Donate() {
 const enum DonationStep {
     AmountAndBilling,
     DonateWithCreditOrDebitCard,
-    DonateWithETransfer,
+    DonateWithAcssDebit,
     Confirmation,
     Error
 }
@@ -53,13 +52,18 @@ const DonatePage: React.FC<GenericPageProps> = ({ donor, parentIsLoading }) => {
             setStripeClientSecret={setStripeClientSecret}
         />
     } else if (step == DonationStep.DonateWithCreditOrDebitCard) {
-        return <StripeDonationWrapper 
-            globalDonation={globalDonation} 
-            stripeClientSecret={stripeClientSecret}
-            setStep={setStep} 
-        />
-    } else if (step == DonationStep.DonateWithETransfer) {
-        return <div /> 
+        return (
+            <StripeWrapper stripeClientSecret={stripeClientSecret}>
+                <DonateWithCreditOrDebitCard globalDonation={globalDonation} stripeClientSecret={stripeClientSecret} setStep={setStep} />
+            </StripeWrapper>
+        )
+        
+    } else if (step == DonationStep.DonateWithAcssDebit) {
+        return (
+            <StripeWrapper stripeClientSecret={stripeClientSecret}>
+                <DonateWithAcssDebit globalDonation={globalDonation} stripeClientSecret={stripeClientSecret} setStep={setStep} />
+            </StripeWrapper>
+        )
     } else if (step == DonationStep.Confirmation) {
         return <div>Confirmation</div>
     } else {
@@ -86,7 +90,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
     const [email, setEmail] = useState<string>("")
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
-    const [state, setState] = useState<string>("on")
+    const [state, setStateOrProvince] = useState<string>("on")
     const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
@@ -101,7 +105,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 setEmail(donor.email)
                 setLineAddress(donor.address.line_address)
                 setCity(donor.address.city)
-                setState(donor.address.state)
+                setStateOrProvince(donor.address.state)
                 setCountry(donor.address.country)
                 setPostalCode(donor.address.postal_code)
             }
@@ -310,7 +314,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                         id="state_or_province"
                         value={state}
                         onChange={(e) => {
-                            setState(e.target.value);
+                            setStateOrProvince(e.target.value);
                         }}
                         required={true}
                     />
@@ -322,7 +326,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                         value={state}
                         options={states_and_provinces[country]}
                         onChange={(e) => {
-                            setState(e.target.value);
+                            setStateOrProvince(e.target.value);
                         }}
                         required={true}
                     />
@@ -343,8 +347,16 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     name="country" 
                     id="country" 
                     options={countries}
-                    value="ca"
-                    onChange={(e)=>{ setCountry(e.target.value) }}
+                    value={country}
+                    onChange={(e)=>{ 
+                        setCountry(e.target.value);
+
+                        if (states_and_provinces[e.target.value]) {
+                            setStateOrProvince(states_and_provinces[e.target.value][0].value)
+                        } else {
+                            setStateOrProvince("")
+                        }
+                    }}
                     required={true}
                 />
             </div>
@@ -398,7 +410,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     isLoading={loading} 
                     style={ButtonStyle.Primary}
                     size={ButtonSize.Large} 
-                    onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithETransfer })}
+                    onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithAcssDebit })}
                 />
 
                 <HorizontalSpacer size={SpacerSize.Small} />
@@ -416,16 +428,14 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
     )
 }
 
-const StripeDonationWrapper: FC<{ globalDonation: Donation, stripeClientSecret: string,  setStep: (value: DonationStep) => void }> = ({ globalDonation, stripeClientSecret, setStep }) => {
-    return (
-        <Elements options={{
-            appearance: { 'theme': 'stripe' },
-            clientSecret: stripeClientSecret
-        }} stripe={stripeClientPromise}>
-            <DonateWithCreditOrDebitCard globalDonation={globalDonation} stripeClientSecret={stripeClientSecret} setStep={setStep} />
-        </Elements>
-    )
-}
+const StripeWrapper: React.FC<{ children: ReactNode, stripeClientSecret: string }> = ({ children, stripeClientSecret }) => (
+    <Elements options={{
+        appearance: { 'theme': 'stripe' },
+        clientSecret: stripeClientSecret,
+    }} stripe={stripeClientPromise}>
+        { children }
+    </Elements>
+);
 
 const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSecret: string,  setStep: (value: DonationStep) => void }> = ({ globalDonation, stripeClientSecret, setStep }) => {
     if (globalDonation == null || globalDonation == undefined) {
@@ -442,6 +452,17 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
         // Kinship servers should never access these details in raw form, even in submitting to Stripe
         const elements = useElements()
 
+        const savePaymentMethodToStripeCustomer = async (clientSecret) => {
+            try {
+                await callKinshipAPI('/api/stripe/updatePaymentIntent', {
+                    clientSecret: clientSecret,
+                })
+            } catch (err) {
+                // implement Logging error here
+                console.error(err)
+            }
+        }
+
         const handleCardSubmit = async (event) => {
             // Stop the page from refreshing
             event.preventDefault();
@@ -452,9 +473,16 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
                 return;
             }
 
+            // If they want to save the payment method, update the payment intent to support this
+            if (savePaymentMethod === true) {
+                await savePaymentMethodToStripeCustomer(stripeClientSecret)
+            }
+
             const response = await stripe.confirmPayment({
                 elements,
-                confirmParams: {},
+                confirmParams: {
+                    return_url: `${process.env.NEXT_PUBLIC_DOMAIN}/confirmation`,
+                },
                 redirect: 'if_required'
             });
 
@@ -462,16 +490,57 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
                 const error = response.error
                 if (error.type === "card_error" || error.type === "validation_error") {
                     setStripeMessages(error.message)
-                } else { setStripeMessages("An unknown error occured") }
+                } else { 
+                    console.error(error)
+                    setStripeMessages("An unknown error occured") 
+                }
             } else {
                 setStripeMessages(`Payment Succeeded: ${response.paymentIntent.id}`)
             }
 
             setProcessingDonation(false)
             return;
-            
         }
+
+
+        const handleSubmit = async (event) => {
+            event.preventDefault()
+
+            setProcessingDonation(true)
+
+            console.log('paying with bank')
         
+            if (!stripe || !elements) {
+                return;
+            }
+        
+            try {
+                const { paymentIntent, error } = await stripe.confirmAcssDebitPayment(
+                        stripeClientSecret,
+                    {
+                        payment_method: {
+                            billing_details: {
+                                name: `Jenny Rosen`,
+                                email: 'jenny.rosen@example.com',
+                            },
+                        },
+                        return_url: "http://localhost:3000/this_isMyreturn"
+                    }
+                );
+        
+              if (error) {
+                // Handle the error and inform the user
+                console.error(error.message);
+              } else {
+                // Handle the successful payment
+                console.log('PaymentIntent ID: ' + paymentIntent.id);
+                console.log('PaymentIntent status: ' + paymentIntent.status);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          };
+
         return (
             <div>
                 Donate with a credit or debit card.
@@ -488,7 +557,102 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
                                 onChange={(e) => { setSavePaymentMethod(e.target.checked) }}
                             />
                         )}
+
+                        <div>
+                            Bank checkout
+                        </div>
+
+                        
+
+
                         <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate"}</button>
+                    </form>
+                )}
+
+                {stripeClientSecret && (
+                    <form onSubmit={handleSubmit}>
+                        <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate With bank"}</button>
+                    </form>
+                )}
+            </div>
+        )
+    }
+}
+
+const DonateWithAcssDebit: FC<{ globalDonation: Donation, stripeClientSecret: string,  setStep: (value: DonationStep) => void }> = ({ globalDonation, stripeClientSecret, setStep }) => {
+    if (globalDonation == null || globalDonation == undefined) {
+        setStep(DonationStep.Error)
+        return null
+    } else {
+        const [processingDonation, setProcessingDonation] = useState<boolean>(false)
+        const [stripeMessages, setStripeMessages] = useState<string>(null)
+        const [savePaymentMethod, setSavePaymentMethod] = useState<boolean>(globalDonation.donor.donor_id ? true : false)
+
+        // This is a hook that access the client created by stripeClientPromise once it loads
+        const stripe = useStripe()
+        // This hook securely accesses sensitive details like CC details inputted to the stripe client, to be passed directly to Stripe
+        // Kinship servers should never access these details in raw form, even in submitting to Stripe
+        const elements = useElements()
+
+        const savePaymentMethodToStripeCustomer = async (clientSecret) => {
+            try {
+                await callKinshipAPI('/api/stripe/updatePaymentIntent', {
+                    clientSecret: clientSecret,
+                })
+            } catch (err) {
+                // implement Logging error here
+                console.error(err)
+            }
+        }
+
+        const handleSubmit = async (event) => {
+            event.preventDefault()
+
+            setProcessingDonation(true)
+        
+            if (!stripe || !elements) {
+                return;
+            }
+            
+            // If they want to save the payment method, update the payment intent to support this
+            if (savePaymentMethod === true) {
+                await savePaymentMethodToStripeCustomer(stripeClientSecret)
+            }
+
+            try {
+                const { paymentIntent, error } = await stripe.confirmAcssDebitPayment(
+                        stripeClientSecret,
+                    {
+                        payment_method: {
+                            billing_details: {
+                                name: `${globalDonation.donor.first_name} ${globalDonation.donor.last_name}`,
+                                email: 'jenny.rosen@example.com',
+                            },
+                        },
+                        return_url: "http://localhost:3000/this_isMyreturn"
+                    }
+                );
+        
+              if (error) {
+                // Handle the error and inform the user
+                console.error(error.message);
+              } else {
+                // Handle the successful payment
+                console.log('PaymentIntent ID: ' + paymentIntent.id);
+                console.log('PaymentIntent status: ' + paymentIntent.status);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          };
+
+        return (
+            <div>
+                Donate with a bank account
+
+                {stripeClientSecret && (
+                    <form onSubmit={handleSubmit}>
+                        <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate With bank"}</button>
                     </form>
                 )}
             </div>

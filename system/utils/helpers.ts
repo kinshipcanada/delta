@@ -150,3 +150,8 @@ export function convertChildrenToStrings(parentObject: object) {
 
     return result
 }
+
+export function extractStripePaymentIntentFromClientSecret(clientSecret: string): string {
+    let clientSecretComponents = clientSecret.split("_")
+    return `${clientSecretComponents[0]}_${clientSecretComponents[1]}`
+}

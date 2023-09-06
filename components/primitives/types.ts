@@ -122,7 +122,7 @@ export const enum InputCustomizations {
 }
 
 export interface SelectOption {
-    value: string | number,
+    value: string,
     label: string,
 }
 

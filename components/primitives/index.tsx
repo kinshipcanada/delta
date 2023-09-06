@@ -3,7 +3,7 @@ export { Badge } from "./Badge";
 export { Box, CenterOfPageBox } from "./Boxes";
 export { default as Button } from "./Button";
 export { Grid } from "./Grid";
-export { TextInput, TextArea, CheckboxInput } from "./Inputs";
+export { TextInput, TextArea, CheckboxInput, SelectionInput } from "./Inputs";
 export { InlineLink } from "./Links";
 export { Loading } from "./Loading";
 export { BasicPanel, PanelWithHeader, PanelWithFooter, PanelWithHeaderAndFooter, PanelWithHeaderNoPadding, PanelWithLeftText } from "./Panels"
