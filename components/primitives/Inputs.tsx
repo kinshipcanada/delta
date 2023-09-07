@@ -6,7 +6,7 @@ import Button from "./Button"
 export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label, button }) => {
 
     const panelStyling = (button != null && button != undefined) ? "flex  mt-2" : "mt-2"
-    const inputStyling = (button != null && button != undefined) ? "flex-grow mr-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-auto sm:text-sm border-gray-300 rounded-md " : "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md "
+    const inputStyling = (button != null && button != undefined) ? "flex-grow mr-2 focus:ring-blue-500 focus:border-blue-500 block w-auto sm:text-sm border-gray-300 rounded-md " : "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md "
     const customization = (inputCustomization == null || inputCustomization == undefined) ? "" : 
         inputCustomization === InputCustomizations.Dollars ? "pl-7 pr-12" :
         inputCustomization === InputCustomizations.None ? "" : ""
@@ -16,7 +16,7 @@ export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, i
             {label && <Label label={label} htmlFor={name} required={required} />}
             
             <div className={panelStyling}>
-                <div className="relative mt-2 rounded-md shadow-sm">
+                <div className="relative mt-2 rounded-md">
                     { inputCustomization === InputCustomizations.Dollars && 
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <span className="text-gray-500 sm:text-sm">$</span>
@@ -79,7 +79,7 @@ export const SelectionInput: React.FC<SelectProps> = ({ options, name, id, value
 
 export const TextArea: React.FC<TextInputProps> = ({ placeholder, type, name, id, value, onChange, required, inputCustomization, label }) => {
     const panelStyling = "mt-2"
-    const inputStyling = "shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+    const inputStyling = "focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
 
     return (
         <div>

@@ -26,7 +26,6 @@ export default function Receipt() {
         }
     
         if (199 < response.status && response.status < 300) {
-            console.log(response.donation)
             setReceipt(response.donation)
             setLoading(false)
             return;
@@ -72,7 +71,7 @@ export default function Receipt() {
                     </Head>
                     <div className="md:flex md:items-center md:justify-between flex">
                         <div className="flex-1 min-w-0">
-                            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor.first_name}&apos;{receipt.donor.first_name[receipt.donor.first_name.length-1] == "s" ? null : "s"} receipt from {(new Date(Date.parse(receipt.created_at))).toLocaleDateString()}</h2>
+                            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor.first_name}&apos;{receipt.donor.first_name[receipt.donor.first_name.length-1] == "s" ? null : "s"} receipt from {(new Date(Date.parse(receipt.date_donated))).toLocaleDateString()}</h2>
                         </div>
                         <div className="sm:mt-4 flex md:mt-0 md:ml-4">
                             {/* <SecondaryButton iconLeft={DocumentIcon} text = "Download PDF" link = "/" /> */}
@@ -85,7 +84,7 @@ export default function Receipt() {
                             <h1 className = 'text-xl font-bold leading-7 text-gray-900 sm:text-2xl sm:truncate mb-2'>Official Receipt For Income Tax Purposes</h1>
                             <p className="font-medium text-gray-700 mb-1">Kinship Canada is a registered charity</p>
                             <p className="font-medium text-gray-700">Registration Number 855070728 RR 0001</p>
-                            <p className="font-medium text-gray-700">Date Of Donation: {(new Date(Date.parse(receipt.created_at))).toLocaleDateString()}</p>
+                            <p className="font-medium text-gray-700">Date Of Donation: {(new Date(Date.parse(receipt.date_donated))).toLocaleDateString()}</p>
                         </div>
                         <div>
                             <p className="font-medium text-gray-700 mb-1">Signed By Vice President</p>

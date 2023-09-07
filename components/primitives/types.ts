@@ -12,7 +12,7 @@ export const enum ButtonStyle {
 export interface ButtonProps {
     text: string;
     style: ButtonStyle;
-    onClick?: () => void;
+    onClick?: (...args: any[]) => void;
     href?: string;
     isLoading?: boolean;
     icon?: React.ReactNode;

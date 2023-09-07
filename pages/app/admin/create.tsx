@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { AppLayout } from "../../../components/prebuilts/Layouts"
-import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label } from "../../../components/primitives"
+import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label, SelectionInput, CheckboxInput } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
 import { CalendarDaysIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
 import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../system/utils/helpers"
 import { InputCustomizations } from "../../../components/primitives/types"
+import { countries, states_and_provinces } from "../../../system/utils/constants"
 
 export default function Index() {
     return (
@@ -160,17 +161,32 @@ const CreateFromScratch: React.FC = () => {
     const [email, setEmail] = useState<string>("")
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
-    const [state, setState] = useState<string>("")
-    const [country, setCountry] = useState<string>("")
+    const [stateOrProvince, setStateOrProvince] = useState<string>("on")
+    const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
+
+    // Fields relating to religous obligations
+    // Kinship has to collect this information as it there are certain religious donations that must be declared seperately (religously)
+    const [isKhums, setIsKhums] = useState<boolean>(false)
+    const [isImam, setIsImam] = useState<boolean>(true)
+    const [isSadat, setIsSadat] = useState<boolean>(false)
+    const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
 
     const handleSaveChanges = async () => {
         setLoading(true)
 
         try {
-            if (firstName.length === 0 || lastName.length === 0 || email.length === 0 || lineAddress.length === 0 || city.length === 0 || state.length === 0 || country.length === 0 || postalCode.length === 0) {
+            if (firstName.length === 0 || lastName.length === 0 || email.length === 0 || lineAddress.length === 0 || city.length === 0 || stateOrProvince.length === 0 || country.length === 0 || postalCode.length === 0) {
                 setLoading(false)
                 toast.error("Please fill out all the fields", { position: "top-right" })
+                return
+            }
+
+            // Validate donation customizations
+            if (isKhums && !isImam && !isSadat) {
+                toast.error("To make a khums donation, please specify whether it is Imam, Sadat, or both", {
+                    position: "top-right"
+                })
                 return
             }
     
@@ -179,12 +195,16 @@ const CreateFromScratch: React.FC = () => {
                 last_name: lastName, 
                 email: email,
                 address_line_address: lineAddress,
-                address_state: state,
+                address_state: stateOrProvince,
                 address_city: city,
                 address_postal_code: postalCode,
                 address_country: country,
                 amount_in_cents: dollarsToCents(unconvertedAmount),
                 date_donated: dateDonated,
+
+                is_imam_donation: isImam,
+                is_sadat_donation: isSadat,
+                is_sadaqah: isSadaqah,
             })
     
             if (response.status == 500) { 
@@ -314,16 +334,32 @@ const CreateFromScratch: React.FC = () => {
                         onChange={(e)=>{ setCity(e.target.value) }} 
                         required={true} 
                     />
-                    <TextInput 
-                        placeholder="State" 
-                        type="text" 
-                        label="State"
-                        name="state" 
-                        id="state" 
-                        value={state}
-                        onChange={(e)=>{ setState(e.target.value) }} 
-                        required={true} 
-                    />
+                    {states_and_provinces[country] === null || states_and_provinces[country] === undefined ? (
+                        <TextInput
+                            placeholder="State or Province"
+                            type="text"
+                            label="State or Province"
+                            name="state_or_province"
+                            id="state_or_province"
+                            value={stateOrProvince}
+                            onChange={(e) => {
+                                setStateOrProvince(e.target.value);
+                            }}
+                            required={true}
+                        />
+                    ) : (
+                        <SelectionInput
+                            label="State or Province"
+                            name="state_or_province"
+                            id="state_or_province"
+                            value={stateOrProvince}
+                            options={states_and_provinces[country]}
+                            onChange={(e) => {
+                                setStateOrProvince(e.target.value);
+                            }}
+                            required={true}
+                        />
+                    )}
                     <TextInput 
                         placeholder="Postal Code" 
                         type="text" 
@@ -334,18 +370,66 @@ const CreateFromScratch: React.FC = () => {
                         onChange={(e)=>{ setPostalCode(e.target.value) }} 
                         required={true} 
                     />
-                    <TextInput 
-                        placeholder="Country" 
-                        type="text" 
+
+                    <SelectionInput
                         label="Country"
                         name="country" 
                         id="country" 
+                        options={countries}
                         value={country}
-                        onChange={(e)=>{ setCountry(e.target.value) }} 
-                        required={true} 
+                        onChange={(e)=>{ 
+                            setCountry(e.target.value);
+
+                            if (states_and_provinces[e.target.value]) {
+                                setStateOrProvince(states_and_provinces[e.target.value][0].value)
+                            } else {
+                                setStateOrProvince("")
+                            }
+                        }}
+                        required={true}
                     />
+                    
                 </div>
-                <VerticalSpacer size={SpacerSize.Medium} />
+
+                <VerticalSpacer size={SpacerSize.Large} />
+                <BaseHeader>Donation Customizations</BaseHeader>
+                <VerticalSpacer size={SpacerSize.Small} />
+                <CheckboxInput
+                    label="Is this donation Saqadah"
+                    checked={isSadaqah}
+                    required={false}
+                    onChange={(e) => { setIsSadaqah(e.target.checked) }}
+                />
+
+                <VerticalSpacer size={SpacerSize.Small} />
+            
+                <CheckboxInput
+                    label="Is this a khums donation?"
+                    checked={isKhums}
+                    required={false}
+                    onChange={(e) => { setIsKhums(e.target.checked) }}
+                />
+
+                <VerticalSpacer size={SpacerSize.Small} />
+
+                { isKhums && (
+                    <div className='px-4'>
+                        <CheckboxInput
+                            label="Sehme Imam"
+                            checked={isImam}
+                            required={false}
+                            onChange={(e) => { setIsImam(e.target.checked) }}
+                        />
+                        <VerticalSpacer size={SpacerSize.Small} />
+                        <CheckboxInput
+                            label="Sehme Sadat"
+                            checked={isSadat}
+                            required={false}
+                            onChange={(e) => { setIsSadat(e.target.checked) }}
+                        />
+                        <VerticalSpacer size={SpacerSize.Small} />
+                    </div>
+                )}
 
                 <VerticalSpacer size={SpacerSize.Medium} />
                 <JustifyEnd>

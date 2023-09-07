@@ -1,10 +1,9 @@
-import { ButtonSize, ButtonStyle, EventColors, GenericPageProps, InputCustomizations, SpacerSize } from '../components/primitives/types';
-import { GenericPageLayout } from '../components/prebuilts/Layouts';
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from '../components/primitives/types';
+import { DonationPageLayout } from '../components/prebuilts/Layouts';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { Donor } from '../system/classes/donor';
-import { Alert, BaseHeader, Button, HorizontalSpacer, TextInput, VerticalSpacer, CheckboxInput, SelectionInput } from '../components/primitives';
+import { Alert, BaseHeader, Text, Button, HorizontalSpacer, TextInput, VerticalSpacer, CheckboxInput, SelectionInput, InlineLink } from '../components/primitives';
 import { countries, states_and_provinces } from '../system/utils/constants';
-import { toast } from 'react-hot-toast';
 import { callKinshipAPI, isFloatOrInteger, validateEmail } from '../system/utils/helpers';
 import { Donation } from '../system/classes/donation';
 import { Address } from '../system/classes/address';
@@ -17,63 +16,81 @@ import {
 } from "@stripe/react-stripe-js";
 import { v4 as uuidv4 } from 'uuid'
 import { CurrencyList } from '../system/classes/utils';
+import { BuildingLibraryIcon, CreditCardIcon, ArrowLeftIcon } from '@heroicons/react/20/solid';
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function Donate() {
-    return (
-        <GenericPageLayout ChildPage={DonatePage} />
-    )
-}
+    const [step, setStep] = useState<DonationStep>(DonationStep.AmountAndBilling);
+  
+    const [globalDonation, setGlobalDonation] = useState<Donation>(null);
+    const [stripeClientSecret, setStripeClientSecret] = useState<string>(null);
+  
+    const donationId = uuidv4();
+  
+    const DonationFormChild = ({
+        donor,
+        parentIsLoading,
+    }: {
+        donor: Donor;
+        parentIsLoading: boolean;
+    }) => {
+        if (step === DonationStep.AmountAndBilling) {
+            return (
+                <AmountAndBillingStep
+                    donationId={donationId}
+                    donor={donor}
+                    parentIsLoading={parentIsLoading}
+                    setStep={setStep}
+                    setGlobalDonation={setGlobalDonation}
+                    setStripeClientSecret={setStripeClientSecret}
+                />
+            );
+        } else if (step === DonationStep.DonateWithCreditOrDebitCard) {
+            return (
+                <StripeWrapper stripeClientSecret={stripeClientSecret}>
+                    <DonateWithCreditOrDebitCard
+                        globalDonation={globalDonation}
+                        stripeClientSecret={stripeClientSecret}
+                        setStep={setStep}
+                    />
+                </StripeWrapper>
+            );
+        } else if (step === DonationStep.DonateWithAcssDebit) {
+            return (
+                <StripeWrapper stripeClientSecret={stripeClientSecret}>
+                    <DonateWithAcssDebit
+                        globalDonation={globalDonation}
+                        stripeClientSecret={stripeClientSecret}
+                        setStep={setStep}
+                    />
+                </StripeWrapper>
+            );
+        } else if (step === DonationStep.WireTransferInstructions) {
+            return <div>Wire transfer instructions</div>;
+        } else if (step === DonationStep.Confirmation) {
+            return <div>Confirmation</div>;
+        } else {
+            return <DonationErrorMessage />;
+        }
+    };
 
+    return (
+        <DonationPageLayout DonationForm={DonationFormChild} globalDonation={globalDonation} />
+    );
+}
+  
 const enum DonationStep {
     AmountAndBilling,
     DonateWithCreditOrDebitCard,
     DonateWithAcssDebit,
+    WireTransferInstructions,
     Confirmation,
     Error
 }
 
-const DonatePage: React.FC<GenericPageProps> = ({ donor, parentIsLoading }) => {
-    const [step, setStep] = useState<DonationStep>(DonationStep.AmountAndBilling)
-
-    const [globalDonation, setGlobalDonation] = useState<Donation>(null)
-    const [stripeClientSecret, setStripeClientSecret] = useState<string>(null)
-
-    const donationId = uuidv4()
-
-    if (step == DonationStep.AmountAndBilling) {
-        return <AmountAndBillingStep 
-            donationId={donationId}
-            donor={donor}
-            parentIsLoading={parentIsLoading} 
-            setStep = {setStep} 
-            setGlobalDonation = {setGlobalDonation}
-            setStripeClientSecret={setStripeClientSecret}
-        />
-    } else if (step == DonationStep.DonateWithCreditOrDebitCard) {
-        return (
-            <StripeWrapper stripeClientSecret={stripeClientSecret}>
-                <DonateWithCreditOrDebitCard globalDonation={globalDonation} stripeClientSecret={stripeClientSecret} setStep={setStep} />
-            </StripeWrapper>
-        )
-        
-    } else if (step == DonationStep.DonateWithAcssDebit) {
-        return (
-            <StripeWrapper stripeClientSecret={stripeClientSecret}>
-                <DonateWithAcssDebit globalDonation={globalDonation} stripeClientSecret={stripeClientSecret} setStep={setStep} />
-            </StripeWrapper>
-        )
-    } else if (step == DonationStep.Confirmation) {
-        return <div>Confirmation</div>
-    } else {
-        return <DonationErrorMessage />
-    }
-    
-}
-
 const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoading: boolean, setStep: (value: DonationStep) => void, setGlobalDonation: (value: Donation) => void, setStripeClientSecret: (value: string) => void }> = ({ donationId, donor, setStep, parentIsLoading, setGlobalDonation, setStripeClientSecret }) => {
-    const [amount, setAmount] = useState(0)
+    const [amount, setAmount] = useState(null)
     const [recurring, setRecurring] = useState<boolean>(false)
 
     // Fields relating to religous obligations
@@ -84,6 +101,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
     const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
 
     const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<{ title: string, message: string }>(null)
 
     const [firstName, setFirstName] = useState<string>("")
     const [lastName, setLastName] = useState<string>("")
@@ -114,6 +132,8 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
 
     const handleDonationDetailsStep = async ({ forwardingStep }: { forwardingStep: DonationStep }) => {
         try {
+            setError(null)
+
             // Validate that there is a valid amount being donated
             try {
                 const amountDonatedInCents = parseFloat(String(amount)) * 100
@@ -126,18 +146,27 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     // We require a minimum of $5 because there are fixed costs associated with credit card fees
                     // We could waive this minimum for eTransfers, which would add a relatively small amount of complexity
                     // However, since donations this small are extremely uncommon we have ommited the edge case
-                    toast.error("Please donate a minimum of $5", { position: "top-right" })
-                    setAmount(0)
+                    setError({
+                        title: "minimum donation required",
+                        message: "Please donate a minimum of $5"
+                    })
+                    setAmount(null)
                     return
                 }
             } catch (e) {
-                setAmount(0)
-                toast.error("Please enter a valid amount to donate", { position: "top-right" })
+                setError({
+                    title: "invalid donation amount",
+                    message: "Please enter a valid amount to donate"
+                })
+                setAmount(null)
                 return
             }
 
             if (!validateEmail(email)) {
-                toast.error("Please enter a valid email", { position: "top-right" })
+                setError({
+                    title: "invalid email",
+                    message: "Please enter a valid email"
+                })
                 return
             }
 
@@ -157,9 +186,21 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
             for (const field in fields) {
                 if (fields.hasOwnProperty(field) && !eval(field + ".length")) {
                     setLoading(false);
-                    toast.error(`Please fill out the ${fields[field]} field`, { position: "top-right" });
+                    setError({
+                        title: "missing fields",
+                        message: `Please fill out the ${fields[field]} field`
+                    });
                     return;
                 }
+            }
+
+            // Validate donation customizations
+            if (isKhums && !isImam && !isSadat) {
+                setError({
+                    title: "Please specify where to direct khums",
+                    message: "To make a khums donation, please specify whether it is Imam, Sadat, or both"
+                })
+                return
             }
 
             // Once the forms fields have been vaidated, construct the donation object for the next step
@@ -203,35 +244,37 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
 
             setGlobalDonation(globalDonation)
 
-            // If the donation is by credit or debit, initialize a Stripe paymentIntent
-            if (forwardingStep == DonationStep.DonateWithCreditOrDebitCard) {
-                const response = await callKinshipAPI('/api/stripe/createPaymentIntent', {
-                    donation: globalDonation,
-                })
-    
-                if (response.status != 200) {
-                    setStep(DonationStep.Error)
-                    return
-                }
-
-                // If the response status is 200, we can assume the shape of the response
-                setStripeClientSecret(response.clientSecret)
+            // If the donation is greater than $3000 CAD, by default we cannot accept it with a bank transfer
+            // Instead, route them to a wire transfer instructions page
+            if (forwardingStep == DonationStep.DonateWithAcssDebit && amountDonatedInCents > 3000_00) {
+                setStep(DonationStep.WireTransferInstructions)
+                return
             }
+
+            const response = await callKinshipAPI('/api/stripe/createPaymentIntent', {
+                donation: globalDonation,
+            })
+
+            if (response.status != 200) {
+                setStep(DonationStep.Error)
+                return
+            }
+
+            // If the response status is 200, we can assume the shape of the response
+            setStripeClientSecret(response.clientSecret)
 
             // Finally, set the next step
             setStep(forwardingStep)
             return
         } catch (error) {
-            console.log("frontend", error)
             setStep(DonationStep.Error)
         }
     }
 
     return (
-        <div className='p-4'>
-            Donate page loaded successfully. Donor is {donor ? donor.email : "No donor"}
-            {firstName ? `First name is ${firstName}`: "no first name"}
+        <div>
             <BaseHeader>Amount Donating Today</BaseHeader>
+            <VerticalSpacer size={SpacerSize.Small} />
             <TextInput
                 placeholder="0"
                 type="text"
@@ -242,10 +285,11 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 onChange={(e) => { setAmount(e.target.value); }}
                 required={true}
             />
-            <VerticalSpacer size={SpacerSize.Medium} />
+
+            <VerticalSpacer size={SpacerSize.Large} />
 
             <BaseHeader>Your Information</BaseHeader>
-            <VerticalSpacer size={SpacerSize.Small} />
+            <VerticalSpacer size={SpacerSize.Medium} />
             <div className="grid sm:grid-cols-2 gap-4">
                 <TextInput 
                     placeholder="First Name" 
@@ -268,7 +312,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     required={true} 
                 />
             </div>
-            <VerticalSpacer size={SpacerSize.Small} />
+            <VerticalSpacer size={SpacerSize.Medium} />
             <TextInput 
                 placeholder="you@gmail.com" 
                 type="text" 
@@ -280,7 +324,8 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 required={true} 
             />
 
-            <VerticalSpacer size={SpacerSize.Medium} />
+            <VerticalSpacer size={SpacerSize.Large} />
+
             <BaseHeader>Address Information (Will Appear On Receipt)</BaseHeader>
             <VerticalSpacer size={SpacerSize.Medium} />
             <TextInput 
@@ -360,21 +405,30 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     required={true}
                 />
             </div>
-            <VerticalSpacer size={SpacerSize.Medium} />
+
+            <VerticalSpacer size={SpacerSize.Large} />
             
+            
+            <BaseHeader>Donation Customizations & Requests</BaseHeader>
+            <VerticalSpacer size={SpacerSize.Medium} />
+
             <CheckboxInput
                 label="Is this donation Saqadah"
                 checked={isSadaqah}
                 required={false}
                 onChange={(e) => { setIsSadaqah(e.target.checked) }}
             />
-
+            
+            <VerticalSpacer size={SpacerSize.Small} />
+            
             <CheckboxInput
                 label="Is this a khums donation?"
                 checked={isKhums}
                 required={false}
                 onChange={(e) => { setIsKhums(e.target.checked) }}
             />
+
+            <VerticalSpacer size={SpacerSize.Small} />
 
             { isKhums && (
                 <div className='px-4'>
@@ -384,12 +438,14 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                         required={false}
                         onChange={(e) => { setIsImam(e.target.checked) }}
                     />
+                    <VerticalSpacer size={SpacerSize.Small} />
                     <CheckboxInput
                         label="Sehme Sadat"
                         checked={isSadat}
                         required={false}
                         onChange={(e) => { setIsSadat(e.target.checked) }}
                     />
+                    <VerticalSpacer size={SpacerSize.Small} />
                 </div>
             )}
 
@@ -402,26 +458,43 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 />
             )}
 
-            <VerticalSpacer size={SpacerSize.Medium} />
 
-            <div className='flex'>
-                <Button 
-                    text="Donate By eTransfer &rarr;" 
-                    isLoading={loading} 
-                    style={ButtonStyle.Primary}
-                    size={ButtonSize.Large} 
-                    onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithAcssDebit })}
-                />
+            {error && (
+                <span>
+                    <VerticalSpacer size={SpacerSize.Large} />
+                    <Alert 
+                        type={EventColors.Error} 
+                        title={`Error: ${error.title}`} 
+                        message={error.message} 
+                    />
+                </span>
+            )}
 
-                <HorizontalSpacer size={SpacerSize.Small} />
+            <VerticalSpacer size={SpacerSize.Large} />
 
-                <Button 
-                    text="Donate By Credit Card &rarr;" 
-                    isLoading={loading} 
-                    style={ButtonStyle.Primary}
-                    size={ButtonSize.Large} 
-                    onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithCreditOrDebitCard })}
-                />
+            <div className='border-t border-gray-200'>
+                <VerticalSpacer size={SpacerSize.Medium} />
+                <div className='flex w-full justify-end'>
+                    <Button 
+                        text="Donate With Bank Account &rarr;" 
+                        isLoading={loading} 
+                        icon={<BuildingLibraryIcon />}
+                        style={ButtonStyle.Primary}
+                        size={ButtonSize.Large} 
+                        onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithAcssDebit })}
+                    />
+
+                    <HorizontalSpacer size={SpacerSize.Small} />
+
+                    <Button 
+                        text="Donate With Credit Card &rarr;" 
+                        isLoading={loading} 
+                        icon={<CreditCardIcon />}
+                        style={ButtonStyle.Primary}
+                        size={ButtonSize.Large} 
+                        onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithCreditOrDebitCard })}
+                    />
+                </div>
 
             </div>
         </div>
@@ -437,14 +510,15 @@ const StripeWrapper: React.FC<{ children: ReactNode, stripeClientSecret: string 
     </Elements>
 );
 
-const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSecret: string,  setStep: (value: DonationStep) => void }> = ({ globalDonation, stripeClientSecret, setStep }) => {
+const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSecret: string, setStep: (value: DonationStep) => void }> = ({ globalDonation, stripeClientSecret, setStep }) => {
     if (globalDonation == null || globalDonation == undefined) {
         setStep(DonationStep.Error)
         return null
     } else {
+        const stripeCreditCardFormRef = useRef(null);
         const [processingDonation, setProcessingDonation] = useState<boolean>(false)
         const [stripeMessages, setStripeMessages] = useState<string>(null)
-        const [savePaymentMethod, setSavePaymentMethod] = useState<boolean>(globalDonation.donor.donor_id ? true : false)
+        const [savePaymentMethod, setSavePaymentMethod] = useState<boolean>(false)
 
         // This is a hook that access the client created by stripeClientPromise once it loads
         const stripe = useStripe()
@@ -502,53 +576,21 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
             return;
         }
 
-
-        const handleSubmit = async (event) => {
-            event.preventDefault()
-
-            setProcessingDonation(true)
-
-            console.log('paying with bank')
-        
-            if (!stripe || !elements) {
-                return;
-            }
-        
-            try {
-                const { paymentIntent, error } = await stripe.confirmAcssDebitPayment(
-                        stripeClientSecret,
-                    {
-                        payment_method: {
-                            billing_details: {
-                                name: `Jenny Rosen`,
-                                email: 'jenny.rosen@example.com',
-                            },
-                        },
-                        return_url: "http://localhost:3000/this_isMyreturn"
-                    }
-                );
-        
-              if (error) {
-                // Handle the error and inform the user
-                console.error(error.message);
-              } else {
-                // Handle the successful payment
-                console.log('PaymentIntent ID: ' + paymentIntent.id);
-                console.log('PaymentIntent status: ' + paymentIntent.status);
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          };
-
         return (
             <div>
-                Donate with a credit or debit card.
+                <GoBackHelper setStep={setStep} />
+                <VerticalSpacer size={SpacerSize.Small} />
+                <BaseHeader>Credit Card Details</BaseHeader>
+                <VerticalSpacer size={SpacerSize.Small} />
+                <Text>
+                    <span>Kinship does not store any credit card details, and all payments and optional payment method storage are handled by <InlineLink href={"https://stripe.com"} text={"Stripe"} />.</span>
+                </Text>
+                <VerticalSpacer size={SpacerSize.Small} />
+
                 {stripeClientSecret && (
-                    <form onSubmit={handleCardSubmit}>
+                    <form onSubmit={handleCardSubmit} ref={stripeCreditCardFormRef}>
                         <PaymentElement id="payment-element" />
-                        {/* Show any error or success messages */}
-                        {stripeMessages && <div id="payment-message">{stripeMessages}</div>}
+                        
                         {globalDonation.donor.donor_id && (
                             <CheckboxInput
                                 label="Save this payment method for future donations"
@@ -558,20 +600,21 @@ const DonateWithCreditOrDebitCard: FC<{ globalDonation: Donation, stripeClientSe
                             />
                         )}
 
-                        <div>
-                            Bank checkout
-                        </div>
+                        {stripeMessages && <div id="payment-message">{stripeMessages}</div>}
 
-                        
-
-
+                        <Button 
+                            text={processingDonation ? "Processing" : "Donate"}
+                            isLoading={processingDonation} 
+                            style={ButtonStyle.Primary}
+                            size={ButtonSize.Large} 
+                            onClick={(event)=>{
+                                event.preventDefault()
+                                if (stripeCreditCardFormRef.current) {
+                                    stripeCreditCardFormRef.current.submit();
+                                }
+                            }}
+                        />
                         <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate"}</button>
-                    </form>
-                )}
-
-                {stripeClientSecret && (
-                    <form onSubmit={handleSubmit}>
-                        <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate With bank"}</button>
                     </form>
                 )}
             </div>
@@ -609,23 +652,20 @@ const DonateWithAcssDebit: FC<{ globalDonation: Donation, stripeClientSecret: st
             event.preventDefault()
 
             setProcessingDonation(true)
+
+            console.log('paying with bank')
         
             if (!stripe || !elements) {
                 return;
             }
-            
-            // If they want to save the payment method, update the payment intent to support this
-            if (savePaymentMethod === true) {
-                await savePaymentMethodToStripeCustomer(stripeClientSecret)
-            }
-
+        
             try {
                 const { paymentIntent, error } = await stripe.confirmAcssDebitPayment(
                         stripeClientSecret,
                     {
                         payment_method: {
                             billing_details: {
-                                name: `${globalDonation.donor.first_name} ${globalDonation.donor.last_name}`,
+                                name: `Jenny Rosen`,
                                 email: 'jenny.rosen@example.com',
                             },
                         },
@@ -644,12 +684,12 @@ const DonateWithAcssDebit: FC<{ globalDonation: Donation, stripeClientSecret: st
             } catch (error) {
               console.error(error);
             }
-          };
+        };
 
         return (
             <div>
-                Donate with a bank account
-
+                <GoBackHelper setStep={setStep} />
+                Donate with bank account
                 {stripeClientSecret && (
                     <form onSubmit={handleSubmit}>
                         <button type='submit' disabled={!stripe}>{processingDonation ? "loading" : "Donate With bank"}</button>
@@ -669,5 +709,19 @@ const DonationErrorMessage = () => {
                 message={`Something went wrong in creating this donation. Please try again shortly. If the issue persists, please contact ${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`} 
             />
         </div> 
+    )
+}
+
+const GoBackHelper: React.FC<{ setStep: (value: DonationStep) => void }> = ({ setStep }) => {
+    return (
+        <div className='flex w-full justify-start'>
+            <Button 
+                text="Go Back" 
+                icon={<ArrowLeftIcon />}
+                style={ButtonStyle.OutlineUnselected}
+                size={ButtonSize.Small} 
+                onClick={() => setStep(DonationStep.AmountAndBilling )}
+            />
+        </div>
     )
 }

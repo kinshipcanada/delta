@@ -1,7 +1,9 @@
 import { Address } from "../../../system/classes/address";
 import { ErroredResponse, MessageResponse } from "../../../system/classes/api";
+import { Cart } from "../../../system/classes/cart";
 import { Donation } from "../../../system/classes/donation";
 import { Donor } from "../../../system/classes/donor";
+import { CurrencyList } from "../../../system/classes/utils";
 import { createManualDonation } from "../../../system/functions/donations";
 import { verifyAllParametersExist } from "../../../system/utils/helpers";
 
@@ -20,10 +22,14 @@ export default async function handler(req, res) {
             address_postal_code,
             address_country,
             amount_in_cents,
-            date_donated
+            date_donated,
+
+            is_imam_donation,
+            is_sadat_donation,
+            is_sadaqah,
         } = req.body
         
-        verifyAllParametersExist(`Please provide all parameters`, first_name, last_name, email, address_line_address, address_state, address_city, address_postal_code, address_country, amount_in_cents, date_donated)
+        verifyAllParametersExist(`Please provide all parameters`, first_name, last_name, email, address_line_address, address_state, address_city, address_postal_code, address_country, amount_in_cents, date_donated, is_imam_donation, is_sadat_donation, is_sadaqah)
 
         const donorAddress: Address = {
             line_address: address_line_address,
@@ -44,6 +50,14 @@ export default async function handler(req, res) {
             set_up: true
         }
 
+        const causes: Cart = {
+            total_amount_paid_in_cents: amount_in_cents,
+            currency: CurrencyList.CAD,
+            causes: null,
+            is_imam_donation: is_imam_donation,
+            is_sadat_donation: is_sadat_donation,
+            is_sadaqah: is_sadaqah
+        }
         const donation: Donation = {
             identifiers: {},
             donor: donor,

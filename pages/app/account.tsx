@@ -238,8 +238,8 @@ const AddressInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: 
                     required={false}
                     options={countries.map((country) => {
                         return {
-                            label: country.name,
-                            value: country.name
+                            label: country.label,
+                            value: country.value
                         }
                     })}
                 />

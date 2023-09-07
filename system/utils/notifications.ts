@@ -15,7 +15,7 @@ export function generateNotificationTemplate(
     const donorCountry = donation.donor.address.country
     const donationAmount = donation.amount_in_cents / 100
     const donorFirstName = donation.donor.first_name
-    const donationUrl = `https://${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`
+    const donationUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`
     
     switch (notificationType) {
         case UserNotificationType.DONATION_MADE: {

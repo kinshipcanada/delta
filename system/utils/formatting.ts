@@ -90,7 +90,10 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
     const constructedCart: Cart = {
         total_amount_paid_in_cents: 50,
         currency: CurrencyList.CAD,
-        causes: {}
+        causes: {},
+        is_imam_donation: false, // Implement
+        is_sadat_donation: false, // Implement
+        is_sadaqah: false // Implement
     }
     
     return {
@@ -228,7 +231,10 @@ function _buildCartFromStripeMetadata(stripeChargeObject: Stripe.Charge): Cart {
     return {
         total_amount_paid_in_cents: total,
         currency: stripeChargeObject.currency as CurrencyList,
-        causes: causes
+        causes: causes,
+        is_imam_donation: false, // Implement
+        is_sadat_donation: false, // Implement
+        is_sadaqah: false // Implement
     }
 }
 
