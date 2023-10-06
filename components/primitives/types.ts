@@ -118,6 +118,7 @@ export interface TextInputProps {
 
 export const enum InputCustomizations {
     Dollars = "dollars",
+    Copyable = "copyable",
     None = "none",
 }
 

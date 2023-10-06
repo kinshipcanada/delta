@@ -23,6 +23,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
     ("text-gray-600 hover:bg-slate-50 hover:text-gray-900 " + outlinedButtonStyling)
 
   const Component = href ? Link : "button";
+
   const handleClick = async () => {
     if (!isDisabled) {
         if (setter) { setter(true) }
