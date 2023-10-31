@@ -287,10 +287,6 @@ export const states_and_provinces: StatesAndProvinces = {
             "value": "NS",
         },
         {
-            "label": "Ontario",
-            "value": "ON",
-        },
-        {
             "label": "Prince Edward Island",
             "value": "PE",
         },

@@ -9,8 +9,9 @@ import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, Ve
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
 import { countries, states_and_provinces } from "../../../system/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
+import { useAuth } from "../Authentication"
 
-const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLoading: boolean, setStep: (value: DonationStep) => void, setGlobalDonation: (value: Donation) => void, setStripeClientSecret: (value: string) => void }> = ({ donationId, donor, setStep, parentIsLoading, setGlobalDonation, setStripeClientSecret }) => {
+const DonationInformationStep: FC<{ globalDonation: Donation, setStep: (value: DonationStep) => void, setGlobalDonation: (value: Donation) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setStep, setGlobalDonation, setStripeClientSecret }) => {
     const [amount, setAmount] = useState(null)
 
     // Fields relating to religous obligations
@@ -32,23 +33,20 @@ const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLo
     const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
+    const { donor } = useAuth()
+
     useEffect(()=>{
-        if (parentIsLoading === false && donor) {
-            // We could double up an && statement, but JS doesn't shortcut boolean comparisons 
-            // in every browser, so we could end up with a reading undefined property error if
-            // the donor object hasn't finished loading
-            if (donor.set_up) {
-                setFirstName(donor.first_name)
-                setLastName(donor.last_name)
-                setEmail(donor.email)
-                setLineAddress(donor.address.line_address)
-                setCity(donor.address.city)
-                setStateOrProvince(donor.address.state)
-                setCountry(donor.address.country)
-                setPostalCode(donor.address.postal_code)
-            }
+        console.log("hook called")
+        if (donor) {
+            setGlobalDonation({
+                ...globalDonation,
+                donor: {
+                    ...globalDonation.donor,
+                    first_name: donor.first_name
+                }
+            })
         }
-    }, [parentIsLoading]) 
+    }, [donor])
 
     const handleDonationDetailsStep = async () => {
         setLoading(true)
@@ -150,7 +148,7 @@ const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLo
             // We create donation identifiers here, so we can log them in Stripe. 
             const globalDonation: Donation = {
                 identifiers: {
-                    donation_id: donationId,
+                    donation_id: "donationId",
                     donor_id: donor.donor_id,
                 },
                 donor: globalDonor,
@@ -209,7 +207,10 @@ const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLo
                 name="amount"
                 id="amount"
                 onChange={(e) => { 
-                    setAmount(e.target.value); 
+                    setGlobalDonation({
+                        ...globalDonation,
+                        amount_in_cents: e.target.value
+                    })
                 }}
                 required={true}
             />
@@ -225,7 +226,7 @@ const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLo
                     label="First Name"
                     name="userFirstName" 
                     id="userFirstName" 
-                    value={firstName}
+                    value={globalDonation.donor.first_name}
                     onChange={(e)=>{ 
                         setFirstName(e.target.value)
                      }} 
