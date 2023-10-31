@@ -108,7 +108,7 @@ export interface TextInputProps {
     type: string,
     name: string,
     id: string,
-    value: string | number,
+    value?: string | number,
     onChange: any,
     required: boolean,
     inputCustomization?: InputCustomizations,

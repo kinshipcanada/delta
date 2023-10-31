@@ -92,7 +92,7 @@ export function AppLayout({ AppPage }) {
 }
 
 
-const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
+export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
   const generateDonationTypesString = (causes) => {
     const donationTypes = [];
   

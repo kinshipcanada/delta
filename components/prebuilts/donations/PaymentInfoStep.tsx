@@ -6,9 +6,11 @@ import { callKinshipAPI } from "../../../system/utils/helpers";
 import GoBackHelper from "./helpers/GoBackButton";
 import { BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
+import { StripePaymentElementOptions } from "@stripe/stripe-js";
 
 const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string, setStep: (value: DonationStep) => void, setConfirmationType: (value: ConfirmationType) => void }> = ({ globalDonation, stripeClientSecret, setStep, setConfirmationType }) => {
     if (globalDonation == null || globalDonation == undefined) {
+        console.log("No global donation")
         setStep(DonationStep.Error)
         return null
     } else {
@@ -71,6 +73,21 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
             return;
         }
 
+        const paymentElementOptions: StripePaymentElementOptions = {
+            defaultValues: {
+                billingDetails: {
+                    name: `${globalDonation.donor.first_name} ${globalDonation.donor.last_name}`,
+                    email: globalDonation.donor.email,
+                    address: {
+                      country: globalDonation.donor.address.country,
+                      postal_code: globalDonation.donor.address.postal_code,
+                      state: globalDonation.donor.address.state,
+                      city: globalDonation.donor.address.city,
+                      line1: globalDonation.donor.address.line_address
+                    }
+                }
+            }
+        }
         return (
             <div>
                 <GoBackHelper setStep={setStep} />
@@ -86,7 +103,7 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
 
                 { stripeClientSecret && (
                     <form>
-                        <PaymentElement id="payment-element" />
+                        <PaymentElement id="payment-element" options={paymentElementOptions} />
                         
                         <VerticalSpacer size={SpacerSize.Medium} />
                         {globalDonation.donor.donor_id && (
