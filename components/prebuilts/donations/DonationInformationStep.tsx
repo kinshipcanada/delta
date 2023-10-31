@@ -1,16 +1,16 @@
 import { useState, FC, useEffect } from "react"
-import { Donor } from "../../../../system/classes/donor"
-import { DonationStep } from "../helpers/types"
-import { Donation } from "../../../../system/classes/donation"
-import { callKinshipAPI, isFloatOrInteger, validateEmail } from "../../../../system/utils/helpers"
-import { Address } from "../../../../system/classes/address"
-import { CurrencyList } from "../../../../system/classes/utils"
-import { Alert, BaseHeader, Button, CheckboxInput, HorizontalSpacer, SelectionInput, TextInput, VerticalSpacer } from "../../../primitives"
-import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../../primitives/types"
-import { countries, states_and_provinces } from "../../../../system/utils/constants"
-import { BuildingLibraryIcon, CreditCardIcon } from "@heroicons/react/24/outline"
+import { Donor } from "../../../system/classes/donor"
+import { DonationStep } from "./helpers/types"
+import { Donation } from "../../../system/classes/donation"
+import { callKinshipAPI, isFloatOrInteger, validateEmail } from "../../../system/utils/helpers"
+import { Address } from "../../../system/classes/address"
+import { CurrencyList } from "../../../system/classes/utils"
+import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
+import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
+import { countries, states_and_provinces } from "../../../system/utils/constants"
+import { LockClosedIcon } from "@heroicons/react/24/solid"
 
-const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoading: boolean, setStep: (value: DonationStep) => void, setGlobalDonation: (value: Donation) => void, setStripeClientSecret: (value: string) => void }> = ({ donationId, donor, setStep, parentIsLoading, setGlobalDonation, setStripeClientSecret }) => {
+const DonationInformationStep: FC<{ donationId: string, donor: Donor, parentIsLoading: boolean, setStep: (value: DonationStep) => void, setGlobalDonation: (value: Donation) => void, setStripeClientSecret: (value: string) => void }> = ({ donationId, donor, setStep, parentIsLoading, setGlobalDonation, setStripeClientSecret }) => {
     const [amount, setAmount] = useState(null)
 
     // Fields relating to religous obligations
@@ -50,7 +50,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
         }
     }, [parentIsLoading]) 
 
-    const handleDonationDetailsStep = async ({ forwardingStep }: { forwardingStep: DonationStep }) => {
+    const handleDonationDetailsStep = async () => {
         setLoading(true)
 
         try {
@@ -95,7 +95,7 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 return
             }
 
-            const amountDonatedInCents = parseFloat(String(amount)) * 100
+            const amountDonatingInCents = parseFloat(String(amount)) * 100
 
             // Make sure all necessary fields are filled (this should already be completed by the browser, but in case)
             const fields = {
@@ -163,20 +163,13 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     is_sadaqah: isSadaqah
                 },
                 live: process.env.NEXT_PUBLIC_LIVEMODE == "true" ? true : false,
-                amount_in_cents: amountDonatedInCents,
-                fees_covered: process.env.NEXT_PUBLIC_FEES_COVERED_DEFAULT == "true" ? Math.round(amountDonatedInCents * 0.029) : 0,
+                amount_in_cents: amountDonatingInCents,
+                fees_covered: process.env.NEXT_PUBLIC_FEES_COVERED_DEFAULT == "true" ? Math.round(amountDonatingInCents * 0.029) : 0,
                 fees_charged_by_stripe: 0, // This will be filled in based on the type of card they pay with, by the post-payment Stripe webhook
                 date_donated: new Date()
             }
 
             setGlobalDonation(globalDonation)
-
-            // If the donation is greater than $3000 CAD, by default we cannot accept it with a bank transfer
-            // Instead, route them to a wire transfer instructions page
-            if (forwardingStep == DonationStep.DonateWithAcssDebit && amountDonatedInCents > 3000_00) {
-                setStep(DonationStep.WireTransferInstructions)
-                return
-            }
 
             const response = await callKinshipAPI('/api/stripe/createPaymentIntent', {
                 donation: globalDonation,
@@ -192,7 +185,11 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
             setStripeClientSecret(response.clientSecret)
 
             // Finally, set the next step
-            setStep(forwardingStep)
+            if (amountDonatingInCents > 50_000_00) {
+                setStep(DonationStep.WireTransferInstructions)
+            } else {
+                setStep(DonationStep.PaymentInfo)
+            }
             return
         } catch (error) {
             setStep(DonationStep.Error)
@@ -229,7 +226,9 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                     name="userFirstName" 
                     id="userFirstName" 
                     value={firstName}
-                    onChange={(e)=>{ setFirstName(e.target.value) }} 
+                    onChange={(e)=>{ 
+                        setFirstName(e.target.value)
+                     }} 
                     required={true} 
                 />
                 <TextInput 
@@ -397,23 +396,12 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
                 <VerticalSpacer size={SpacerSize.Medium} />
                 <div className='flex w-full justify-end'>
                     <Button 
-                        text="Donate With Bank Account &rarr;" 
+                        text="Proceed To Payment &rarr;" 
                         isLoading={loading} 
-                        icon={<BuildingLibraryIcon />}
+                        icon={<LockClosedIcon />}
                         style={ButtonStyle.Primary}
                         size={ButtonSize.Large} 
-                        onClick={() => {handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithAcssDebit })}}
-                    />
-
-                    <HorizontalSpacer size={SpacerSize.Small} />
-
-                    <Button 
-                        text="Donate With Credit Card &rarr;" 
-                        isLoading={loading} 
-                        icon={<CreditCardIcon />}
-                        style={ButtonStyle.Primary}
-                        size={ButtonSize.Large} 
-                        onClick={() => handleDonationDetailsStep({ forwardingStep: DonationStep.DonateWithCreditOrDebitCard })}
+                        onClick={handleDonationDetailsStep}
                     />
                 </div>
 
@@ -422,4 +410,4 @@ const AmountAndBillingStep: FC<{ donationId: string, donor: Donor, parentIsLoadi
     )
 }
 
-export default AmountAndBillingStep
+export default DonationInformationStep

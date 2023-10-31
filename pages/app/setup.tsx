@@ -43,7 +43,7 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
     const [lastName, setLastName] = useState<string>("")
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
-    const [state, setState] = useState<string>("on")
+    const [state, setState] = useState<string>("ON")
     const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
@@ -182,7 +182,9 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
                     id="country" 
                     options={countries}
                     value="ca"
-                    onChange={(e)=>{ setCountry(e.target.value) }}
+                    onChange={(e)=>{ 
+                        setCountry(e.target.value)
+                     }}
                     required={true}
                 />
             </div>

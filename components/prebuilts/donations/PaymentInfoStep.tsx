@@ -1,13 +1,13 @@
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState, FC, useRef } from "react";
-import { ConfirmationType, DonationStep } from "../helpers/types";
-import { Donation } from "../../../../system/classes/donation";
-import { callKinshipAPI } from "../../../../system/utils/helpers";
-import GoBackHelper from "../helpers/GoBackButton";
-import { BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../../primitives";
+import { ConfirmationType, DonationStep } from "./helpers/types";
+import { Donation } from "../../../system/classes/donation";
+import { callKinshipAPI } from "../../../system/utils/helpers";
+import GoBackHelper from "./helpers/GoBackButton";
+import { BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
 
-const DonateWithCard: FC<{ globalDonation: Donation, stripeClientSecret: string, setStep: (value: DonationStep) => void, setConfirmationType: (value: ConfirmationType) => void }> = ({ globalDonation, stripeClientSecret, setStep, setConfirmationType }) => {
+const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string, setStep: (value: DonationStep) => void, setConfirmationType: (value: ConfirmationType) => void }> = ({ globalDonation, stripeClientSecret, setStep, setConfirmationType }) => {
     if (globalDonation == null || globalDonation == undefined) {
         setStep(DonationStep.Error)
         return null
@@ -80,7 +80,7 @@ const DonateWithCard: FC<{ globalDonation: Donation, stripeClientSecret: string,
                 <Text>
                     <span>Kinship does not store any credit card details, and all payments and optional payment method storage are handled by <InlineLink href={"https://stripe.com"} text={"Stripe"} />.</span>
                 </Text>
-                <VerticalSpacer size={SpacerSize.Small} />
+                <VerticalSpacer size={SpacerSize.Medium} />
 
                 { !stripeClientSecret && <span className="flex items-center text-md font-medium w-full justify-center"><Loading color={LoadingColors.Blue} /><span className="ml-2">Loading secure payment form</span></span> }
 
@@ -125,4 +125,4 @@ const DonateWithCard: FC<{ globalDonation: Donation, stripeClientSecret: string,
     }
 }
 
-export default DonateWithCard
+export default PaymentInfoStep

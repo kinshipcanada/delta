@@ -6,13 +6,12 @@ import { loadStripe } from "@stripe/stripe-js";
 import { v4 as uuidv4 } from 'uuid'
 import { CurrencyList } from '../system/classes/utils';
 import { ConfirmationType, DonationStep } from '../components/prebuilts/donations/helpers/types';
-import AmountAndBillingStep from '../components/prebuilts/donations/information/AmountAndBilling';
+import DonationInformationStep from '../components/prebuilts/donations/DonationInformationStep';
 import DonationErrorMessage from '../components/prebuilts/donations/helpers/ErrorMessage';
 import StripeWrapper from '../components/prebuilts/donations/helpers/StripeWrapper';
-import WireTransferInstructions from '../components/prebuilts/donations/payment/DonateWithWireTransfer';
-import DonateWithCard from '../components/prebuilts/donations/payment/DonateWithCard';
-import DonateWithAcssDebit from '../components/prebuilts/donations/payment/DonateWithAcssDebit';
+import PaymentInfoStep from '../components/prebuilts/donations/PaymentInfoStep';
 import Confirmation from '../components/prebuilts/donations/confirmation/Confirmation';
+import WireTransferInstructions from '../components/prebuilts/donations/WireTransferInstructions';
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -55,7 +54,7 @@ export default function Donate() {
     }) => {
         if (step === DonationStep.AmountAndBilling) {
             return (
-                <AmountAndBillingStep
+                <DonationInformationStep
                     donationId={donationId}
                     donor={donor}
                     parentIsLoading={parentIsLoading}
@@ -64,25 +63,14 @@ export default function Donate() {
                     setStripeClientSecret={setStripeClientSecret}
                 />
             );
-        } else if (step === DonationStep.DonateWithCreditOrDebitCard) {
+        } else if (step === DonationStep.PaymentInfo) {
             return (
                 <StripeWrapper stripeClientSecret={stripeClientSecret} stripeClientPromise={stripeClientPromise}>
-                    <DonateWithCard
+                    <PaymentInfoStep
                         globalDonation={globalDonation}
                         stripeClientSecret={stripeClientSecret}
                         setConfirmationType={setConfirmationType}
                         setStep={setStep}
-                    />
-                </StripeWrapper>
-            );
-        } else if (step === DonationStep.DonateWithAcssDebit) {
-            return (
-                <StripeWrapper stripeClientSecret={stripeClientSecret} stripeClientPromise={stripeClientPromise}>
-                    <DonateWithAcssDebit
-                        globalDonation={globalDonation}
-                        stripeClientSecret={stripeClientSecret}
-                        setStep={setStep}
-                        setConfirmationType={setConfirmationType}
                     />
                 </StripeWrapper>
             );

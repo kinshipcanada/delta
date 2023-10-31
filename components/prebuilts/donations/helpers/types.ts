@@ -1,7 +1,6 @@
 export const enum DonationStep {
     AmountAndBilling,
-    DonateWithCreditOrDebitCard,
-    DonateWithAcssDebit,
+    PaymentInfo,
     WireTransferInstructions,
     Confirmation,
     Error
