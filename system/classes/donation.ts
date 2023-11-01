@@ -1,5 +1,6 @@
-import { Cart } from "./cart";
-import { Donor } from "./donor";
+import { calculateStripeFee } from "../utils/helpers";
+import { Cart, generateFakeCauses } from "./cart";
+import { Donor, generateFakeDonor } from "./donor";
 import { DonationIdentifiers } from "./utils";
 
 /**
@@ -45,3 +46,29 @@ export function isDonation(obj: any): obj is Donation {
         typeof obj.fees_charged_by_stripe === 'number'
     );
 }
+
+import { faker } from '@faker-js/faker';
+
+export const generateFakeDonation = (): Donation => {
+
+    const donor = generateFakeDonor()
+    const causes = generateFakeCauses()
+
+    const stripeFee = calculateStripeFee(causes.total_amount_paid_in_cents)
+
+    const donation: Donation = {
+      identifiers: {
+        donation_id: faker.string.uuid(),
+        donor_id: donor.donor_id,
+      },
+      donor: donor,
+      causes: causes,
+      live: false,
+      amount_in_cents: causes.total_amount_paid_in_cents + stripeFee,
+      fees_covered: stripeFee,
+      fees_charged_by_stripe: stripeFee,
+      date_donated: faker.date.past(),
+    };
+  
+    return donation;
+};

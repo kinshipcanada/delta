@@ -12,7 +12,7 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             name: 'Resend Receipt',
             icon: EnvelopeIcon,
             color: EventColors.Info,
-            description: 'Use this tool to find a donation and resend the donor their receipt. Donor will receive an email.',
+            description: 'Use this tool to find a donation and resend the donor their receipt.  The donor will automatically be emailed a receipt.',
             href: "/app/admin/resend",
             toolEnabled: true,
         },
@@ -22,7 +22,7 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             color: EventColors.Success,
             description: 'Use this tool to record a cash or eTransfer donation. The donor will automatically be emailed a receipt.',
             href: "/app/admin/create",
-            toolEnabled: true,
+            toolEnabled: false,
         },
         {
             name: 'Upload Proof of Donation',
@@ -53,14 +53,18 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
                     const iconStyling = tool.color == EventColors.Success ? 'text-green-600' : tool.color == EventColors.Info ? 'text-blue-600' : tool.color == EventColors.Warning ? 'text-yellow-600' : tool.color == EventColors.Error ? 'text-red-600' : 'text-gray-500'
 
                     return (
-                        <PanelWithHeaderNoPadding key={toolIdx} header={<div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-                                <span 
-                                    className={`h-12 w-12 flex items-center justify-center rounded-lg bg-white object-cover ring-1 ring-gray-900/10 ${iconStyling}`}
-                                >
-                                    <tool.icon className={ExtraLargeIconSizing} />
-                                </span>
-                                <BoldText>{tool.name}</BoldText>
-                                </div>}>
+                        <PanelWithHeaderNoPadding key={toolIdx} 
+                            header={
+                                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+                                    <span 
+                                        className={`h-12 w-12 flex items-center justify-center rounded-lg bg-white object-cover ring-1 ring-gray-900/10 ${iconStyling}`}
+                                    >
+                                        <tool.icon className={ExtraLargeIconSizing} />
+                                    </span>
+                                    <BoldText>{tool.name}</BoldText>
+                                </div>
+                            }
+                        >
                             <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6 space-y-4">
                                 <div>
                                     <VerticalSpacer size={SpacerSize.Medium} />

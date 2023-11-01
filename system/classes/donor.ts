@@ -45,3 +45,27 @@ export function isDonor(obj: any): obj is Donor {
         obj.stripe_customer_ids.every((id) => typeof id === 'string')
     );
 }
+
+import { faker } from '@faker-js/faker';
+
+export const generateFakeDonor = (): Donor => {
+    const donor: Donor = {
+        donor_id: faker.string.uuid(),
+        first_name: faker.person.firstName(),
+        last_name: faker.person.lastName(),
+        email: faker.internet.email(),
+        phone_number: Number(faker.phone.number()),
+        address: {
+          line_address: faker.location.streetAddress(),
+          city: faker.location.city(),
+          state: "ON",
+          postal_code: faker.location.zipCode(),
+          country: "ca"
+        },
+        admin: false,
+        set_up: faker.datatype.boolean(),
+        stripe_customer_ids: [],
+    }
+    
+    return donor;
+};

@@ -19,3 +19,18 @@ export interface Cart {
     is_sadat_donation: boolean
     is_sadaqah: boolean
 }
+
+import { faker } from '@faker-js/faker';
+
+export const generateFakeCauses = (): Cart => {
+    const cart: Cart = {
+        total_amount_paid_in_cents: Math.floor(parseFloat(faker.finance.amount()) * 100),
+        currency: CurrencyList.CAD,
+        causes: undefined,
+        is_imam_donation: faker.datatype.boolean(),
+        is_sadat_donation: faker.datatype.boolean(),
+        is_sadaqah: faker.datatype.boolean(),
+    }
+    
+    return cart;
+};

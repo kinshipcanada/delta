@@ -42,6 +42,16 @@ export function PanelWithHeaderAndFooter({ header, footer, children }) {
   )
 }
 
+export function PanelWithHeaderAndFooterNoPadding({ header, footer, children }) {
+  return (
+    <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
+      { header }
+      { children }
+      { footer }
+    </div>
+  )
+}
+
 export function PanelWithHeaderNoPadding({ header, children }) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200">
