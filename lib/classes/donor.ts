@@ -1,4 +1,6 @@
-import { Address } from "./address";
+import { Address, AddressSchema } from "./address";
+import { z } from "zod";
+import { faker } from '@faker-js/faker';
 
 /**
  * @description Interface representing a donor. Supports logged in and anonymous donors.
@@ -25,6 +27,19 @@ export interface Donor {
     stripe_customer_ids: string[];
 }
 
+export const DonorSchema = z.object({
+    donor_id: z.string().uuid().optional(),
+    first_name: z.string().min(1),
+    middle_name: z.string().min(1).optional(),
+    last_name: z.string().min(1),
+    email: z.string().email(),
+    phone_number: z.number().optional(),
+    address: AddressSchema,
+    admin: z.boolean(),
+    set_up: z.boolean(),
+    stripe_customer_ids: z.array(z.string())
+});
+
 export function isDonor(obj: any): obj is Donor {
     return (
         typeof obj === 'object' &&
@@ -42,11 +57,9 @@ export function isDonor(obj: any): obj is Donor {
         typeof obj.admin === 'boolean' &&
         typeof obj.set_up === 'boolean' &&
         Array.isArray(obj.stripe_customer_ids) &&
-        obj.stripe_customer_ids.every((id) => typeof id === 'string')
+        obj.stripe_customer_ids.every((id: any) => typeof id === 'string')
     );
 }
-
-import { faker } from '@faker-js/faker';
 
 export const generateFakeDonor = (): Donor => {
     const donor: Donor = {

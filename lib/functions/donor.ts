@@ -1,10 +1,9 @@
 import { Address } from "../classes/address";
 import { Donor } from "../classes/donor";
-import { CountryList } from "../classes/utils";
 import { fetchDonorFromDatabase, setupDonorInDatabase, updateDonorInDatabase } from "../utils/database";
 import { formatDonorFromDatabase } from "../utils/formatting";
 import { isValidCountryCode } from "../utils/helpers";
-import { isValidUUIDV4 as verifyUUID } from 'is-valid-uuid-v4';
+import { validate as verifyUUID } from 'uuid';
 import { createStripeCustomer } from "../utils/stripe";
 import { logError } from "../utils/logger";
 
@@ -37,10 +36,10 @@ export async function createDonor(
             postal_code: postalCode,
             city: city,
             state: state,
-            country: country as CountryList
+            country: country
         }
     
-        const stripeCustomer = await createStripeCustomer(email, donorId, firstName, lastName, address);
+        const stripeCustomer = await createStripeCustomer(email, firstName, lastName, address, donorId);
         await setupDonorInDatabase(
             donorId,
             firstName, 
@@ -68,7 +67,7 @@ export async function createDonor(
     
         return donor
     } catch (error) {
-        await logError(error.message, FUNCTION_NAME, FILE_NAME)
+        await logError("Error creating donor profile", FUNCTION_NAME, FILE_NAME)
         throw new Error("Error setting up donor profile.")
     }
 }
@@ -83,7 +82,7 @@ export async function fetchDonor(donorId?: string, donorEmail?: string): Promise
     try {
         return formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
     } catch (error) {
-        await logError(error.message, FUNCTION_NAME, FILE_NAME)
+        await logError("Error fetching donor profile", FUNCTION_NAME, FILE_NAME)
         throw new Error("Error fetching donor from database.")
     }
 }
@@ -131,7 +130,7 @@ export async function updateDonor(
             postal_code: address_postal_code,
             city: address_city,
             state: address_state,
-            country: address_country as CountryList
+            country: address_country
         }
             
         const updatedDonor: Donor = {
@@ -161,8 +160,7 @@ export async function updateDonor(
 
         return updatedDonor
     } catch (error) {
-        console.log(error)
-        throw new Error(error.message)
+        throw error
     }
 }
 
@@ -200,7 +198,7 @@ export async function setupDonor(
             postal_code: address_postal_code,
             city: address_city,
             state: address_state,
-            country: address_country as CountryList
+            country: address_country
         }
             
         const updatedDonor: Donor = {
@@ -230,7 +228,6 @@ export async function setupDonor(
 
         return updatedDonor
     } catch (error) {
-        console.log(error)
-        throw new Error(error.message)
+        throw error
     }
 }

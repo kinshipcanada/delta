@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv'
 import { Donation } from '../classes/donation'
 import { DonationIdentifiers } from '../classes/utils'
 import { formatDonationForDatabase } from './formatting'
-import { DatabaseTable } from './constants'
 
 dotenv.config()
 
@@ -19,9 +18,9 @@ export function uploadDonationToDatabase(donation: Donation): Promise<any> {
   try {
     return database('donations').insert(formatDonationForDatabase(donation))
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destory()
   }
 }
 
@@ -31,17 +30,17 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
     const allowedIdentifiers = ['donation_id', 'stripe_charge_id', 'stripe_payment_intent_id'];
 
     for (const identifier of allowedIdentifiers) {
-      if (donation_identifiers[identifier]) {
-        return database('donations').where(identifier == "donation_id" ? "id" : identifier, donation_identifiers[identifier]).first();
+      if (donation_identifiers[identifier as keyof DonationIdentifiers]) {
+        return database('donations').where(identifier === "donation_id" ? "id" : identifier, donation_identifiers[identifier as keyof DonationIdentifiers]).first();
       }
     }
 
     throw new Error('No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.')
 
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
@@ -55,9 +54,9 @@ export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): P
   try {
     return donorId ? database('donor_profiles').where('id', donorId).first() : database('donor_profiles').where('donor_email', donorEmail).first()
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
@@ -86,9 +85,9 @@ export function updateDonorInDatabase(
       address_country: address_country
     })
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
@@ -119,19 +118,19 @@ export async function setupDonorInDatabase(
       stripe_customer_ids: JSON.stringify([stripe_customer_id])
     })
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
-export async function parameterizedDatabaseQuery(table: DatabaseTable, params, limitToFirstResult: boolean): Promise<any> {
+export async function parameterizedDatabaseQuery(table: string, params: any, limitToFirstResult: boolean): Promise<any> {
   const columns = Object.keys(params)
   const database = _createDatabase()
   let result;
 
   try {
-    const parameterizedQuery = (query) => {
+    const parameterizedQuery = (query: any) => {
       for (const column of columns) {
         if (params[column] != null) { query.andWhere(`${table}.${column}`, `${params[column]}`); }
       }
@@ -144,9 +143,9 @@ export async function parameterizedDatabaseQuery(table: DatabaseTable, params, l
     }
 
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 
   return result
@@ -158,9 +157,9 @@ export function uploadFeedbackToDatabase(feedback: string, donor_id?: string): P
   try {
     return database('feedback').insert({ feedback: feedback, donor_id: donor_id })
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
@@ -170,9 +169,9 @@ export function uploadLogToDatabase(error_message: string, file_name: string, fu
   try {
     return database('logs').insert({ error_message: error_message, file_name: file_name, function_name: function_name })
   } catch (error) {
-    throw new Error(error)
+    throw error
   } finally {
-    (destoryFunc => database.destroy())
+    database.destroy()
   }
 }
 
@@ -394,7 +393,7 @@ export interface DatabaseTypings {
       kinship_carts: {
         Row: {
           address_city: string | null
-          address_country: DatabaseTypings["public"]["Enums"]["country"] | null
+          address_country: DatabaseTypings["public"]["Enums"]["country"]
           address_line_address: string | null
           address_postal_code: string | null
           address_state: string | null

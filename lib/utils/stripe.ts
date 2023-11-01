@@ -8,7 +8,7 @@ import { Donor } from "../classes/donor";
 const dotenv = require('dotenv')
 dotenv.config();
 
-const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
     apiVersion: "2023-08-16"
 })
 
@@ -56,25 +56,25 @@ export async function fetchSpecificStripePaymentMethod(payment_method_id: string
 
 export async function fetchFullDonationFromStripe(identifiers: DonationIdentifiers): Promise<RawStripeTransactionObject> {
     let rawStripeTransactionObject: RawStripeTransactionObject = {
-        payment_intent_object: null,
-        charge_object: null,
-        balance_transaction_object: null,
-        customer: null,
-        payment_method: null
+        payment_intent_object: undefined,
+        charge_object: undefined,
+        balance_transaction_object: undefined,
+        customer: undefined,
+        payment_method: undefined
     }
 
     let stripePromises = []
     let { stripe_payment_intent_id, stripe_charge_id } = identifiers
 
-    if (!stripe_payment_intent_id && !stripe_charge_id) {
+    if (stripe_payment_intent_id == null && stripe_charge_id == null) {
         throw new Error('No payment intent or charge id provided to fetchFullDonationFromStripe')
     }
 
     if (stripe_payment_intent_id) {
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(stripe_payment_intent_id)
-        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(typeof (rawStripeTransactionObject.payment_intent_object.latest_charge) == "string" ? rawStripeTransactionObject.payment_intent_object.latest_charge : rawStripeTransactionObject.payment_intent_object.latest_charge.id)
+        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(typeof (rawStripeTransactionObject.payment_intent_object.latest_charge) == "string" ? rawStripeTransactionObject.payment_intent_object.latest_charge : rawStripeTransactionObject.payment_intent_object.latest_charge!.id)
     } else {
-        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(stripe_charge_id)
+        rawStripeTransactionObject.charge_object = await fetchStripeChargeObject(stripe_charge_id as string)
         rawStripeTransactionObject.payment_intent_object = await fetchStripePaymentIntentObject(rawStripeTransactionObject.charge_object.payment_intent as string)
     }
 
@@ -108,16 +108,16 @@ export async function fetchFullDonationFromStripe(identifiers: DonationIdentifie
 
 export async function createStripeCustomer(
     email: string,
-    donorId: string,
     firstName: string,
     lastName: string,
     address: Address,
+    donorId?: string,
 ): Promise<Stripe.Customer> {
     return await stripeClient.customers.create({
         email,
         name: `${firstName} ${lastName}`,
         metadata: {
-            user_id: donorId,
+            user_id: donorId ? donorId : null,
             first_name: firstName,
             last_name: lastName,
         },
@@ -147,7 +147,7 @@ export async function createStripeCustomerIfNotExists(donor: Donor): Promise<str
     }
 
     // Create a new profile from the donor if there is none
-    const createdStripeCustomer = await createStripeCustomer(donor.email, donor.donor_id, donor.first_name, donor.last_name, donor.address)
+    const createdStripeCustomer = await createStripeCustomer(donor.email, donor.first_name, donor.last_name, donor.address, donor.donor_id)
 
     return createdStripeCustomer.id
 }

@@ -1,8 +1,8 @@
-import { FetchDonationResponse, ErroredResponse } from "../../../system/classes/api";
-import { Donation } from "../../../system/classes/donation";
-import { DonationIdentifiers } from "../../../system/classes/utils";
-import { fetchDonation } from "../../../system/functions/donations";
-import { generateIdentifiersFromStrings, verifyAllParametersExist } from "../../../system/utils/helpers";
+import { FetchDonationResponse, ErroredResponse } from "../../../lib/classes/api";
+import { Donation } from "../../../lib/classes/donation";
+import { DonationIdentifiers } from "../../../lib/classes/utils";
+import { fetchDonation } from "../../../lib/functions/donations";
+import { generateIdentifiersFromStrings, verifyAllParametersExist } from "../../../lib/utils/helpers";
 
 /**
  * @description Fetches a single donation. To fetch a number of donations, use a donor's email address and the api/donor/donations/fetch endpoint

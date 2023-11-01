@@ -1,11 +1,6 @@
-import { SelectOption } from "../../components/primitives/types"
-
-export const enum DatabaseTable {
-    DONATIONS = "donations",
-    DONOR_PROFILES = "donor_profiles",
-    EVENTS = "events",
-    KINSHIP_CARTS = "kinship_carts",
-}
+export type SelectOption = {
+    [key: string]: any;
+};
 
 export const countries: SelectOption[] = [
     {"label": "Canada", "value": "ca"}, 
@@ -254,12 +249,16 @@ export const countries: SelectOption[] = [
     {"label": "Zimbabwe", "value": "zw"} 
 ]
 
-// This type exists only to make VSCode inferrence and completions easier
-type StatesAndProvinces = {
-    [key: string]: SelectOption[];
-};
+export const enum DatabaseTable {
+    DONATIONS = "donations",
+    DONOR_PROFILES = "donor_profiles",
+    EVENTS = "events",
+    KINSHIP_CARTS = "kinship_carts",
+}
 
-export const states_and_provinces: StatesAndProvinces = {
+
+
+export const states_and_provinces: SelectOption = {
     "ca": [
         { "label": "Ontario", "value": "ON" },
         {
@@ -285,6 +284,10 @@ export const states_and_provinces: StatesAndProvinces = {
         {
             "label": "Nova Scotia",
             "value": "NS",
+        },
+        {
+            "label": "Ontario",
+            "value": "ON",
         },
         {
             "label": "Prince Edward Island",
@@ -363,143 +366,3 @@ export const states_and_provinces: StatesAndProvinces = {
     
     // Feel free to extend this with your own charitys countries, to make completions easier for donors
 }
-
-export const canadian_states = [
-	{
-		"name": "Alberta",
-		"code": "AB",
-		"subdivision": "province",
-		"native": "Alberta"
-	},
-	{
-		"name": "British Columbia",
-		"code": "BC",
-		"subdivision": "province",
-		"native": "Colombie-Britannique"
-	},
-	{
-		"name": "Manitoba",
-		"code": "MB",
-		"subdivision": "province",
-		"native": "Manitoba"
-	},
-	{
-		"name": "New Brunswick",
-		"code": "NB",
-		"subdivision": "province",
-		"native": "Nouveau-Brunswick"
-	},
-	{
-		"name": "Newfoundland and Labrador",
-		"code": "CA-NL",
-		"subdivision": "province",
-		"native": "Terre-Neuve-et-Labrador"
-	},
-	{
-		"name": "Nova Scotia",
-		"code": "NS",
-		"subdivision": "province",
-		"native": "Nouvelle-Écosse"
-	},
-	{
-		"name": "Ontario",
-		"code": "ON",
-		"subdivision": "province",
-		"native": "Ontario"
-	},
-	{
-		"name": "Prince Edward Island",
-		"code": "PE",
-		"subdivision": "province",
-		"native": "Île-du-Prince-Édouard"
-	},
-	{
-		"name": "Quebec",
-		"code": "QC",
-		"subdivision": "province",
-		"native": "Québec"
-	},
-	{
-		"name": "Saskatchewan",
-		"code": "SK",
-		"subdivision": "province",
-		"native": "Saskatchewan"
-	},
-	{
-		"name": "Northwest Territories",
-		"code": "NT",
-		"subdivision": "territory",
-		"native": "Territoires du Nord-Ouest"
-	},
-	{
-		"name": "Nunavut",
-		"code": "NU",
-		"subdivision": "territory",
-		"native": "Nunavut"
-	},
-	{
-		"name": "Yukon",
-		"code": "YT",
-		"subdivision": "territory",
-		"native": "Yukon"
-	}
-]
-
-export const causes = [
-    {
-        cause_id: 0,
-        name: "Anywhere",
-        description: "I'd like my donation to be allocated wherever it's needed most right now.",
-        default_selected: true,
-        campaign: false
-    },
-    {
-        cause_id: 8,
-        name: 'Vision Kinship',
-        description: 'Comprehensively lift a family out of poverty, by helping them start a business, build a home, and provide for their children\'s education.',
-        default_selected: false,
-        campaign: true
-    },
-    {
-        cause_id: 1,
-        name: 'Education',
-        description: 'Help the next generation get on their feet. Break the cycle of poverty through education.',
-        default_selected: false,
-        campaign: false
-    },
-    {
-        cause_id: 2,
-        name: 'Orphans',
-        description: 'Cover an orphans basic housing, food, educational, and clothing needs.',
-        default_selected: false,
-        campaign: false
-    },
-    {
-        cause_id: 3,
-        name: 'Housing',
-        description: 'Provide a roof over the heads of those who need it most. Help them get back on their feet by providing a reliable place to stay.',
-        default_selected: false,
-        campaign: false
-    },
-    {
-        cause_id: 4,
-        name: 'Medical Aid',
-        description: 'Contribute to much needed medical aid, including life-saving operations and medication.',
-        default_selected: false,
-        campaign: false
-    },
-    {
-        cause_id: 5,
-        name: 'Poverty Relief',
-        description: 'Covers general needs of those in poverty or in extreme situation of needs, such as emergency medical relief, food & water, and more.',
-        default_selected: false,
-        campaign: false
-    },
-    {
-        cause_id: 6,
-        name: 'Khums Donations',
-        description: 'Kinship is registered to recieve and distribute Khums donations, also eligible for a tax receipt.',
-        default_selected: false,
-        campaign: false
-    },
-]

@@ -1,7 +1,7 @@
-import { ErroredResponse, FetchGroupOfDonationsResponse } from "../../../../system/classes/api";
-import { Donation } from "../../../../system/classes/donation";
-import { fetchAllDonationsForDonor } from "../../../../system/functions/donations";
-import { verifyAllParametersExist } from "../../../../system/utils/helpers";
+import { ErroredResponse, FetchGroupOfDonationsResponse } from "../../../../lib/classes/api";
+import { Donation } from "../../../../lib/classes/donation";
+import { fetchAllDonationsForDonor } from "../../../../lib/functions/donations";
+import { verifyAllParametersExist } from "../../../../lib/utils/helpers";
 
 /**
  * @description Fetches all donations for a given donor

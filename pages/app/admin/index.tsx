@@ -1,7 +1,7 @@
 import React from "react"
 import { Button, JustifyEnd, Badge, Grid, PanelWithHeaderNoPadding, BoldText, PageHeader, Text, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, ExtraLargeIconSizing,SpacerSize, Style, } from "../../../components/primitives"
-import { Donation } from "../../../system/classes/donation"
-import { Donor } from "../../../system/classes/donor"
+import { Donation } from "../../../lib/classes/donation"
+import { Donor } from "../../../lib/classes/donor"
 import { ArrowUpOnSquareIcon, DocumentDuplicateIcon, EnvelopeIcon, PlusCircleIcon } from "@heroicons/react/24/solid"
 
   

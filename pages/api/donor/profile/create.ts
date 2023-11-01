@@ -1,11 +1,10 @@
 
-import { ErroredResponse } from "../../../../system/classes/api";
-import { createStripeCustomer } from "../../../../system/utils/stripe";
-import { Address } from "../../../../system/classes/address";
-import { CountryList } from "../../../../system/classes/utils";
-import { verifyAllParametersExist } from "../../../../system/utils/helpers";
-import { MessageResponse } from "../../../../system/classes/api"; 
-import { createDonor } from "../../../../system/functions/donor";
+import { ErroredResponse } from "../../../../lib/classes/api";
+import { createStripeCustomer } from "../../../../lib/utils/stripe";
+import { Address } from "../../../../lib/classes/address";
+import { verifyAllParametersExist } from "../../../../lib/utils/helpers";
+import { MessageResponse } from "../../../../lib/classes/api"; 
+import { createDonor } from "../../../../lib/functions/donor";
 
 /**
  * @description Creates a Stripe customer profile, given a donor's details, and setups up their Kinship profile in the database.
@@ -29,8 +28,7 @@ export default async function handler(req, res) {
         )
 
         return completedDonorProfile ? res.status(200).send({
-            status: 200,
-            endpoint_called: `/api/donor/profile/create`,
+            message: `/api/donor/profile/create`,
         } as MessageResponse) : new Error("Something went wrong creating your donor profile");
     } catch (error) {
         res.status(500).send({

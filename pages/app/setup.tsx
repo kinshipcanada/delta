@@ -1,11 +1,11 @@
 
 import React, { useState } from "react";
 import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween, BaseHeader, TextInput, JustifyEnd, ButtonSize, Label } from  "../../components/primitives";
-import { callKinshipAPI } from "../../system/utils/helpers";
+import { callKinshipAPI } from "../../lib/utils/helpers";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { SelectionInput } from "../../components/primitives/Inputs";
-import { countries, states_and_provinces } from "../../system/utils/constants";
+import { countries, states_and_provinces } from "../../lib/utils/constants";
 import { useAuth } from "../../components/prebuilts/Authentication";
 
 const AppSetupPage: React.FC<AppPageProps> = () => {

@@ -1,6 +1,6 @@
-import { ErroredResponse, FetchDonorResponse } from "../../../../system/classes/api";
-import { fetchDonor } from "../../../../system/functions/donor";
-import { verifyAtLeastOneParametersExists } from "../../../../system/utils/helpers";
+import { ErroredResponse, FetchDonorResponse } from "../../../../lib/classes/api";
+import { fetchDonor } from "../../../../lib/functions/donor";
+import { verifyAtLeastOneParametersExists } from "../../../../lib/utils/helpers";
 
 /**
  * @description Fetches a donors profile

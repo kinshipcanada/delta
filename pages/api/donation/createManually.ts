@@ -1,11 +1,11 @@
-import { Address } from "../../../system/classes/address";
-import { ErroredResponse, MessageResponse } from "../../../system/classes/api";
-import { Cart } from "../../../system/classes/cart";
-import { Donation } from "../../../system/classes/donation";
-import { Donor } from "../../../system/classes/donor";
-import { CurrencyList } from "../../../system/classes/utils";
-import { createManualDonation } from "../../../system/functions/donations";
-import { verifyAllParametersExist } from "../../../system/utils/helpers";
+import { Address } from "../../../lib/classes/address";
+import { ErroredResponse, MessageResponse } from "../../../lib/classes/api";
+import { Causes } from "@lib/classes/causes";
+import { Donation } from "../../../lib/classes/donation";
+import { Donor } from "../../../lib/classes/donor";
+import { CurrencyList } from "../../../lib/classes/utils";
+import { createManualDonation } from "../../../lib/functions/donations";
+import { verifyAllParametersExist } from "../../../lib/utils/helpers";
 
 /**
  * @description Creates a new donation. Only to be called by admin panel
@@ -50,10 +50,9 @@ export default async function handler(req, res) {
             set_up: true
         }
 
-        const causes: Cart = {
+        const causes: Causes = {
             total_amount_paid_in_cents: amount_in_cents,
             currency: CurrencyList.CAD,
-            causes: null,
             is_imam_donation: is_imam_donation,
             is_sadat_donation: is_sadat_donation,
             is_sadaqah: is_sadaqah

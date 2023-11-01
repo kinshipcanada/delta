@@ -1,7 +1,7 @@
 import React from "react"
 import { Tabs, Alert, EventColors, SpacerSize, Tab, VerticalSpacer, PageHeader, Text  } from "../../../components/primitives"
-import { Donation } from "../../../system/classes/donation"
-import { Donor } from "../../../system/classes/donor"
+import { Donation } from "../../../lib/classes/donation"
+import { Donor } from "../../../lib/classes/donor"
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 

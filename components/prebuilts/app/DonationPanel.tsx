@@ -2,9 +2,8 @@ import { CalendarDaysIcon } from "@heroicons/react/20/solid";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon, EnvelopeIcon, CurrencyDollarIcon } from "@heroicons/react/24/solid";
 import React from "react";
-import { Donation } from "../../../system/classes/donation";
-import { CountryList } from "../../../system/classes/utils";
-import { centsToDollars, parseFrontendDate } from "../../../system/utils/helpers";
+import { Donation } from "../../../lib/classes/donation";
+import { centsToDollars, parseFrontendDate } from "../../../lib/utils/helpers";
 import { toast } from "react-hot-toast";
 import { Badge } from "../../primitives/Badge";
 import Button from "../../primitives/Button";
@@ -43,7 +42,7 @@ export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) =>
                     <Text>
                         ${ centsToDollars(donation.amount_in_cents) }
                         <HorizontalSpacer size={SpacerSize.Small} />
-                        <Badge text={donation.donor.address.country == CountryList.CANADA ? "Tax Receipt" : "Donation Receipt"} style={Style.Outlined} color={donation.donor.address.country == CountryList.CANADA ? EventColors.Success : EventColors.Neutral } />
+                        <Badge text={donation.donor.address.country == "ca" ? "Tax Receipt" : "Donation Receipt"} style={Style.Outlined} color={donation.donor.address.country == "ca" ? EventColors.Success : EventColors.Neutral } />
                     </Text>
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">

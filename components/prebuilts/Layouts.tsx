@@ -3,13 +3,13 @@ import Navigation from './Navigation';
 import Footer from './Footer';
 import { AppNavigation } from './app/Navigation';
 import { useState, useEffect, ReactNode, FC } from 'react';
-import { callKinshipAPI, centsToDollars, supabase } from '../../system/utils/helpers';
+import { callKinshipAPI, centsToDollars, supabase } from '../../lib/utils/helpers';
 import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
-import { Donor } from '../../system/classes/donor';
-import { Donation } from '../../system/classes/donation';
+import { Donor } from '../../lib/classes/donor';
+import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
 

@@ -1,10 +1,10 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
-import { Donation } from "../../../system/classes/donation"
-import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../system/utils/helpers"
+import { Donation } from "../../../lib/classes/donation"
+import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
-import { countries, states_and_provinces } from "../../../system/utils/constants"
+import { countries, states_and_provinces } from "../../../lib/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 

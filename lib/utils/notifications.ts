@@ -1,6 +1,6 @@
 import { Donation } from "../classes/donation";
 import { AdminNotificationType, DeliveryMethod, NotificationTemplate, UserNotificationType } from "../classes/notifications";
-import { CountryList } from "../classes/utils";
+import { countries } from "./constants";
 import * as dotenv from 'dotenv' 
 const twilio = require('twilio')
 const postmark = require('postmark')
@@ -23,12 +23,12 @@ export function generateNotificationTemplate(
                 email_body: `
                     Dear ${donorFirstName},
 
-                    Thank you for your donation of ${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }.
+                    Thank you for your donation of ${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "CAD" : null }.
 
-                    You can access your ${donorCountry == CountryList.CANADA ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                    You can access your ${donorCountry == "ca" ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
                 `,
                 email_subject: `Thank you for your donation on ${donation.date_donated}.`,
-                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }. Access your receipt of donation here: ${donationUrl}`
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }. Access your receipt of donation here: ${donationUrl}`
             }
         }
 
@@ -37,12 +37,12 @@ export function generateNotificationTemplate(
                 email_body: `
                     Dear ${donorFirstName},
 
-                    Thank you for your donation of ${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }.
+                    Thank you for your donation of ${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }.
 
-                    You can access your ${donorCountry == CountryList.CANADA ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                    You can access your ${donorCountry == "ca" ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
                 `,
                 email_subject: `Thank you for your donation on ${donation.date_donated}.`,
-                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == CountryList.CANADA ? "CAD" : CountryList.UNITED_STATES ? "CAD" : null }. Access your receipt of donation here: ${donationUrl}`
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }. Access your receipt of donation here: ${donationUrl}`
             }
         }
 
@@ -94,7 +94,12 @@ async function _sendEmail(template: NotificationTemplate, donor: Donor): Promise
 
         return;
     } catch (error) {
-        throw new Error("Error sending email: " + error.message)
+        if (error instanceof Error) {
+            throw new Error("Error sending Email: " + error.message);
+        } else {
+            // Handle the case where 'error' is not an instance of 'Error'
+            throw new Error("An unknown error occurred");
+        }
     }
 }
 
@@ -114,6 +119,11 @@ async function _sendSMS(template: NotificationTemplate, donor: Donor): Promise<v
 
         return;
     } catch (error) {
-        throw new Error("Error sending SMS: " + error.message)
+        if (error instanceof Error) {
+            throw new Error("Error sending SMS: " + error.message);
+        } else {
+            // Handle the case where 'error' is not an instance of 'Error'
+            throw new Error("An unknown error occurred");
+        }
     }
 }

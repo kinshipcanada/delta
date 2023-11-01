@@ -1,5 +1,5 @@
 import React from "react";
-import { classNames } from "../../system/utils/helpers"
+import { classNames } from "../../lib/utils/helpers"
 import { TableProps } from "./types";
 
 export const Table: React.FC<TableProps> = ({ headers, rows }) => {

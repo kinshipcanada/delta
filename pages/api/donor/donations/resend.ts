@@ -1,8 +1,8 @@
-import { ErroredResponse } from "../../../../system/classes/api";
-import { DonationIdentifiers } from "../../../../system/classes/utils";
-import { checkAndResendReceipt } from "../../../../system/functions/notifications";
-import { verifyAtLeastOneParametersExists } from "../../../../system/utils/helpers";
-import { MessageResponse } from "../../../../system/classes/api"
+import { ErroredResponse } from "../../../../lib/classes/api";
+import { DonationIdentifiers } from "../../../../lib/classes/utils";
+import { checkAndResendReceipt } from "../../../../lib/functions/notifications";
+import { verifyAtLeastOneParametersExists } from "../../../../lib/utils/helpers";
+import { MessageResponse } from "../../../../lib/classes/api"
 
 /**
  * @description Resends a donation receipt to a donor, given the donation's identifiers

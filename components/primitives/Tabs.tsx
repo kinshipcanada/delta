@@ -1,4 +1,4 @@
-import { classNames } from "../../system/utils/helpers"
+import { classNames } from "../../lib/utils/helpers"
 import { Tab } from '@headlessui/react'
 import { Fragment } from "react";
 import { TabsProps } from "./types";

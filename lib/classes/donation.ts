@@ -1,7 +1,8 @@
+import { z } from "zod";
 import { calculateStripeFee } from "../utils/helpers";
-import { Cart, generateFakeCauses } from "./cart";
-import { Donor, generateFakeDonor } from "./donor";
-import { DonationIdentifiers } from "./utils";
+import { Causes, CausesSchema, generateFakeCauses } from "./causes";
+import { Donor, DonorSchema, generateFakeDonor } from "./donor";
+import { DonationIdentifiers, DonationIdentifiersSchema } from "./utils";
 
 /**
  * @description Represents a donation object
@@ -16,15 +17,26 @@ import { DonationIdentifiers } from "./utils";
  */
 
 export interface Donation {
-    identifiers: DonationIdentifiers;
-    donor: Donor;
-    causes: Cart;
-    live: boolean;
-    amount_in_cents: number;
-    fees_covered: number;
-    fees_charged_by_stripe: number;
-    date_donated: Date;
+  identifiers: DonationIdentifiers;
+  donor: Donor;
+  causes: Causes;
+  live: boolean;
+  amount_in_cents: number;
+  fees_covered: number;
+  fees_charged_by_stripe: number;
+  date_donated: Date;
 }
+
+export const DonationSchema = z.object({
+  identifiers: DonationIdentifiersSchema,
+  donor: DonorSchema,
+  causes: CausesSchema,
+  live: z.boolean(),
+  amount_in_cents: z.number(),
+  fees_covered: z.number(),
+  fees_charged_by_stripe: z.number(),
+  date_donated: z.date(),
+});
 
 export function isDonation(obj: any): obj is Donation {
     return (

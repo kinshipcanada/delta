@@ -1,7 +1,7 @@
-import { CreateDonationResponse, ErroredResponse } from "../../../system/classes/api";
-import { DonationIdentifiers } from "../../../system/classes/utils";
-import { createDonation } from "../../../system/functions/donations";
-import { verifyAllParametersExist } from "../../../system/utils/helpers";
+import { CreateDonationResponse, ErroredResponse } from "../../../lib/classes/api";
+import { DonationIdentifiers } from "../../../lib/classes/utils";
+import { createDonation } from "../../../lib/functions/donations";
+import { verifyAllParametersExist } from "../../../lib/utils/helpers";
 
 /**
  * @description Creates a new donation. Only to be called by Stripe's webhook

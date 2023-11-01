@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { AuthProvider } from "../components/prebuilts/Authentication";
-import { callKinshipAPI, supabase } from "../system/utils/helpers";
+import { callKinshipAPI, supabase } from "../lib/utils/helpers";
 import { ConfirmationType, DonationStep } from "../components/prebuilts/donations/helpers/types";
 import { v4 as uuidv4 } from 'uuid'
-import { CurrencyList } from "../system/classes/utils";
-import { Donation } from "../system/classes/donation";
+import { CurrencyList } from "../lib/classes/utils";
+import { Donation } from "../lib/classes/donation";
 import { loadStripe } from "@stripe/stripe-js";
 import { DonationSummary } from "../components/prebuilts/Layouts";
 import DonationInformationStep from "../components/prebuilts/donations/DonationInformationStep";
@@ -13,7 +13,7 @@ import PaymentInfoStep from "../components/prebuilts/donations/PaymentInfoStep";
 import WireTransferInstructions from "../components/prebuilts/donations/WireTransferInstructions";
 import Confirmation from "../components/prebuilts/donations/confirmation/Confirmation";
 import DonationErrorMessage from "../components/prebuilts/donations/helpers/ErrorMessage";
-import { states_and_provinces } from "../system/utils/constants";
+import { states_and_provinces } from "../lib/utils/constants";
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 

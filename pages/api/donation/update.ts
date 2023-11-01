@@ -1,4 +1,4 @@
-import { ErroredResponse } from "../../../system/classes/api";
+import { ErroredResponse } from "../../../lib/classes/api";
 /**
  * @description Updates a donations details. Heavily restricted, and only to be used by the admin panel.
  */

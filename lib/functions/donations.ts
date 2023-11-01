@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Donation } from "../classes/donation";
-import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
-import { DonationIdentifiers } from "../classes/utils";
+import { Donation } from '../classes/donation';
+import { DeliveryMethod, UserNotificationType } from "@lib/classes/notifications";
+import { DonationIdentifiers } from "@lib/classes/utils";
 import { DatabaseTable } from "../utils/constants";
-import { parameterizedDatabaseQuery } from "../utils/database";
+import { DatabaseTypings, parameterizedDatabaseQuery } from "@lib/utils/database";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
 import { formatDonationFromRawStripeData, formatDonationFromDatabase, formatCartFromDatabase } from "../utils/formatting";
 import { validateEmail } from "../utils/helpers";
 import { sendNotification } from "../utils/notifications";
-import { fetchFullDonationFromStripe } from "../utils/stripe";
+import { fetchFullDonationFromStripe } from "@lib/utils/stripe";
 
 export async function createDonation(identifiers: DonationIdentifiers): Promise<Donation> {
     try {
@@ -22,7 +22,7 @@ export async function createDonation(identifiers: DonationIdentifiers): Promise<
 
         return donation
     } catch (error) {
-        throw new Error("Error creating donation");
+        throw error
     }
 }
 
@@ -38,7 +38,7 @@ export async function createManualDonation(donation: Donation): Promise<Donation
         )
         return donation
     } catch (error) {
-        throw new Error(error.message);
+        throw error
     }
 }
 
@@ -59,24 +59,30 @@ export async function fetchDonation(identifiers: DonationIdentifiers): Promise<D
         // If the donation already exists in the database, return that, otherwise, fetch it from Stripe
         return await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
     } catch (error) {
-        throw new Error("Error fetching donation");
+        throw error
     }
 }
 
 export async function fetchAllDonationsForDonor(donorEmail: string): Promise<Donation[]> {
     try {
-        if (!validateEmail(donorEmail)) { throw new Error("Invalid email address provided.") }
-        return (await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { email: donorEmail }, false)).map(donation => formatDonationFromDatabase(donation));
-    }    catch (error) {
-        throw new Error(error.message);
+        if (!validateEmail(donorEmail)) {
+            throw new Error("Invalid email address provided.");
+        }
+
+        const donationsFromDatabase = await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { email: donorEmail }, false);
+
+        return donationsFromDatabase.map((donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]) => formatDonationFromDatabase(donation));
+    } catch (error) {
+        throw error;
     }
 }
+
 
 export async function fetchKinshipCart(cartId: string): Promise<Donation> {
     try {
         const cart =  formatCartFromDatabase(await parameterizedDatabaseQuery(DatabaseTable.KINSHIP_CARTS, { id: cartId }, true));
         return cart
     } catch (error) {
-        throw new Error(error.message);
+        throw error
     }
 }

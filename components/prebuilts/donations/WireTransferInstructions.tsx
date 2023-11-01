@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Donation } from "../../../system/classes/donation"
+import { Donation } from "../../../lib/classes/donation"
 
 const WireTransferInstructions: FC<{ globalDonation: Donation }> = ({ globalDonation }) => {
     return (

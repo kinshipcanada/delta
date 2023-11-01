@@ -1,4 +1,4 @@
-import { supabase } from '../../system/utils/helpers'
+import { supabase } from '../../lib/utils/helpers'
 import { useState, useRef, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'

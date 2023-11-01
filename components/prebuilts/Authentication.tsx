@@ -1,7 +1,7 @@
 // AuthContext.tsx
 import { createContext, useContext, ReactNode } from 'react';
-import { Donor } from '../../system/classes/donor';
-import { Donation } from '../../system/classes/donation';
+import { Donor } from '../../lib/classes/donor';
+import { Donation } from '../../lib/classes/donation';
 
 type AuthContextType = {
   donor: Donor;

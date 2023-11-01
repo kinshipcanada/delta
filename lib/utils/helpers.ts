@@ -1,10 +1,21 @@
-import { CountryList } from "../classes/utils";
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 import { createClient } from '@supabase/supabase-js'
 import { DonationIdentifiers } from '../classes/utils';
-import { isValidUUIDV4 as verifyUUID } from 'is-valid-uuid-v4';
+import { validate as verifyUUID } from 'uuid';
 import Stripe from "stripe";
+import { countries } from "./constants";
+import { NextApiResponse } from "next";
 
-export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string)
+
+export function isValidCountryCode(countryCode: string): boolean {
+    return countries.some(country => country.value === countryCode);
+}
 
 export async function callKinshipAPI(url: string, data?: {}) {
     try {
@@ -56,11 +67,8 @@ export function generateIdentifiersFromStrings(strings: string[]): DonationIdent
     return identifiers;
 }
 
-export function isValidCountryCode(countryCode: string): boolean {
-    return (Object.values(CountryList) as string[]).includes(countryCode);
-}
 
-export function verifyAllParametersExist(errorMessage, ...args: any[]): void {
+export function verifyAllParametersExist(errorMessage: string, ...args: any[]): void {
     for (let i = 0; i < args.length; i++) {
         if (args[i] === null || args[i] === undefined) {
             throw new Error(errorMessage ? errorMessage : `Null parameter at index ${i}`);
@@ -68,7 +76,7 @@ export function verifyAllParametersExist(errorMessage, ...args: any[]): void {
     }
 }
 
-export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): void {
+export function verifyAtLeastOneParametersExists(errorMessage: string, ...args: any[]): void {
     let allAreNull = true;
 
     for (let i = 0; i < args.length; i++) {
@@ -85,7 +93,7 @@ export function verifyAtLeastOneParametersExists(errorMessage, ...args: any[]): 
     return;
 }
 
-export function classNames(...classes) {
+export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -97,16 +105,16 @@ export function centsToDollars(amount: number | string) {
     return (amount / 100).toFixed(2);
 }
 
-export function calculateStripeFee(amount_in_cents: number) {
-    return (amount_in_cents * 0.029) + 30
-}
-
 export function dollarsToCents(amount: number | string): string {
     if (typeof amount === 'string') {
         amount = parseFloat(amount);
     }
 
     return (amount * 100).toFixed(0);
+}
+
+export function calculateStripeFee(amount_in_cents: number) {
+    return (amount_in_cents * 0.029) + 30
 }
 
 export function parseFrontendDate(date: string | Date) {
@@ -140,20 +148,23 @@ export function isFloatOrInteger(input: any): boolean {
 }
 
 export function convertChildrenToStrings(parentObject: object) {
-    const result: Stripe.MetadataParam = {};
+  const result: Stripe.MetadataParam = {};
 
-    for (const key in parentObject) {
-        let value = parentObject[key]
+  for (const key in parentObject) {
+      if (parentObject.hasOwnProperty(key)) {
+          let value: any = parentObject[key as keyof typeof parentObject];
 
-        if (typeof(value) == "object") {
-            value = JSON.stringify(value)
-        }
+          if (typeof value === "object") {
+              value = JSON.stringify(value);
+          }
 
-        result[key] = value
-    }
+          result[key] = value;
+      }
+  }
 
-    return result
+  return result;
 }
+
 
 export function extractStripePaymentIntentFromClientSecret(clientSecret: string): string {
     let clientSecretComponents = clientSecret.split("_")

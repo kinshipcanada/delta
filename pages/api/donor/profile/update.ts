@@ -1,6 +1,6 @@
-import { ErroredResponse, FetchDonorResponse, MessageResponse } from "../../../../system/classes/api";
-import { updateDonor } from "../../../../system/functions/donor";
-import { verifyAllParametersExist } from "../../../../system/utils/helpers";
+import { ErroredResponse, FetchDonorResponse, MessageResponse } from "../../../../lib/classes/api";
+import { updateDonor } from "../../../../lib/functions/donor";
+import { verifyAllParametersExist } from "../../../../lib/utils/helpers";
 
 /**
  * @description Updates a customers profile. Only intended to be used by the frontend account management page UI

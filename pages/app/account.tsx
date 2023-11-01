@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { Button, VerticalSpacer, PanelWithLeftText, TextInput, JustifyBetween, JustifyEnd, PageHeader, Text, BaseHeader,  AppPageProps, ButtonSize, ButtonStyle, SpacerSize  } from "../../components/primitives";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { Donor } from "../../system/classes/donor";
+import { Donor } from "../../lib/classes/donor";
 import { toast } from "react-hot-toast";
-import { callKinshipAPI } from "../../system/utils/helpers";
-import { FetchDonorResponse } from "../../system/classes/api";
+import { callKinshipAPI } from "../../lib/utils/helpers";
+import { FetchDonorResponse } from "../../lib/classes/api";
 import { SelectionInput } from "../../components/primitives/Inputs";
-import { countries } from "../../system/utils/constants";
+import { countries } from "../../lib/utils/constants";
 import { useAuth } from "../../components/prebuilts/Authentication";
 
 const AppAccountPage: React.FC<AppPageProps> = () => {

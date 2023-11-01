@@ -1,5 +1,6 @@
-import { Donation } from "../../system/classes/donation";
-import { Donor } from "../../system/classes/donor";
+import { SelectOption } from "@lib/utils/constants";
+import { Donation } from "../../lib/classes/donation";
+import { Donor } from "../../lib/classes/donor";
 
 export const enum ButtonStyle {
     Primary,
@@ -120,11 +121,6 @@ export const enum InputCustomizations {
     Dollars = "dollars",
     Copyable = "copyable",
     None = "none",
-}
-
-export interface SelectOption {
-    value: string,
-    label: string,
 }
 
 export interface SelectProps {

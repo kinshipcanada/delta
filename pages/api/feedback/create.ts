@@ -1,6 +1,6 @@
-import { ErroredResponse, MessageResponse } from "../../../system/classes/api";
-import { logFeedback } from "../../../system/functions/feedback";
-import { verifyAllParametersExist } from "../../../system/utils/helpers";
+import { ErroredResponse, MessageResponse } from "../../../lib/classes/api";
+import { logFeedback } from "../../../lib/functions/feedback";
+import { verifyAllParametersExist } from "../../../lib/utils/helpers";
 
 /**
  * @description Submits feedback from the frontend

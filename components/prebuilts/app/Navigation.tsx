@@ -1,7 +1,7 @@
 import { ArrowLeftOnRectangleIcon, ArrowPathIcon, ChatBubbleOvalLeftIcon, Cog6ToothIcon, HomeIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 import { useRouter } from "next/router"
 import { useState } from "react"
-import { supabase } from "../../../system/utils/helpers"
+import { supabase } from "../../../lib/utils/helpers"
 import Button from "../../primitives/Button"
 import { ButtonStyle } from "../../primitives/types"
 import { LargeIconSizing } from "../../primitives/types"

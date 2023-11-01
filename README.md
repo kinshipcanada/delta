@@ -9,6 +9,13 @@ It's open source to allow other charities to easily replicate the functionality 
 
 Charity should be powered by good software.
 
+
+// provide params
+// Validate params
+// Call functions
+// Success -> return response
+// Error -> log, return generic response
+
 ## Folder Structure
 *Tentative, changes quickly*
 

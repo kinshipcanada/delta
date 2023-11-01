@@ -3,8 +3,8 @@ import React from "react";
 import { Button, JustifyEnd, CheckboxInput, TextArea, VerticalSpacer, AppPageProps, ButtonSize, ButtonStyle, SpacerSize, PageHeader, Text } from "../../components/primitives";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
-import { ErroredResponse, MessageResponse } from "../../system/classes/api";
-import { callKinshipAPI } from "../../system/utils/helpers";
+import { ErroredResponse, MessageResponse } from "../../lib/classes/api";
+import { callKinshipAPI } from "../../lib/utils/helpers";
 import { useAuth } from "../../components/prebuilts/Authentication";
 
 const AppFeedbackPage: React.FC<AppPageProps> = () => {

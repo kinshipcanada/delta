@@ -1,4 +1,5 @@
 import { CurrencyList } from "./utils";
+import { z } from "zod";
 
 export interface CauseMap {
     [key: string]: number
@@ -10,23 +11,28 @@ export interface CauseMap {
  * @param currency The currency of the cart
  * @param causes A map of causes and the amount paid in cents for each cause
  */
-export interface Cart {
+export interface Causes {
     total_amount_paid_in_cents: number
     currency: CurrencyList
-    causes: CauseMap
     // Kinship specific identifiers for religious obligations
     is_imam_donation: boolean
     is_sadat_donation: boolean
     is_sadaqah: boolean
 }
 
+export const CausesSchema = z.object({
+    total_amount_paid_in_cents: z.number(),
+    is_imam_donation: z.boolean(),
+    is_sadat_donation: z.boolean(),
+    is_sadaqah: z.boolean(),
+});
+
 import { faker } from '@faker-js/faker';
 
-export const generateFakeCauses = (): Cart => {
-    const cart: Cart = {
+export const generateFakeCauses = (): Causes => {
+    const cart: Causes = {
         total_amount_paid_in_cents: Math.floor(parseFloat(faker.finance.amount()) * 100),
         currency: CurrencyList.CAD,
-        causes: undefined,
         is_imam_donation: faker.datatype.boolean(),
         is_sadat_donation: faker.datatype.boolean(),
         is_sadaqah: faker.datatype.boolean(),

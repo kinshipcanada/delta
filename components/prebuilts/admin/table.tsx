@@ -19,8 +19,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
-import { Button } from "../../../@/components/ui/button"
-import { Checkbox } from "../../../@/components/ui/checkbox"
+import { Button } from "../../ui/button"
+import { Checkbox } from "../../ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -29,8 +29,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../../@/components/ui/dropdown-menu"
-import { Input } from "../../../@/components/ui/input"
+} from "../../ui/dropdown-menu"
+import { Input } from "../../ui/input"
 import {
   Table,
   TableBody,
@@ -38,8 +38,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../@/components/ui/table"
-import { Donation, generateFakeDonation } from "../../../system/classes/donation"
+} from "../../ui/table"
+import { Donation, generateFakeDonation } from "../../../lib/classes/donation"
 
 const data: Donation[] =  Array.from({ length: 10 }, generateFakeDonation);  // Generate an array of 10 fake donations
 

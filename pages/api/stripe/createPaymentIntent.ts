@@ -1,10 +1,10 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { isDonation } from '../../../system/classes/donation';
-import { isDonor } from '../../../system/classes/donor';
-import { createStripeCustomerIfNotExists } from '../../../system/utils/stripe';
-import { convertChildrenToStrings } from '../../../system/utils/helpers';
-import { StripeCreatePaymentIntentResponse } from '../../../system/classes/api';
+import { isDonation } from '../../../lib/classes/donation';
+import { isDonor } from '../../../lib/classes/donor';
+import { createStripeCustomerIfNotExists } from '../../../lib/utils/stripe';
+import { convertChildrenToStrings } from '../../../lib/utils/helpers';
+import { StripeCreatePaymentIntentResponse } from '../../../lib/classes/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {

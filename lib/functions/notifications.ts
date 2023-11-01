@@ -37,7 +37,7 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
             return `Successfully generated and sent receipt of donation to ${donation.donor.email}`
         }
     } catch (error) {
-        throw new Error(error);
+        throw error
     }
 }
 

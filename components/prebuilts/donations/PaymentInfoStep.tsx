@@ -1,8 +1,8 @@
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState, FC, useRef } from "react";
 import { ConfirmationType, DonationStep } from "./helpers/types";
-import { Donation } from "../../../system/classes/donation";
-import { callKinshipAPI } from "../../../system/utils/helpers";
+import { Donation } from "../../../lib/classes/donation";
+import { callKinshipAPI } from "../../../lib/utils/helpers";
 import GoBackHelper from "./helpers/GoBackButton";
 import { Alert, BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, EventColors, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
 import { CreditCardIcon } from "@heroicons/react/24/solid";

@@ -1,13 +1,13 @@
 import React, { useState } from "react"
 import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label, SelectionInput, CheckboxInput } from "../../../components/primitives"
-import { Donation } from "../../../system/classes/donation"
-import { Donor } from "../../../system/classes/donor"
+import { Donation } from "../../../lib/classes/donation"
+import { Donor } from "../../../lib/classes/donor"
 import { CalendarDaysIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
-import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../system/utils/helpers"
+import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../lib/utils/helpers"
 import { InputCustomizations } from "../../../components/primitives/types"
-import { countries, states_and_provinces } from "../../../system/utils/constants"
+import { countries, states_and_provinces } from "../../../lib/utils/constants"
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 

@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { extractStripePaymentIntentFromClientSecret } from '../../../system/utils/helpers';
-import { BaseApiResponse, StripeCreatePaymentIntentResponse } from '../../../system/classes/api';
+import { extractStripePaymentIntentFromClientSecret } from '../../../lib/utils/helpers';
+import { BaseApiResponse, StripeCreatePaymentIntentResponse } from '../../../lib/classes/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {

@@ -1,4 +1,4 @@
-import { ErroredResponse } from "../../../system/classes/api";
+import { ErroredResponse } from "../../../lib/classes/api";
 /**
  * @description Creates a PDF of a donation receipt, and returns it to the frontend
  */
