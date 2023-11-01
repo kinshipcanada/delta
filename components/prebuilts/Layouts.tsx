@@ -13,18 +13,26 @@ import { Donor } from '../../system/classes/donor';
 import { Donation } from '../../system/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 
-export const Layout = ({ children }) => (
-  <>
-    <Head>
-      <title>Kinship Canada</title>
-    </Head>
-    <main id="app" className="min-h-screen">
-      <Navigation />
-        { children }
-      <Footer />
-    </main>
-  </>
-);
+export const Layout = ({ children }) => {
+  const [testState, myTestState] = useState<string>("hello")
+
+  return (
+    <>
+      <Head>
+        <title>Kinship Canada</title>
+      </Head>
+      <main id="app" className="min-h-screen">
+        <p>{testState}</p>
+        <button onClick={()=>{myTestState("another string")}}>
+          Click to chnage state
+        </button>
+        <Navigation />
+          { children }
+        <Footer />
+      </main>
+    </>
+  )
+}
 
 export function AppLayout({ AppPage }) {
   const router = useRouter();

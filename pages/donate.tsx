@@ -13,6 +13,7 @@ import PaymentInfoStep from "../components/prebuilts/donations/PaymentInfoStep";
 import WireTransferInstructions from "../components/prebuilts/donations/WireTransferInstructions";
 import Confirmation from "../components/prebuilts/donations/confirmation/Confirmation";
 import DonationErrorMessage from "../components/prebuilts/donations/helpers/ErrorMessage";
+import { states_and_provinces } from "../system/utils/constants";
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -58,8 +59,8 @@ export default function Donate() {
                 line_address: "",
                 postal_code: "",
                 city: "",
-                state: "",
-                country: ""
+                state: states_and_provinces["ca"][0].value,
+                country: "ca"
             },
             admin: false,
             set_up: false,
@@ -113,6 +114,7 @@ export default function Donate() {
                                             <PaymentInfoStep
                                                 globalDonation={globalDonation}
                                                 stripeClientSecret={stripeClientSecret}
+                                                setGlobalDonation={setGlobalDonation}
                                                 setConfirmationType={setConfirmationType}
                                                 setStep={setStep}
                                             />
@@ -133,13 +135,6 @@ export default function Donate() {
 
                                     : <DonationErrorMessage />
                                 }
-                            {/* {globalDonation.identifiers.donation_id} {globalDonation.donor.first_name} {globalDonation.amount_in_cents}
-                                <Page2 
-                                    globalDonation={globalDonation} 
-                                    setGlobalDonation={setGlobalDonation} 
-                                    setStep={setStep}
-                                    setStripeClientSecret={setStripeClientSecret}
-                                /> */}
                             </div>
                         </div>
                     </section>
@@ -148,58 +143,3 @@ export default function Donate() {
         </AuthProvider>
     )
 }
-
-// const Page: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void }> = ({ globalDonation, setGlobalDonation }) => {
-//     const { donor } = useAuth()
-
-//     useEffect(()=>{
-//         console.log("hook called")
-//         if (donor) {
-//             setGlobalDonation({
-//                 ...globalDonation,
-//                 donor: donor
-//             })
-//         }
-//     }, [donor])
-
-//     return (
-//         <div>
-//             <input 
-//                 value={globalDonation.donor.first_name}
-//                 onChange={(e)=>{
-//                     setGlobalDonation({
-//                         ...globalDonation,
-//                         donor: {
-//                             ...globalDonation.donor,
-//                             first_name: e.target.value
-//                         }
-//                     })
-//                 }}
-//             />
-
-//             <TextInput
-//                 placeholder="0"
-//                 type="text"
-//                 value={globalDonation.donor.first_name}
-//                 name="amount"
-//                 id="amount"
-//                 onChange={(e) => { 
-//                     setGlobalDonation({
-//                         ...globalDonation,
-//                         donor: {
-//                             ...globalDonation.donor,
-//                             first_name: e.target.value
-//                         }
-//                     })
-//                 }}
-//                 required={true}
-//             />
-
-//             { donor ?
-//                 <p>{donor.first_name}</p>
-
-//                 : "No donor"
-//             }
-//         </div>
-//     )
-// }

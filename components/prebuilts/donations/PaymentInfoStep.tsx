@@ -4,13 +4,12 @@ import { ConfirmationType, DonationStep } from "./helpers/types";
 import { Donation } from "../../../system/classes/donation";
 import { callKinshipAPI } from "../../../system/utils/helpers";
 import GoBackHelper from "./helpers/GoBackButton";
-import { BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
+import { Alert, BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, EventColors, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
 import { StripePaymentElementOptions } from "@stripe/stripe-js";
 
-const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string, setStep: (value: DonationStep) => void, setConfirmationType: (value: ConfirmationType) => void }> = ({ globalDonation, stripeClientSecret, setStep, setConfirmationType }) => {
+const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setConfirmationType: (value: ConfirmationType) => void }> = ({ globalDonation, stripeClientSecret, setGlobalDonation, setStep, setConfirmationType }) => {
     if (globalDonation == null || globalDonation == undefined) {
-        console.log("No global donation")
         setStep(DonationStep.Error)
         return null
     } else {
@@ -37,7 +36,6 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
 
         const handleCardSubmit = async () => {
             setProcessingDonation(true)
-            console.log("submitting")
 
             if (!stripe || !elements) {
                 return;
@@ -65,7 +63,25 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
                     setStripeMessages("An unknown error occured") 
                 }
             } else {
-                setConfirmationType(ConfirmationType.ConfirmedAndReceived)
+                setGlobalDonation({
+                    ...globalDonation,
+                    identifiers: {
+                        ...globalDonation.identifiers,
+                        stripe_payment_intent_id: response.paymentIntent.id,
+                        stripe_payment_method_id: response.paymentIntent.payment_method.toString()
+                    }
+                })
+
+                if (response.paymentIntent.status == "succeeded") {
+                    setConfirmationType(ConfirmationType.ConfirmedAndReceived)
+                } else if (response.paymentIntent.status == "processing") {
+                    setConfirmationType(ConfirmationType.ConfirmedProcessing)
+                } else if (response.paymentIntent.status == "requires_action") {
+                    setConfirmationType(ConfirmationType.FurtherStepsRequired)
+                } else {
+                    setConfirmationType(ConfirmationType.Unconfirmed)
+                }
+                
                 setStep(DonationStep.Confirmation)
             }
 
@@ -105,21 +121,20 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
                     <form>
                         <PaymentElement id="payment-element" options={paymentElementOptions} />
                         
-                        <VerticalSpacer size={SpacerSize.Medium} />
-                        {globalDonation.donor.donor_id && (
+                        {/* {globalDonation.donor.donor_id && (
                             <CheckboxInput
                                 label="Save this payment method for future donations (optional)"
                                 checked={savePaymentMethod}
                                 required={false}
                                 onChange={(e) => { setSavePaymentMethod(e.target.checked) }}
                             />
-                        )}
+                        )} */}
 
 
                         
                         {stripeClientSecret && (
                             <div>
-                                <VerticalSpacer size={SpacerSize.Medium} />
+                                <VerticalSpacer size={SpacerSize.Large} />
                                 <div className='w-full flex justify-end'>
                                     <Button 
                                         text={processingDonation ? "Processing Donation" : "Donate"}
@@ -130,10 +145,17 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
                                         onClick={handleCardSubmit}
                                     />
                                 </div>
+                                <VerticalSpacer size={SpacerSize.Medium} />
                             </div>
                         )}
 
-                        {stripeMessages && <div id="payment-message">{stripeMessages}</div>}
+                        {stripeMessages && 
+                            <Alert 
+                                type={EventColors.Error} 
+                                title={`Oops, something went wrong`} 
+                                message={stripeMessages} 
+                            />
+                        }
 
                     </form>
                 )}

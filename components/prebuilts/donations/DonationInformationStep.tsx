@@ -72,8 +72,6 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 return
             }
 
-            const amountDonatingInCents = parseFloat(String(globalDonation.amount_in_cents)) * 100
-
             // Validate donation customizations
             if (isKhums && !globalDonation.causes.is_imam_donation && !globalDonation.causes.is_sadat_donation) {
                 setError({
@@ -99,7 +97,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             setStripeClientSecret(response.clientSecret)
 
             // Finally, set the next step
-            if (amountDonatingInCents > 50_000_00) {
+            if (globalDonation.amount_in_cents > 10_000_00) {
                 setStep(DonationStep.WireTransferInstructions)
             } else {
                 setStep(DonationStep.PaymentInfo)

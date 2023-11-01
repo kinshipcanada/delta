@@ -97,6 +97,10 @@ export function centsToDollars(amount: number | string) {
     return (amount / 100).toFixed(2);
 }
 
+export function calculateStripeFee(amount_in_cents: number) {
+    return (amount_in_cents * 0.029) + 30
+}
+
 export function dollarsToCents(amount: number | string): string {
     if (typeof amount === 'string') {
         amount = parseFloat(amount);

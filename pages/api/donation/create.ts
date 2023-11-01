@@ -8,6 +8,7 @@ import { verifyAllParametersExist } from "../../../system/utils/helpers";
  */
 export default async function handler(req, res) {
     try {
+        console.log("Received payload,", req.body)
         const stripe_charge_id = req.body.data.object.id
         
         verifyAllParametersExist(`No stripe charge id provided. Object given was ${JSON.stringify(req.body.data.object)}`, stripe_charge_id)
