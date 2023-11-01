@@ -2,103 +2,116 @@ import Head from 'next/head';
 import Navigation from './Navigation';
 import Footer from './Footer';
 import { AppNavigation } from './app/Navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode, FC } from 'react';
 import { callKinshipAPI, centsToDollars, supabase } from '../../system/utils/helpers';
 import { useRouter } from 'next/router';
-import { toast } from 'react-hot-toast';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
 import { Donor } from '../../system/classes/donor';
 import { Donation } from '../../system/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
+import { AuthProvider } from './Authentication';
 
-export const Layout = ({ children }) => {
-  const [testState, myTestState] = useState<string>("hello")
+export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
+  const [donor, setDonor] = useState<Donor>(undefined)
+  const [donations, setDonations] = useState<Donation[]>([])
+  const [authContextLoading, setAuthContextLoading] = useState<boolean>(true)
+  const [authReload, triggerAuthReload] = useState<boolean>(false)
+  const [shouldRedirect, setShouldRedirect] = useState<boolean>(false)
+  const router = useRouter()
 
-  return (
-    <>
-      <Head>
-        <title>Kinship Canada</title>
-      </Head>
-      <main id="app" className="min-h-screen">
-        <p>{testState}</p>
-        <button onClick={()=>{myTestState("another string")}}>
-          Click to chnage state
-        </button>
-        <Navigation />
-          { children }
-        <Footer />
-      </main>
-    </>
-  )
-}
-
-export function AppLayout({ AppPage }) {
-  const router = useRouter();
-  const [donor, setDonor] = useState(null);
-  const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [adminEnabled, setAdminEnabled] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false); // New state
-
-  const fetchUser = async () => {
+  const setupAuthContext = async () => {
     try {
+      setAuthContextLoading(true)
       const loggedInUser = await supabase.auth.getUser();
-      if (loggedInUser) {
-        const [donorResponse, donationsResponse] = await Promise.all([
-          callKinshipAPI('/api/donor/profile/fetch', {
-            donor_id: loggedInUser.data.user.id,
-          }),
-          callKinshipAPI('/api/donor/donations/fetch', {
-            donor_email: loggedInUser.data.user.email,
-          }),
-        ]);
 
-        if (donorResponse.donor.set_up == false && router.pathname != '/app/setup') {
-          setShouldRedirect(true); // Set the redirect state
-          router.push('/app/setup');
+      if (loggedInUser.data.user) {
+        if (isApp) {
+          const [donorResponse, donationsResponse] = await Promise.all([
+            callKinshipAPI('/api/donor/profile/fetch', {
+              donor_id: loggedInUser.data.user.id,
+            }),
+            callKinshipAPI('/api/donor/donations/fetch', {
+              donor_email: loggedInUser.data.user.email,
+            }),
+          ]);
+  
+          if (donorResponse.donor.set_up == false && router.pathname != '/app/setup') {
+            setShouldRedirect(true); // Set the redirect state
+            router.push('/app/setup');
+            return
+          } else {
+            setDonor(donorResponse.donor)
+            setDonations(donationsResponse.donations)
+          }
         } else {
-          setShouldRedirect(false);
+          const donorResponse = await callKinshipAPI('/api/donor/profile/fetch', {
+            donor_id: loggedInUser.data.user.id,
+          })
+  
+          setDonor(donorResponse.donor);
         }
-        setDonor(donorResponse.donor);
-        setDonations(donationsResponse.donations);
-        setAdminEnabled(donorResponse.donor.admin);
       } else {
-        router.push('/auth/login');
+        if (isApp) {
+          setShouldRedirect(true)
+          router.push("/auth/login")
+        }
       }
+
+      setAuthContextLoading(false)
     } catch (error) {
-      toast.error(error.message, { position: 'top-right' });
-      router.push('/auth/login');
-    } finally {
-      setLoading(false);
+        // Log error
+      console.error(error)
     }
   };
 
   useEffect(() => {
     if (!donor) {
-      fetchUser();
+      setupAuthContext();
     }
-  }, [supabase, donor]);
+  }, [supabase, donor, authReload]);
 
-  if (shouldRedirect) return null; // Don't render anything if we should redirect
+  const isApp = router.pathname.split("/").length > 1 && router.pathname.split("/")[1] == "app"
 
   return (
-    <div className="p-10 grid grid-cols-4 gap-12">
-      <AppNavigation adminEnabled={adminEnabled} />
-      <div className="col-span-3">
-        {(loading || !donor) ? (
-          <CenterOfPageBox>
-            <Loading color={LoadingColors.Blue} />
-          </CenterOfPageBox>
-        ) : (
-          <AppPage donor={donor} donations={donations} parentIsLoading={loading} />
-        )}
-      </div>
-    </div>
-  );
-}
+    <AuthProvider donor={donor} triggerAuthReload={triggerAuthReload} donorDonations={donations} authContextLoading={authContextLoading}>
+      <Head>
+        <title>Kinship Canada</title>
+      </Head>
+      <main id="app" className="min-h-screen">
+        <Navigation />
+          { isApp ?
 
+            <div>
+              {authContextLoading || shouldRedirect || !donor ? (
+                  <div className='flex min-h-screen'>
+                    <CenterOfPageBox>
+                      <Loading color={LoadingColors.Blue} />
+                    </CenterOfPageBox>
+                  </div>
+                )
+
+                :
+
+                <div className="p-10 grid grid-cols-4 gap-12">
+                  <AppNavigation adminEnabled={donor.admin} />
+                  <div className="col-span-3">
+                    { children }
+                  </div>
+                </div>
+              }
+            </div>
+
+            :
+
+            children
+          }
+        <Footer />
+      </main>
+    </AuthProvider>
+  )
+}
 
 export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
   const generateDonationTypesString = (causes) => {

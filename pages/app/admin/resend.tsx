@@ -1,17 +1,10 @@
 import React from "react"
-import { AppLayout } from "../../../components/prebuilts/Layouts"
 import { Tabs, Table, ButtonSize, ButtonStyle, SpacerSize, Tab, VerticalSpacer, HorizontalSpacer, PageHeader, Text  } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
 import Button from "../../../components/primitives/Button"
 import { EnvelopeIcon } from "@heroicons/react/20/solid"
 import { toast } from "react-hot-toast"
-
-export default function Index() {
-    return (
-        <AppLayout AppPage={AdminCreatePage} />
-    )
-}
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -30,6 +23,8 @@ const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ do
         </div>
     )
 }
+
+export default AdminCreatePage
 
 const SearchAllDonations: React.FC = () => {
 

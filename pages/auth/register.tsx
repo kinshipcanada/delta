@@ -3,10 +3,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { toast } from "react-hot-toast"
+import { useAuth } from '../../components/prebuilts/Authentication'
 
 export default function Register() {
 
 	const router = useRouter()
+
+	const { triggerAuthReload } = useAuth()
 
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState(null)
@@ -48,7 +51,8 @@ export default function Register() {
 					setLoading(false)
 					return
 				} else {
-					router.push('/app')
+					triggerAuthReload(true)
+					router.push('/app/setup')
 				}
 			}
 

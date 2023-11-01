@@ -1,15 +1,9 @@
 import React from "react"
-import { AppLayout } from "../../../components/prebuilts/Layouts"
 import { Button, JustifyEnd, Badge, Grid, PanelWithHeaderNoPadding, BoldText, PageHeader, Text, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, ExtraLargeIconSizing,SpacerSize, Style, } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
 import { ArrowUpOnSquareIcon, DocumentDuplicateIcon, EnvelopeIcon, PlusCircleIcon } from "@heroicons/react/24/solid"
 
-export default function Index() {
-    return (
-        <AppLayout AppPage={AppAdminPage} />
-    )
-}
   
 const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -111,3 +105,4 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
     )
 }
 
+export default AppAdminPage

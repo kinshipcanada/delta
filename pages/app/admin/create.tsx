@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { AppLayout } from "../../../components/prebuilts/Layouts"
 import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label, SelectionInput, CheckboxInput } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
@@ -9,12 +8,6 @@ import { PlusCircleIcon } from "@heroicons/react/20/solid"
 import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../system/utils/helpers"
 import { InputCustomizations } from "../../../components/primitives/types"
 import { countries, states_and_provinces } from "../../../system/utils/constants"
-
-export default function Index() {
-    return (
-        <AppLayout AppPage={AdminCreatePage} />
-    )
-}
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -34,6 +27,8 @@ const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ do
         </div>
     )
 }
+
+export default AdminCreatePage
 
 const CreateFromKinshipCart: React.FC = () => {
 

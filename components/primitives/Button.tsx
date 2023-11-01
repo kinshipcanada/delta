@@ -39,9 +39,9 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
       href={href ? href : undefined}
       onClick={href ? undefined : handleClick} 
       disabled={isLoading || isDisabled}
-      className="inline-block"
+      className=""
     >
-      <span className={`flex cursor-pointer items-center rounded-md font-medium text-sm ${buttonStyle}`}>
+      <span className={`inline-block flex cursor-pointer items-center rounded-md font-medium text-sm ${buttonStyle}`}>
           {(icon && !isLoading) && <><span className={StandardIconSizing}>{icon}</span><HorizontalSpacer size={SpacerSize.Small} /></>}
           {isLoading ? <><Loading color = {style === ButtonStyle.Primary ? LoadingColors.White : LoadingColors.Slate} />{(icon || isLoading) && <HorizontalSpacer size={SpacerSize.Small} />}</> : null}
           { text }

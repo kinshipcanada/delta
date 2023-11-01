@@ -1,21 +1,14 @@
 
 import React, { useState } from "react";
-import { AppLayout } from "../../components/prebuilts/Layouts";
 import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween, BaseHeader, TextInput, JustifyEnd, ButtonSize, Label } from  "../../components/primitives";
 import { callKinshipAPI } from "../../system/utils/helpers";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { SelectionInput } from "../../components/primitives/Inputs";
-import { SelectOption } from "../../components/primitives/types";
 import { countries, states_and_provinces } from "../../system/utils/constants";
+import { useAuth } from "../../components/prebuilts/Authentication";
 
-export default function Index() {
-    return (
-        <AppLayout AppPage={AppHomePage} />
-    )
-}
-
-const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
+const AppSetupPage: React.FC<AppPageProps> = () => {
 
     return (
         <div>
@@ -27,16 +20,18 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor, donations }) => {
             <SectionHeader>Your Donations</SectionHeader>
             <Text><span>This will be your Kinship Canada profile. This information will be used to issue you donation confirmations, tax receipts (if eligible), and more. If you need any help or have questions, you can contact support at <InlineLink href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`} text={`${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}/></span></Text>
             <VerticalSpacer size={SpacerSize.Small} />
-            <SetupForm donor={donor} donations={donations} />
+            <SetupForm />
         </div> 
     )
 }
 
+export default AppSetupPage
 
-const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
+const SetupForm = () => {
     
     const router = useRouter()
 
+    const { donor, triggerAuthReload } = useAuth()
     const [loading, setLoading] = useState<boolean>(false)
 
     const [firstName, setFirstName] = useState<string>("")
@@ -69,10 +64,10 @@ const SetupForm: React.FC<AppPageProps> = ({ donor }) => {
             })
     
             if (response.status == 500) { 
-                console.error(response)
                 toast.error(response.error, { position: "top-right" })
             } else if (response.status == 200) {
                 toast.success(`Successfully created your profile!`, { position: "top-right" })
+                triggerAuthReload(true)
                 router.push("/app")
             } else {
                 toast.error("An unknown error occurred", { position: "top-right" })

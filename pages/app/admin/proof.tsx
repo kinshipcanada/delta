@@ -1,14 +1,7 @@
 import React from "react"
-import { AppLayout } from "../../../components/prebuilts/Layouts"
 import { Tabs, Alert, EventColors, SpacerSize, Tab, VerticalSpacer, PageHeader, Text  } from "../../../components/primitives"
 import { Donation } from "../../../system/classes/donation"
 import { Donor } from "../../../system/classes/donor"
-
-export default function Index() {
-    return (
-        <AppLayout AppPage={AdminCreatePage} />
-    )
-}
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -28,6 +21,8 @@ const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ do
         </div>
     )
 }
+
+export default AdminCreatePage
 
 const CreateFromKinshipCart: React.FC = () => {
 

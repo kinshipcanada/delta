@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import { AppLayout } from "../../components/prebuilts/Layouts";
 import { Button, VerticalSpacer, PanelWithLeftText, TextInput, JustifyBetween, JustifyEnd, PageHeader, Text, BaseHeader,  AppPageProps, ButtonSize, ButtonStyle, SpacerSize  } from "../../components/primitives";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Donor } from "../../system/classes/donor";
@@ -9,15 +8,11 @@ import { callKinshipAPI } from "../../system/utils/helpers";
 import { FetchDonorResponse } from "../../system/classes/api";
 import { SelectionInput } from "../../components/primitives/Inputs";
 import { countries } from "../../system/utils/constants";
+import { useAuth } from "../../components/prebuilts/Authentication";
 
-export default function Index() {
-    return (
-        <AppLayout AppPage={AppHomePage} />
-    )
-}
+const AppAccountPage: React.FC<AppPageProps> = () => {
 
-const AppHomePage: React.FC<AppPageProps> = ({ donor }) => {
-
+    const { donor } = useAuth()
     const [globalDonor, setGlobalDonor] = useState<Donor>(donor)
 
     return (
@@ -32,6 +27,8 @@ const AppHomePage: React.FC<AppPageProps> = ({ donor }) => {
         </div>
     )
 }
+
+export default AppAccountPage
 
 const AccountInformationPanel: React.FC<{ donor: Donor, setGlobalDonor: (donor: Donor) => void }> = ({ donor, setGlobalDonor }) => {
     const [loading, setLoading] = useState<boolean>(false)

@@ -19,31 +19,6 @@ const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABL
 
 export default function Donate() {
 
-    const [donor, setDonor] = useState(undefined)
-
-    const fetchUser = async () => {
-        try {
-            const loggedInUser = await supabase.auth.getUser();
-
-            if (loggedInUser.data.user) {
-                const donorResponse = await callKinshipAPI('/api/donor/profile/fetch', {
-                    donor_id: loggedInUser.data.user.id,
-                })
-
-                setDonor(donorResponse.donor);
-            }
-        } catch (error) {
-            // Log error
-            console.error(error)
-        }
-    };
-
-    useEffect(() => {
-        if (!donor) {
-            fetchUser();
-        }
-    }, [supabase, donor]);
-
     const donationId = uuidv4();
     const [step, setStep] = useState<DonationStep>(DonationStep.AmountAndBilling);
     const [globalDonation, setGlobalDonation] = useState<Donation>({
@@ -84,62 +59,60 @@ export default function Donate() {
     const [stripeClientSecret, setStripeClientSecret] = useState<string>(null);
     
     return (
-        <AuthProvider donor={donor}>
-            <div className="bg-white">
-                <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" />
-                <div className="fixed right-0 top-0 hidden h-full w-1/2 bg-gray-50 lg:block" />
+        <div className="bg-white">
+            <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" />
+            <div className="fixed right-0 top-0 hidden h-full w-1/2 bg-gray-50 lg:block" />
 
-                <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16">
-                    <DonationSummary globalDonation={globalDonation} />
+            <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16">
+                <DonationSummary globalDonation={globalDonation} />
 
-                    <section
-                        aria-labelledby="payment-and-shipping-heading"
-                        className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
-                        >
-                        <div>
-                            <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-                                {
-                                    step == DonationStep.AmountAndBilling ?
+                <section
+                    aria-labelledby="payment-and-shipping-heading"
+                    className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
+                    >
+                    <div>
+                        <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
+                            {
+                                step == DonationStep.AmountAndBilling ?
 
-                                        <DonationInformationStep
-                                            globalDonation={globalDonation} 
-                                            setGlobalDonation={setGlobalDonation} 
+                                    <DonationInformationStep
+                                        globalDonation={globalDonation} 
+                                        setGlobalDonation={setGlobalDonation} 
+                                        setStep={setStep}
+                                        setStripeClientSecret={setStripeClientSecret}
+                                    />
+
+                                : step == DonationStep.PaymentInfo ?
+                                    
+                                    <StripeWrapper stripeClientSecret={stripeClientSecret} stripeClientPromise={stripeClientPromise}>
+                                        <PaymentInfoStep
+                                            globalDonation={globalDonation}
+                                            stripeClientSecret={stripeClientSecret}
+                                            setGlobalDonation={setGlobalDonation}
+                                            setConfirmationType={setConfirmationType}
                                             setStep={setStep}
-                                            setStripeClientSecret={setStripeClientSecret}
                                         />
+                                    </StripeWrapper>
 
-                                    : step == DonationStep.PaymentInfo ?
-                                        
-                                        <StripeWrapper stripeClientSecret={stripeClientSecret} stripeClientPromise={stripeClientPromise}>
-                                            <PaymentInfoStep
-                                                globalDonation={globalDonation}
-                                                stripeClientSecret={stripeClientSecret}
-                                                setGlobalDonation={setGlobalDonation}
-                                                setConfirmationType={setConfirmationType}
-                                                setStep={setStep}
-                                            />
-                                        </StripeWrapper>
+                                : step == DonationStep.WireTransferInstructions ?
 
-                                    : step == DonationStep.WireTransferInstructions ?
+                                    <WireTransferInstructions
+                                        globalDonation={globalDonation}
+                                    />
 
-                                        <WireTransferInstructions
-                                            globalDonation={globalDonation}
-                                        />
+                                : step == DonationStep.Confirmation ?
 
-                                    : step == DonationStep.Confirmation ?
+                                    <Confirmation
+                                        globalDonation={globalDonation}
+                                        confirmationType={confirmationType} 
+                                    />
 
-                                        <Confirmation
-                                            globalDonation={globalDonation}
-                                            confirmationType={confirmationType} 
-                                        />
-
-                                    : <DonationErrorMessage />
-                                }
-                            </div>
+                                : <DonationErrorMessage />
+                            }
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
-        </AuthProvider>
+        </div>
     )
 }

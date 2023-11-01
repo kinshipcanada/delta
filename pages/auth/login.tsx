@@ -4,10 +4,12 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Dialog, Transition } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '../../components/prebuilts/Authentication'
 
 export default function Register() {
 
 	const router = useRouter()
+	const { triggerAuthReload } = useAuth()
 
 	const [open, setOpen] = useState(false)
 	const cancelButtonRef = useRef(null)
@@ -29,6 +31,7 @@ export default function Register() {
 		if (error) {
 			setError(error.message)
 		} else {
+			triggerAuthReload(true)
 			router.push('/app')
 		}
 

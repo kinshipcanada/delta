@@ -6,6 +6,7 @@ import { Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { Button, ButtonSize, ButtonStyle } from '../primitives';
+import { useAuth } from './Authentication';
 
 interface PageLink {
   name: string
@@ -16,8 +17,7 @@ interface PageLink {
 export default function Navigation() {
     const router = useRouter()
 
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const { donor, authContextLoading } = useAuth()
 
     const pages: PageLink[] = [
       { name: "Home", link: "/", current: router.asPath == "/" },
@@ -25,19 +25,6 @@ export default function Navigation() {
       { name: "Vision Kinship Campaign", link: "/campaigns/vision", current: router.asPath == "/campaigns/vision" },
       { name: "About", link: "/about", current: router.asPath == "/about" }
     ]
-
-    useEffect(() => {
-        (async () => {
-            const loggedInUser = await supabase.auth.getUser()
-
-            if (loggedInUser) {
-                setUser(loggedInUser.data.user)
-                setLoading(false)
-            } else {
-                setLoading(false)
-            }
-        })();
-    }, [supabase])
 
     return (
         <Popover className="relative bg-white z-10">
@@ -70,49 +57,33 @@ export default function Navigation() {
                 </div>
 
                 <div className="flex items-center md:ml-12">
-
-                    {
-                        loading ? null :
-
-                        user ? 
-
-                        <Button 
-                            text = "Dashboard"
-                            href = "/app"
-                            style={ButtonStyle.Secondary}
-                            size={ButtonSize.Standard}
-                        />
-
-                        : !user ?
-
-                        <Button 
-                            text = "Login"
-                            href = "/auth/login"
-                            style={ButtonStyle.Secondary}
-                            size={ButtonSize.Standard}
-                        />
-
-                        : 
-                        
-                        <Button 
-                          text = "Login"
-                          href = "/auth/login"
-                          style={ButtonStyle.Secondary}
-                          size={ButtonSize.Standard}
-                        />
-                    }
-
-                    <div className='m-1' />
-
+                  {
+                    authContextLoading ? null :
+                    donor ? (
+                      <Button 
+                        text = "Dashboard"
+                        href = "/app"
+                        style={ButtonStyle.Secondary}
+                        size={ButtonSize.Standard}
+                      />
+                    ) :
                     <Button 
-                      text = "Donate"
-                      href = "/donate"
-                      style={ButtonStyle.Primary}
+                      text = "Login"
+                      href = "/auth/login"
+                      style={ButtonStyle.Secondary}
                       size={ButtonSize.Standard}
                     />
+                  }
+
+                  <div className='m-1' />
+
+                  <Button 
+                    text = "Donate"
+                    href = "/donate"
+                    style={ButtonStyle.Primary}
+                    size={ButtonSize.Standard}
+                  />
                 </div>
-
-
             </div>
         </Popover>
     )

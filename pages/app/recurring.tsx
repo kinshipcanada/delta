@@ -1,15 +1,8 @@
 
 import React from "react";
-import { AppLayout } from "../../components/prebuilts/Layouts";
 import { Button, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, SectionHeader, JustifyCenter } from  "../../components/primitives";
 
-export default function Index() {
-    return (
-        <AppLayout AppPage={AppHomePage} />
-    )
-}
-
-const AppHomePage: React.FC<AppPageProps> = () => {
+const AppRecurringPage: React.FC<AppPageProps> = () => {
     return (
         <JustifyCenter>
             <SectionHeader>Support for recurring donations is coming soon...</SectionHeader>
@@ -19,4 +12,4 @@ const AppHomePage: React.FC<AppPageProps> = () => {
     )
 }
 
-
+export default AppRecurringPage
