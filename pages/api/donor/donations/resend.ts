@@ -1,35 +1,51 @@
-import { ErroredResponse } from "../../../../lib/classes/api";
-import { DonationIdentifiers } from "../../../../lib/classes/utils";
-import { checkAndResendReceipt } from "../../../../lib/functions/notifications";
-import { verifyAtLeastOneParametersExists } from "../../../../lib/utils/helpers";
-import { MessageResponse } from "../../../../lib/classes/api"
+import { DonationIdentifiers } from "@lib/classes/utils";
+import { checkAndResendReceipt } from "@lib/functions/notifications";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
+
+const requestSchema = z.object({
+    donation_id: z.string().uuid().optional(),
+    stripe_charge_id: z.string().optional(), 
+    stripe_payment_intent_id: z.string().optional(),
+})
+
+export const responseSchema = z.object({
+    error: z.string().optional()
+})
 
 /**
  * @description Resends a donation receipt to a donor, given the donation's identifiers
  */
-export default async function handler(req, res) {
-    try {
-        const { donation_id, stripe_charge_id, stripe_payment_intent_id } = req.body
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const response = requestSchema.safeParse(req.body);
 
-        verifyAtLeastOneParametersExists("No donation identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.", donation_id, stripe_charge_id, stripe_payment_intent_id)
+  if (!response.success || !(response.data.donation_id || response.data.stripe_charge_id || response.data.stripe_payment_intent_id)) {
+    return res.status(400).send({
+        error: 'Invalid payload',
+    });
+  }
 
-        const identifiers: DonationIdentifiers = {
-            donation_id: donation_id,
-            stripe_charge_id: stripe_charge_id,
-            stripe_payment_intent_id: stripe_payment_intent_id
-        }
-
-        const receiptResentResponse = await checkAndResendReceipt(identifiers);
-        res.status(200).send({
-            status: 200,
-            endpoint_called: `/api/donor/donations/resend`,
-            message: receiptResentResponse
-        } as MessageResponse);
-    } catch (error) {
-        res.status(500).send({
-            status: 500,
-            endpoint_called: `/api/donor/donations/resend`,
-            error: "Error resending receipt."
-        } as ErroredResponse);
+  try {
+    // To do: update generateIdentifiersFromStrings to include optionals so that we verify by prefix
+    const identifiers: DonationIdentifiers = {
+        donation_id: response.data.donation_id, 
+        stripe_charge_id: response.data.stripe_charge_id, 
+        stripe_payment_intent_id: response.data.stripe_payment_intent_id
     }
-};
+    
+    await checkAndResendReceipt(identifiers)
+
+    return res.status(200).send({
+        error: undefined
+    })
+  } catch (error) {
+    // Log error
+    
+    return res.status(500).send({
+        error: "Sorry, something went wrong resending this receipt",
+    })
+  }
+}

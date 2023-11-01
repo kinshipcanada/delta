@@ -1,4 +1,4 @@
-import { supabase, callKinshipAPI } from '../../system/utils/helpers';
+import { callKinshipAPI, supabase } from "../../lib/utils/helpers";
 import { useState } from 'react';
 import Head from 'next/head'
 

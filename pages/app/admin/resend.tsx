@@ -45,7 +45,7 @@ const SearchAllDonations: React.FC = () => {
         return
     }
 
-    const handleResendEmail = (email) => {
+    const handleResendEmail = (email: string) => {
     // Implement the logic to resend email
         console.log(`Resending email to ${email}`);
     };

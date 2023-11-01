@@ -22,6 +22,7 @@ export interface Causes {
 
 export const CausesSchema = z.object({
     total_amount_paid_in_cents: z.number(),
+    currency: z.nativeEnum(CurrencyList),
     is_imam_donation: z.boolean(),
     is_sadat_donation: z.boolean(),
     is_sadaqah: z.boolean(),

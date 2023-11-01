@@ -13,7 +13,7 @@ const AppHomePage: React.FC<AppPageProps> = () => {
     return (
         <div>
             <JustifyBetween>
-                <PageHeader>{ donor.first_name }{ donor.first_name.endsWith('s') ? "'" : "'s" } Kinship Dashboard</PageHeader>
+                <PageHeader>{ donor!.first_name }{ donor!.first_name.endsWith('s') ? "'" : "'s" } Kinship Dashboard</PageHeader>
                 <Button text="Support" style={ButtonStyle.Secondary} href={"/support"}></Button>
             </JustifyBetween>
             <VerticalSpacer size={SpacerSize.Medium} />

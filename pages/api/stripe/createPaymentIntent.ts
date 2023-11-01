@@ -8,7 +8,7 @@ import { StripeCreatePaymentIntentResponse } from '../../../lib/classes/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
             apiVersion: "2023-08-16"
         })
 
@@ -54,12 +54,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         res.send({
-            status: 200,
             clientSecret: paymentIntent.client_secret,
-            message: null
+            message: undefined
         } as StripeCreatePaymentIntentResponse);
     } catch (error) {
-        console.error('error x', error)
-        res.status(500).json({ status: 500, message: error.message, clientSecret: null } as StripeCreatePaymentIntentResponse);
+        // Log error
+        res.status(500).json({ message: "Sorry, something went wrong on our end", clientSecret: undefined } as StripeCreatePaymentIntentResponse);
     }
 }

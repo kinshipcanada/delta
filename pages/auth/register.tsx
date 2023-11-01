@@ -12,12 +12,12 @@ export default function Register() {
 	const { triggerAuthReload } = useAuth()
 
 	const [loading, setLoading] = useState(false)
-	const [email, setEmail] = useState(null)
-	const [password, setPassword] = useState("")
+	const [email, setEmail] = useState<string>("")
+	const [password, setPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState("")
-	const [error, setError] = useState(null)
+	const [error, setError] = useState<string | undefined>(undefined)
 
-	const register = async (event) => {
+	const register = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 
 		try {
@@ -41,8 +41,9 @@ export default function Register() {
 			} else {
 				const { error } = await supabase
 					.from('donor_profiles')
+					// todo
 					.insert({ 
-						id: data.user.id,
+						id: data.user!.id,
 						email: email,
 					})
 				
@@ -57,7 +58,8 @@ export default function Register() {
 			}
 
 		} catch (error) {
-			toast.error(`Error: ${error.message}`, { position: "top-right" })
+			// todo
+			// toast.error(`Error: ${error.message}`, { position: "top-right" })
 		} finally {
 			setLoading(false)
 			return

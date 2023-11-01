@@ -15,7 +15,10 @@ import Confirmation from "../components/prebuilts/donations/confirmation/Confirm
 import DonationErrorMessage from "../components/prebuilts/donations/helpers/ErrorMessage";
 import { states_and_provinces } from "../lib/utils/constants";
 
-const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+// todo figure out if stripeClientPromise is returned as an obj or promise
+import { Stripe } from "@stripe/stripe-js";
+
+const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
 export default function Donate() {
 
@@ -24,7 +27,7 @@ export default function Donate() {
     const [globalDonation, setGlobalDonation] = useState<Donation>({
         identifiers: {
             donation_id: donationId,
-            donor_id: null,
+            donor_id: undefined,
         },
         donor: {
             first_name: "",
@@ -44,7 +47,6 @@ export default function Donate() {
         causes: {
             total_amount_paid_in_cents: 0,
             currency: CurrencyList.CAD,
-            causes: null, // causes is no longer a supported field, and is kept for backwards compatability
             is_imam_donation: false,
             is_sadat_donation: false,
             is_sadaqah: false
@@ -56,7 +58,7 @@ export default function Donate() {
         date_donated: new Date()
     });
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed)
-    const [stripeClientSecret, setStripeClientSecret] = useState<string>(null);
+    const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);
     
     return (
         <div className="bg-white">
@@ -84,10 +86,11 @@ export default function Donate() {
 
                                 : step == DonationStep.PaymentInfo ?
                                     
-                                    <StripeWrapper stripeClientSecret={stripeClientSecret} stripeClientPromise={stripeClientPromise}>
+                                    <StripeWrapper stripeClientSecret={stripeClientSecret ? stripeClientSecret : ""} stripeClientPromise={stripeClientPromise as Promise<Stripe>}>
+                                        {/* // todo error if the clientsecret isnt there  */}
                                         <PaymentInfoStep
                                             globalDonation={globalDonation}
-                                            stripeClientSecret={stripeClientSecret}
+                                            stripeClientSecret={stripeClientSecret ? stripeClientSecret : ""}
                                             setGlobalDonation={setGlobalDonation}
                                             setConfirmationType={setConfirmationType}
                                             setStep={setStep}

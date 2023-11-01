@@ -1,19 +1,19 @@
-import { Donation, DonationSchema } from "@lib/classes/donation";
-import { fetchAllDonationsForDonor } from "@lib/functions/donations";
+import { logFeedback } from "@lib/functions/feedback";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 
 const requestSchema = z.object({
-    donor_email: z.string().email()
+    feedback: z.string(),
+    donor_id: z.string().uuid(),
+    anonymous: z.boolean().optional()
 })
 
 export const responseSchema = z.object({
-    donations: z.array(DonationSchema),
     error: z.string().optional()
 })
 
 /**
- * @description Fetches all donations for a given donor
+ * @description Submits feedback from the frontend
  */
 export default async function handler(
   req: NextApiRequest,
@@ -23,24 +23,21 @@ export default async function handler(
 
   if (!response.success) {
     return res.status(400).send({
-        error: 'No donor email provided',
-        donations: undefined
+        error: 'Invalid payload',
     });
   }
 
   try {
-    const donations: Donation[] = await fetchAllDonationsForDonor(response.data.donor_email);
+    await logFeedback(response.data.feedback, response.data.donor_id)
 
     return res.status(200).send({
-        donations: donations,
         error: undefined
     })
   } catch (error) {
     // Log error
     
     return res.status(500).send({
-        error: "Sorry, something went wrong fetching your donations",
-        donations: undefined
+        error: "Sorry, something went wrong submitting the feedback",
     })
   }
 }

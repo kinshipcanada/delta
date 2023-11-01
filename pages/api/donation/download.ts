@@ -1,11 +1,13 @@
-import { ErroredResponse } from "../../../lib/classes/api";
+import { NextApiRequest, NextApiResponse } from "next";
+
 /**
  * @description Creates a PDF of a donation receipt, and returns it to the frontend
  */
-export default async function handler(req, res) {
-    res.status(500).send({
-        status: 500,
-        endpoint_called: `/api/donation/download`,
-        error: 'Method has not been implemented yet.'
-    } as ErroredResponse);
-};
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+    return res.status(500).send({
+        error: "Method has not been implemented",
+    });
+}

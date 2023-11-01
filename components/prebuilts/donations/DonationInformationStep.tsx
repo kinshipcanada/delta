@@ -25,7 +25,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
     }, [donor])
 
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<{ title: string, message: string }>(null)
+    const [error, setError] = useState<{ title: string, message: string } | undefined>(undefined)
 
     const [isKhums, setIsKhums] = useState<boolean>(false)
 
@@ -33,7 +33,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
         setLoading(true)
 
         try {
-            setError(null)
+            setError(undefined)
 
             // Validate that there is a valid amount being donated
             try {
@@ -121,7 +121,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 inputCustomization={InputCustomizations.Dollars}
                 name="amount"
                 id="amount"
-                onChange={(e) => { 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                     setGlobalDonation({
                         ...globalDonation,
                         amount_in_cents: parseInt(dollarsToCents(e.target.value))
@@ -142,7 +142,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     name="userFirstName" 
                     id="userFirstName" 
                     value={globalDonation.donor.first_name}
-                    onChange={(e) => { 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                         setGlobalDonation({
                             ...globalDonation,
                             donor: {
@@ -160,7 +160,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     name="userLastName" 
                     id="userLastName" 
                     value={globalDonation.donor.last_name}
-                    onChange={(e) => { 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                         setGlobalDonation({
                             ...globalDonation,
                             donor: {
@@ -180,7 +180,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 name="emailAddress" 
                 id="emailAddress" 
                 value={globalDonation.donor.email}
-                onChange={(e) => { 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                     setGlobalDonation({
                         ...globalDonation,
                         donor: {
@@ -203,7 +203,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 name="lineAddress" 
                 id="lineAddress" 
                 value={globalDonation.donor.address.line_address}
-                onChange={(e)=>{
+                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                     setGlobalDonation({
                         ...globalDonation,
                         donor: {
@@ -226,7 +226,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     name="city" 
                     id="city" 
                     value={globalDonation.donor.address.city}
-                    onChange={(e)=>{
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                         setGlobalDonation({
                             ...globalDonation,
                             donor: {
@@ -248,7 +248,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                         name="state_or_province"
                         id="state_or_province"
                         value={globalDonation.donor.address.state}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setGlobalDonation({
                                 ...globalDonation,
                                 donor: {
@@ -269,7 +269,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                         id="state_or_province"
                         value={globalDonation.donor.address.state}
                         options={states_and_provinces[globalDonation.donor.address.country]}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setGlobalDonation({
                                 ...globalDonation,
                                 donor: {
@@ -291,7 +291,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     name="postalCode" 
                     id="postalCode" 
                     value={globalDonation.donor.address.postal_code}
-                    onChange={(e)=>{
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                         setGlobalDonation({
                             ...globalDonation,
                             donor: {
@@ -312,7 +312,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     id="country" 
                     options={countries}
                     value={globalDonation.donor.address.country}
-                    onChange={(e)=>{ 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
                         setGlobalDonation({
                             ...globalDonation,
                             donor: {

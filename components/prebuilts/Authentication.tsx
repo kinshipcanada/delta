@@ -4,7 +4,7 @@ import { Donor } from '../../lib/classes/donor';
 import { Donation } from '../../lib/classes/donation';
 
 type AuthContextType = {
-  donor: Donor;
+  donor?: Donor;
   triggerAuthReload: (value: boolean) => void;
   donorDonations: Donation[];
   authContextLoading: boolean;

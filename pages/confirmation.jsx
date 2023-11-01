@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Loading } from "../components/primitives/Loading";
 import toast from "react-hot-toast";
-import { callKinshipAPI } from "../system/utils/helpers";
+import { callKinshipAPI } from "../lib/utils/helpers";
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
 import { InformationCircleIcon, DocumentDuplicateIcon, CheckCircleIcon } from "@heroicons/react/20/solid";

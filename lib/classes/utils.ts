@@ -20,7 +20,7 @@ export const DonationIdentifiersSchema = StripeTagsSchema.merge(KinshipTagsSchem
 /**
  * @description Currencies supported by Kinship
  */
-export const enum CurrencyList {
+export enum CurrencyList {
     CAD = 'cad',
     USD = 'usd',
     EUR = 'eur',

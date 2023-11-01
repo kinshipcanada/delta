@@ -26,16 +26,17 @@ const AppFeedbackPage: React.FC<AppPageProps> = () => {
 
         const response: MessageResponse | ErroredResponse = await callKinshipAPI('/api/feedback/create', {
             feedback: feedback,
-            donor_id: stayAnonymous ? null : donor.donor_id
+            donor_id: stayAnonymous ? null : donor!.donor_id
         })
 
-        if (response.status == 500) { 
-            toast.error("Error submitting feedback", { position: "top-right" })
-        } else if (response.status == 200) {
-            toast.success("Successfully submitted feedback. Thank you!", { position: "top-right" })
-        } else {
-            toast.error("An unknown error occurred", { position: "top-right" })
-        }
+        // todo
+        // if (response.status == 500) { 
+        //     toast.error("Error submitting feedback", { position: "top-right" })
+        // } else if (response.status == 200) {
+        //     toast.success("Successfully submitted feedback. Thank you!", { position: "top-right" })
+        // } else {
+        //     toast.error("An unknown error occurred", { position: "top-right" })
+        // }
 
         setLoading(false)
         return
@@ -58,7 +59,7 @@ const AppFeedbackPage: React.FC<AppPageProps> = () => {
                 name="userFirstName" 
                 id="userFirstName" 
                 value={feedback}
-                onChange={(e)=>{ setFeedback(e.target.value) }} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setFeedback(e.target.value) }} 
                 required={false} 
             />
             <VerticalSpacer size={SpacerSize.Small} />

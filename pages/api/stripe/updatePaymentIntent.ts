@@ -1,11 +1,10 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { extractStripePaymentIntentFromClientSecret } from '../../../lib/utils/helpers';
-import { BaseApiResponse, StripeCreatePaymentIntentResponse } from '../../../lib/classes/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
             apiVersion: "2023-08-16"
         })
 
@@ -26,11 +25,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }}
         );
 
-        res.send({
+        res.status(200).send({
             status: 200
-        } as BaseApiResponse);
+        });
     } catch (error) {
         // Implement: log error here
-        res.status(500).json({ status: 500 } as BaseApiResponse);
+        res.status(500).json({ status: 500 });
     }
 }

@@ -52,8 +52,8 @@ const SetupForm = () => {
                 return
             }
             const response = await callKinshipAPI('/api/donor/profile/create', {
-                email: donor.email,
-                donor_id: donor.donor_id,
+                email: donor!.email,
+                donor_id: donor!.donor_id,
                 first_name: firstName,
                 last_name: lastName, 
                 address_line_address: lineAddress,
@@ -74,7 +74,9 @@ const SetupForm = () => {
             }
     
         } catch (error) {
-            toast.error(`Error: ${error.message}`, { position: "top-right" })
+            // todo
+            console.error(error)
+            // toast.error(`Error: ${error.message}`, { position: "top-right" })
         } finally {
             setLoading(false)
             return
@@ -94,7 +96,7 @@ const SetupForm = () => {
                     name="userFirstName" 
                     id="userFirstName" 
                     value={firstName}
-                    onChange={(e)=>{ setFirstName(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setFirstName(e.target.value) }} 
                     required={true} 
                 />
                 <TextInput 
@@ -104,7 +106,7 @@ const SetupForm = () => {
                     name="userLastName" 
                     id="userLastName" 
                     value={lastName}
-                    onChange={(e)=>{ setLastName(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLastName(e.target.value) }} 
                     required={true} 
                 />
             </div>
@@ -119,7 +121,7 @@ const SetupForm = () => {
                 name="lineAddress" 
                 id="lineAddress" 
                 value={lineAddress}
-                onChange={(e)=>{ setLineAddress(e.target.value) }} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLineAddress(e.target.value) }} 
                 required={true} 
             />
             <VerticalSpacer size={SpacerSize.Medium} />
@@ -131,7 +133,7 @@ const SetupForm = () => {
                     name="city" 
                     id="city" 
                     value={city}
-                    onChange={(e)=>{ setCity(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setCity(e.target.value) }} 
                     required={true} 
                 />
                 {states_and_provinces[country] === null || states_and_provinces[country] === undefined ? (
@@ -142,7 +144,7 @@ const SetupForm = () => {
                         name="state_or_province"
                         id="state_or_province"
                         value={state}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setState(e.target.value);
                         }}
                         required={true}
@@ -154,7 +156,7 @@ const SetupForm = () => {
                         id="state_or_province"
                         value={state}
                         options={states_and_provinces[country]}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setState(e.target.value);
                         }}
                         required={true}
@@ -167,7 +169,7 @@ const SetupForm = () => {
                     name="postalCode" 
                     id="postalCode" 
                     value={postalCode}
-                    onChange={(e)=>{ setPostalCode(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setPostalCode(e.target.value) }} 
                     required={true} 
                 />
 
@@ -177,7 +179,7 @@ const SetupForm = () => {
                     id="country" 
                     options={countries}
                     value="ca"
-                    onChange={(e)=>{ 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
                         setCountry(e.target.value)
                      }}
                     required={true}

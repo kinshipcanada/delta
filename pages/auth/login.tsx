@@ -1,5 +1,5 @@
 import { supabase } from '../../lib/utils/helpers'
-import { useState, useRef, Fragment } from 'react'
+import { useState, useRef, Fragment, FC } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Dialog, Transition } from '@headlessui/react'
@@ -15,11 +15,11 @@ export default function Register() {
 	const cancelButtonRef = useRef(null)
 
 	const [loading, setLoading] = useState(false)
-	const [email, setEmail] = useState(null)
-	const [password, setPassword] = useState(null)
-	const [error, setError] = useState(null)
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
+	const [error, setError] = useState(undefined)
 
-	const login = async (event) => {
+	const login = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		setLoading(true)
 
@@ -29,7 +29,8 @@ export default function Register() {
 		})
 
 		if (error) {
-			setError(error.message)
+			// todo
+			// setError(error.message)
 		} else {
 			triggerAuthReload(true)
 			router.push('/app')
@@ -139,10 +140,11 @@ export default function Register() {
 	)
 }
 
-export function ResetModal({ open, setOpen, email, setEmail, cancelButtonRef }) {
+// todo proper typings
+export const ResetModal: FC<{ open: boolean, setOpen: (value: boolean) => void, email: string, setEmail: (value: string) => void, cancelButtonRef: any }> = ({ open, setOpen, email, setEmail, cancelButtonRef }) => {
 	const [error, setError] = useState(null)
 	const [loading, setLoading] = useState(false)
-	const [message, setMessage] = useState(null)
+	const [message, setMessage] = useState("")
 
 	return (
 		<Transition.Root show={open} as={Fragment}>
@@ -232,7 +234,7 @@ export function ResetModal({ open, setOpen, email, setEmail, cancelButtonRef }) 
   
 							if (error) {
 								console.error(error)
-								setMessage(error.message)
+								// setMessage(error.message)
 							} else {
 								setMessage("Success! Password reset link sent to your email, if you have already signed up.")
 							}

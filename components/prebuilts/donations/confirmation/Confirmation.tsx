@@ -11,7 +11,7 @@ import { EnvelopeIcon } from "@heroicons/react/20/solid"
 const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation }) => {
 
   const [loading, setLoading] = useState(true)
-  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod>(null)
+  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod | undefined>(undefined)
   const [showLink, setShowLink] = useState(false);
 
   const fetchPaymentMethod = async () => {
@@ -79,7 +79,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
             <div>
               { 
               
-                (!loading && paymentMethod) ?
+                (!loading && paymentMethod && paymentMethod.card) ?
 
                 <div>
                   <dt className="font-medium text-gray-900">Payment Information</dt>
@@ -121,7 +121,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
 const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation }) => {
 
   const [loading, setLoading] = useState(true)
-  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod>(null)
+  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod | undefined>(undefined)
   const [showLink, setShowLink] = useState(false);
 
   const fetchPaymentMethod = async () => {
@@ -192,7 +192,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
             <div>
               { 
               
-                (!loading && paymentMethod) ?
+                (!loading && paymentMethod && paymentMethod.acss_debit) ?
 
                 <div>
                   <dt className="font-medium text-gray-900">Payment Information</dt>
@@ -234,7 +234,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
 const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation }) => {
 
   const [loading, setLoading] = useState(true)
-  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod>(null)
+  const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod | undefined>(undefined)
 
   const fetchPaymentMethod = async () => {
     const paymentMethodResponse = await callKinshipAPI('/api/stripe/fetchPaymentMethod', {
@@ -296,7 +296,7 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
             <div>
               { 
               
-                (!loading && paymentMethod) ?
+                (!loading && paymentMethod && paymentMethod.acss_debit) ?
 
                 <div>
                   <dt className="font-medium text-gray-900">Payment Information</dt>

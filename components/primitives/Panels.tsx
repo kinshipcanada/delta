@@ -1,4 +1,4 @@
-export function BasicPanel({ children }) {
+export const BasicPanel: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div className="overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
             <div className="px-4 py-5 sm:p-6">{ children }</div>
@@ -6,7 +6,7 @@ export function BasicPanel({ children }) {
     )
 }
 
-export function PanelWithHeader({ header, children }) {
+export const PanelWithHeader: React.FC<{ header: React.ReactNode, children: React.ReactNode }> = ({ header, children }) => {
     return (
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
         <div className="px-4 py-5 sm:px-6">
@@ -17,7 +17,7 @@ export function PanelWithHeader({ header, children }) {
     )
 }
 
-export function PanelWithFooter({ footer, children }) {
+export const PanelWithFooter: React.FC<{ children: React.ReactNode, footer: React.ReactNode }> = ({ footer, children }) => {
     return (
         <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
             <div className="px-4 py-5 sm:p-6">{ children }</div>
@@ -28,7 +28,7 @@ export function PanelWithFooter({ footer, children }) {
     )
 }
 
-export function PanelWithHeaderAndFooter({ header, footer, children }) {
+export const PanelWithHeaderAndFooter: React.FC<{ header: React.ReactNode, children: React.ReactNode, footer: React.ReactNode }> = ({ header, footer, children }) => {
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
       <div className="px-4 py-5 sm:px-6">
@@ -42,7 +42,7 @@ export function PanelWithHeaderAndFooter({ header, footer, children }) {
   )
 }
 
-export function PanelWithHeaderAndFooterNoPadding({ header, footer, children }) {
+export const PanelWithHeaderAndFooterNoPadding: React.FC<{ header: React.ReactNode, children: React.ReactNode, footer: React.ReactNode }> = ({ header, footer, children }) => {
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white border border-slate-200 shadow-sm">
       { header }
@@ -52,7 +52,7 @@ export function PanelWithHeaderAndFooterNoPadding({ header, footer, children }) 
   )
 }
 
-export function PanelWithHeaderNoPadding({ header, children }) {
+export const PanelWithHeaderNoPadding: React.FC<{ header: React.ReactNode, children: React.ReactNode }> = ({ header, children }) => {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200">
       { header }
@@ -61,7 +61,7 @@ export function PanelWithHeaderNoPadding({ header, children }) {
   )
 }
   
-export function PanelWithLeftText({ header, children }) {
+export const PanelWithLeftText: React.FC<{ header: React.ReactNode, children: React.ReactNode }> = ({ header, children }) => {
   return (
     <div className="bg-white border border-gray-200 px-4 py-5 sm:rounded-lg sm:p-6">
       <div className="md:grid md:grid-cols-3 md:gap-6">

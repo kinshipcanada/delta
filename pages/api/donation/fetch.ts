@@ -1,31 +1,46 @@
-import { FetchDonationResponse, ErroredResponse } from "../../../lib/classes/api";
-import { Donation } from "../../../lib/classes/donation";
-import { DonationIdentifiers } from "../../../lib/classes/utils";
-import { fetchDonation } from "../../../lib/functions/donations";
-import { generateIdentifiersFromStrings, verifyAllParametersExist } from "../../../lib/utils/helpers";
+import { Donation, DonationSchema } from "@lib/classes/donation";
+import { DonationIdentifiers } from "@lib/classes/utils";
+import { fetchDonation } from "@lib/functions/donations";
+import { generateIdentifiersFromStrings } from "@lib/utils/helpers";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-/**
- * @description Fetches a single donation. To fetch a number of donations, use a donor's email address and the api/donor/donations/fetch endpoint
- */
-export default async function handler(req, res) {
-    try {
-        const { donation_id } = req.body
-        
-        verifyAllParametersExist(`No donation_id provided. You must pass either a Kinship ID, Stripe charge id, or Stripe payment intent id.`, donation_id)
+const requestSchema = z.object({
+    donation_id: z.string().min(8)
+})
 
-        const identifiers: DonationIdentifiers = generateIdentifiersFromStrings([donation_id])
-        const donation: Donation = await fetchDonation(identifiers)
+export const responseSchema = z.object({
+    donation: DonationSchema.optional(),
+    error: z.string().optional()
+})
 
-        return donation ? res.status(200).send({
-            status: 200,
-            endpoint_called: `/api/donation/fetch`,
-            donation: donation
-        } as FetchDonationResponse) : new Error("Something went wrong creating the donation.");
-    } catch (error) {
-        res.status(500).send({
-            status: 500,
-            endpoint_called: `/api/donation/fetch`,
-            error: error.message
-        } as ErroredResponse);
-    }
-};
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const response = requestSchema.safeParse(req.body);
+
+  if (!response.success) {
+    return res.status(400).send({
+        error: 'No donation_id provided. You must pass either a Kinship ID, Stripe charge id, or Stripe payment intent id.',
+        donation: undefined
+    });
+  }
+
+  try {
+    const identifiers: DonationIdentifiers = generateIdentifiersFromStrings([response.data.donation_id])
+    const donation: Donation = await fetchDonation(identifiers)
+
+    return res.status(200).send({
+        donation: donation,
+        error: undefined
+    })
+  } catch (error) {
+    // Log error
+    
+    return res.status(500).send({
+        error: "Sorry, something went wrong fetching this donation",
+        donation: undefined
+    })
+  }
+}

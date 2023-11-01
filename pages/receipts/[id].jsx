@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { callKinshipAPI } from "../../system/utils/helpers";
+import { callKinshipAPI } from "../../lib/utils/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { XCircleIcon } from "@heroicons/react/24/outline";

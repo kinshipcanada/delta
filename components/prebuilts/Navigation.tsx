@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Popover, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { classNames, supabase } from '../../lib/utils/helpers'
-import { Fragment, useEffect, useState} from 'react';
+import { FC, Fragment, useEffect, useState} from 'react';
 import { EnvelopeIcon, LifebuoyIcon, PlayIcon, TicketIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { Button, ButtonSize, ButtonStyle } from '../primitives';
@@ -89,7 +89,7 @@ export default function Navigation() {
     )
 }
 
-export function MenuLink({ text, link, current }) {
+export const MenuLink: FC<{ text: string, link: string, current: boolean }> = ({ text, link, current }) => {
     return (
         <Link href={link}>
           <a className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}>

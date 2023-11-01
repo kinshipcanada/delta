@@ -12,9 +12,10 @@ import { Donor } from '../../lib/classes/donor';
 import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
+import { Causes } from '@lib/classes/causes';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
-  const [donor, setDonor] = useState<Donor>(undefined)
+  const [donor, setDonor] = useState<Donor>()
   const [donations, setDonations] = useState<Donation[]>([])
   const [authContextLoading, setAuthContextLoading] = useState<boolean>(true)
   const [authReload, triggerAuthReload] = useState<boolean>(false)
@@ -114,7 +115,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 }
 
 export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
-  const generateDonationTypesString = (causes) => {
+  const generateDonationTypesString = (causes: Causes) => {
     const donationTypes = [];
   
     if (causes.is_sadaqah) {
@@ -206,7 +207,7 @@ export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }
     )
 }
 
-const DonationFormWrapper = ({ children }) => (
+const DonationFormWrapper: FC<{ children: ReactNode }> = ({ children }) => (
     <section
         aria-labelledby="payment-and-shipping-heading"
         className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
@@ -218,64 +219,3 @@ const DonationFormWrapper = ({ children }) => (
         </div>
     </section>
 )
-
-export function DonationPageLayout({ DonationForm, globalDonation }) {
-
-  const donationChild = ({ donor, parentIsLoading}: { donor: Donor, parentIsLoading: boolean }) => {
-    return (
-      <div className="bg-white">
-        <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" />
-        <div className="fixed right-0 top-0 hidden h-full w-1/2 bg-gray-50 lg:block" />
-  
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16">
-          <DonationSummary globalDonation={globalDonation} />
-  
-          <DonationFormWrapper>
-            <DonationForm donor = {donor} parentIsLoading={parentIsLoading} />
-          </DonationFormWrapper>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <GenericPageLayout ChildPage={donationChild} />
-  );
-}
-  
-// Opinionated dynamic user rendering - comment on this
-export function GenericPageLayout({ ChildPage }) {
-  const [loading, setLoading] = useState(null);
-  const [donor, setDonor] = useState(null);
-
-  const fetchUser = async () => {
-    setLoading(true)
-    try {
-      const loggedInUser = await supabase.auth.getUser();
-
-      if (loggedInUser.data.user) {
-        const donorResponse = await callKinshipAPI('/api/donor/profile/fetch', {
-        donor_id: loggedInUser.data.user.id,
-      })
-
-      setDonor(donorResponse.donor);
-    }
-    } catch (error) {
-      // Log error
-      console.error(error)
-    }
-
-    setLoading(false)
-    return
-  };
-
-  useEffect(() => {
-    if (!donor) {
-      fetchUser();
-    }
-  }, [supabase, donor]);
-
-  return (
-    <ChildPage donor={donor} parentIsLoading={loading} />
-  );
-}

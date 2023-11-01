@@ -33,7 +33,7 @@ export default AdminCreatePage
 const CreateFromKinshipCart: React.FC = () => {
 
     const [kinshipCartId, setKinshipCartId] = useState<string>("")
-    const [kinshipCart, setKinshipCart] = useState<Donation>(null)
+    const [kinshipCart, setKinshipCart] = useState<Donation | undefined>(undefined)
     const [loading, setLoading] = React.useState<boolean>(false)
 
 
@@ -88,7 +88,7 @@ const CreateFromKinshipCart: React.FC = () => {
                 name="kinshipCartId" 
                 id="kinshipCartId" 
                 value={kinshipCartId}
-                onChange={(e)=>{ setKinshipCartId(e.target.value) }} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setKinshipCartId(e.target.value) }} 
                 required={true} 
                 button={{
                     text: "Fetch Kinship Cart",
@@ -112,7 +112,7 @@ const CreateFromKinshipCart: React.FC = () => {
                             name="amount"
                             id="amount"
                             value={centsToDollars(kinshipCart.amount_in_cents)} // use the centsToDollars function to format the amount_in_cents value
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 const newKinshipCart = { ...kinshipCart, amount_in_cents: parseFloat(e.target.value) * 100 };
                                 setKinshipCart(newKinshipCart);
                             }}
@@ -212,7 +212,9 @@ const CreateFromScratch: React.FC = () => {
             }
     
         } catch (error) {
-            toast.error(`Error: ${error.message}`, { position: "top-right" })
+            console.error(error)
+            // todo
+            // toast.error(`Error: ${error.message}`, { position: "top-right" })
         } finally {
             setLoading(false)
             return
@@ -241,7 +243,7 @@ const CreateFromScratch: React.FC = () => {
                         name="amount" 
                         id="amount"
                         value={unconvertedAmount}
-                        onChange={(e)=>{ 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
                             setUnconvertedAmount(e.target.value)
                         }} 
                         required={true} 
@@ -260,7 +262,7 @@ const CreateFromScratch: React.FC = () => {
                                 type = "date" 
                                 name = "donationDate"
                                 id = "donationDate"
-                                onChange = {(e)=>{ setDateDonated(new Date(e.target.value)) }}
+                                onChange = {(e: React.ChangeEvent<HTMLInputElement>)=>{ setDateDonated(new Date(e.target.value)) }}
                                 required = {true}
                             />
                         </div>
@@ -278,7 +280,7 @@ const CreateFromScratch: React.FC = () => {
                         name="userFirstName" 
                         id="userFirstName" 
                         value={firstName}
-                        onChange={(e)=>{ setFirstName(e.target.value) }} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setFirstName(e.target.value) }} 
                         required={true} 
                     />
                     <TextInput 
@@ -288,7 +290,7 @@ const CreateFromScratch: React.FC = () => {
                         name="userLastName" 
                         id="userLastName" 
                         value={lastName}
-                        onChange={(e)=>{ setLastName(e.target.value) }} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLastName(e.target.value) }} 
                         required={true} 
                     />
                 </div>
@@ -300,7 +302,7 @@ const CreateFromScratch: React.FC = () => {
                     name="emailAddress" 
                     id="emailAddress" 
                     value={email}
-                    onChange={(e)=>{ setEmail(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setEmail(e.target.value) }} 
                     required={true} 
                 />
 
@@ -314,7 +316,7 @@ const CreateFromScratch: React.FC = () => {
                     name="lineAddress" 
                     id="lineAddress" 
                     value={lineAddress}
-                    onChange={(e)=>{ setLineAddress(e.target.value) }} 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLineAddress(e.target.value) }} 
                     required={true} 
                 />
                 <VerticalSpacer size={SpacerSize.Medium} />
@@ -326,7 +328,7 @@ const CreateFromScratch: React.FC = () => {
                         name="city" 
                         id="city" 
                         value={city}
-                        onChange={(e)=>{ setCity(e.target.value) }} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setCity(e.target.value) }} 
                         required={true} 
                     />
                     {states_and_provinces[country] === null || states_and_provinces[country] === undefined ? (
@@ -337,7 +339,7 @@ const CreateFromScratch: React.FC = () => {
                             name="state_or_province"
                             id="state_or_province"
                             value={stateOrProvince}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 setStateOrProvince(e.target.value);
                             }}
                             required={true}
@@ -349,7 +351,7 @@ const CreateFromScratch: React.FC = () => {
                             id="state_or_province"
                             value={stateOrProvince}
                             options={states_and_provinces[country]}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 setStateOrProvince(e.target.value);
                             }}
                             required={true}
@@ -362,7 +364,7 @@ const CreateFromScratch: React.FC = () => {
                         name="postalCode" 
                         id="postalCode" 
                         value={postalCode}
-                        onChange={(e)=>{ setPostalCode(e.target.value) }} 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setPostalCode(e.target.value) }} 
                         required={true} 
                     />
 
@@ -372,7 +374,7 @@ const CreateFromScratch: React.FC = () => {
                         id="country" 
                         options={countries}
                         value={country}
-                        onChange={(e)=>{ 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
                             setCountry(e.target.value);
 
                             if (states_and_provinces[e.target.value]) {

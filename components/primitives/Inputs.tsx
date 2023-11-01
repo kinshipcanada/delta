@@ -53,7 +53,7 @@ export const TextInput: React.FC<TextInputProps> = ({ placeholder, type, name, i
                             type="button"
                             onClick={()=>{
                                 setCopied(true)
-                                navigator.clipboard.writeText(value.toString());
+                                navigator.clipboard.writeText((value ? value : "").toString());
                     
                                 setTimeout(() => {
                                   setCopied(false)

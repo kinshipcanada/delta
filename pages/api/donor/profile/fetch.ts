@@ -1,28 +1,45 @@
-import { ErroredResponse, FetchDonorResponse } from "../../../../lib/classes/api";
-import { fetchDonor } from "../../../../lib/functions/donor";
-import { verifyAtLeastOneParametersExists } from "../../../../lib/utils/helpers";
+import { DonorSchema } from "@lib/classes/donor";
+import { fetchDonor } from "@lib/functions/donor";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
+
+const requestSchema = z.object({
+    donor_id: z.string().uuid(),
+    donor_email: z.string().email()
+})
+
+export const responseSchema = z.object({
+    donor: DonorSchema,
+    error: z.string().optional()
+})
 
 /**
  * @description Fetches a donors profile
  */
-export default async function handler(req, res) {
-    try {
-        const { donor_id, donor_email } = req.body
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const response = requestSchema.safeParse(req.body);
 
-        verifyAtLeastOneParametersExists("You must provide either a donor_id, donor_email, or both", donor_id, donor_email)
+  if (!response.success || !(response.data.donor_id || response.data.donor_email)) {
+    return res.status(400).send({
+        error: 'Invalid payload',
+    });
+  }
 
-        const donor = await fetchDonor(donor_id, donor_email)
+  try {
+    const donor = await fetchDonor(response.data.donor_id, response.data.donor_email)
 
-        return donor ? res.status(200).send({
-            status: 200,
-            endpoint_called: `/api/donor/profile/fetch`,
-            donor: donor
-        } as FetchDonorResponse) : new Error("Something went wrong fetching your donor profile.");
-    } catch (error) {
-        res.status(500).send({
-            status: 500,
-            endpoint_called: `/api/donor/profile/fetch`,
-            error: error.message
-        } as ErroredResponse);
-    }
-};
+    return res.status(200).send({
+        donor: donor
+    })
+  } catch (error) {
+    // Log error
+    
+    return res.status(500).send({
+        error: "Sorry, something went wrong fetching this donor",
+    })
+  }
+}
+

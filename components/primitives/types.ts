@@ -85,11 +85,6 @@ export interface AppPageProps {
     donations: Donation[],
 }
 
-export interface GenericPageProps {
-    donor: Donor,
-    parentIsLoading: boolean
-}
-
 export interface Tab {
     name: string;
     component: React.ReactElement;

@@ -6,6 +6,7 @@ import { validate as verifyUUID } from 'uuid';
 import Stripe from "stripe";
 import { countries } from "./constants";
 import { NextApiResponse } from "next";
+import { ZodType, z } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -169,4 +170,14 @@ export function convertChildrenToStrings(parentObject: object) {
 export function extractStripePaymentIntentFromClientSecret(clientSecret: string): string {
     let clientSecretComponents = clientSecret.split("_")
     return `${clientSecretComponents[0]}_${clientSecretComponents[1]}`
+}
+
+export function generateZodSchema<T extends Record<string, z.ZodType<any, any, any>>>(obj: T): ZodType<{ [K in keyof T]: z.infer<T[K]> }, any, any> {
+    const schemaObject: Record<string, any> = {};
+  
+    Object.keys(obj).forEach((key) => {
+      schemaObject[key] = obj[key];
+    });
+  
+    return z.object(schemaObject) as ZodType<{ [K in keyof T]: z.infer<T[K]> }, any, any>;
 }

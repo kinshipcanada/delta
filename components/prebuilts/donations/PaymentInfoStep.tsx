@@ -14,7 +14,7 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
         return null
     } else {
         const [processingDonation, setProcessingDonation] = useState<boolean>(false)
-        const [stripeMessages, setStripeMessages] = useState<string>(null)
+        const [stripeMessages, setStripeMessages] = useState<string | undefined>(undefined)
         const [savePaymentMethod, setSavePaymentMethod] = useState<boolean>(false)
 
         // This is a hook that access the client created by stripeClientPromise once it loads
@@ -23,7 +23,7 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
         // Kinship servers should never access these details in raw form, even in submitting to Stripe
         const elements = useElements()
 
-        const savePaymentMethodToStripeCustomer = async (clientSecret) => {
+        const savePaymentMethodToStripeCustomer = async (clientSecret: string) => {
             try {
                 await callKinshipAPI('/api/stripe/updatePaymentIntent', {
                     clientSecret: clientSecret,
@@ -68,7 +68,8 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
                     identifiers: {
                         ...globalDonation.identifiers,
                         stripe_payment_intent_id: response.paymentIntent.id,
-                        stripe_payment_method_id: response.paymentIntent.payment_method.toString()
+                        // todo: check
+                        stripe_payment_method_id: response.paymentIntent.payment_method!.toString()
                     }
                 })
 

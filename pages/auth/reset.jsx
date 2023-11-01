@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react"
-import { supabase } from "../../system/utils/helpers";
+import { supabase } from "../../lib/utils/helpers";
 
 export default function Reset() {
     const [password, setPassword] = useState("")

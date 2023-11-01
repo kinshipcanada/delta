@@ -28,7 +28,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
     if (!isDisabled) {
         if (setter) { setter(true) }
         setIsDisabled(true);
-        await onClick();
+        await onClick!();
         setIsDisabled(false);
         if (setter) { setter(false) }
     }
@@ -36,7 +36,7 @@ const Button: React.FC<ButtonProps> = ({ text, style, onClick, href, isLoading =
 
   return (
     <Component 
-      href={href ? href : undefined}
+      href={href ? href : ""}
       onClick={href ? undefined : handleClick} 
       disabled={isLoading || isDisabled}
       className=""

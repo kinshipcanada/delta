@@ -1,4 +1,4 @@
-export function JustifyBetween({ children }) {
+export const JustifyBetween: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div className="flex justify-between">
             { children }
@@ -6,7 +6,7 @@ export function JustifyBetween({ children }) {
     )
 }
 
-export function JustifyCenter({ children }) {
+export const JustifyCenter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div className="text-center items-center justify-center h-full w-full">
             { children }
@@ -14,7 +14,7 @@ export function JustifyCenter({ children }) {
     )
 }
 
-export function JustifyEnd({ children }) {
+export const JustifyEnd: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div className="flex justify-end">
             { children }
