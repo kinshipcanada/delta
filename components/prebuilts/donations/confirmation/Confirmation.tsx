@@ -15,11 +15,12 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
   const [showLink, setShowLink] = useState(false);
 
   const fetchPaymentMethod = async () => {
-    const paymentMethodResponse = await callKinshipAPI('/api/stripe/fetchPaymentMethod', {
+    const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
       paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
     })
 
-    setPaymentMethod(paymentMethodResponse.payment_method);
+    // todo
+    setPaymentMethod(paymentMethodResponse.data);
     setLoading(false)
   }
 
@@ -125,11 +126,11 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
   const [showLink, setShowLink] = useState(false);
 
   const fetchPaymentMethod = async () => {
-    const paymentMethodResponse = await callKinshipAPI('/api/stripe/fetchPaymentMethod', {
+    const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
       paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
     })
 
-    setPaymentMethod(paymentMethodResponse.payment_method);
+    setPaymentMethod(paymentMethodResponse.data!);
     setLoading(false)
   }
 
@@ -237,11 +238,11 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
   const [paymentMethod, setPaymentMethod] = useState<Stripe.PaymentMethod | undefined>(undefined)
 
   const fetchPaymentMethod = async () => {
-    const paymentMethodResponse = await callKinshipAPI('/api/stripe/fetchPaymentMethod', {
+    const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
       paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
     })
 
-    setPaymentMethod(paymentMethodResponse.payment_method);
+    setPaymentMethod(paymentMethodResponse.data);
     setLoading(false)
   }
 

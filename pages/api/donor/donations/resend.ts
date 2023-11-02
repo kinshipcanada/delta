@@ -1,3 +1,4 @@
+import { NoDataApiResponse } from "@lib/classes/api";
 import { DonationIdentifiers } from "@lib/classes/utils";
 import { checkAndResendReceipt } from "@lib/functions/notifications";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -9,10 +10,6 @@ const requestSchema = z.object({
     stripe_payment_intent_id: z.string().optional(),
 })
 
-export const responseSchema = z.object({
-    error: z.string().optional()
-})
-
 /**
  * @description Resends a donation receipt to a donor, given the donation's identifiers
  */
@@ -20,32 +17,28 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const response = requestSchema.safeParse(req.body);
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-  if (!response.success || !(response.data.donation_id || response.data.stripe_charge_id || response.data.stripe_payment_intent_id)) {
-    return res.status(400).send({
-        error: 'Invalid payload',
-    });
+  if (!parsedRequest.success || !(parsedRequest.data.donation_id || parsedRequest.data.stripe_charge_id || parsedRequest.data.stripe_payment_intent_id)) {
+    const response: NoDataApiResponse = { error: "Invalid payload" }
+    return res.status(400).send(response);
   }
 
   try {
     // To do: update generateIdentifiersFromStrings to include optionals so that we verify by prefix
     const identifiers: DonationIdentifiers = {
-        donation_id: response.data.donation_id, 
-        stripe_charge_id: response.data.stripe_charge_id, 
-        stripe_payment_intent_id: response.data.stripe_payment_intent_id
+        donation_id: parsedRequest.data.donation_id, 
+        stripe_charge_id: parsedRequest.data.stripe_charge_id, 
+        stripe_payment_intent_id: parsedRequest.data.stripe_payment_intent_id
     }
     
     await checkAndResendReceipt(identifiers)
 
-    return res.status(200).send({
-        error: undefined
-    })
+    return res.status(200).send({} as NoDataApiResponse)
   } catch (error) {
     // Log error
     
-    return res.status(500).send({
-        error: "Sorry, something went wrong resending this receipt",
-    })
+    const response: NoDataApiResponse = {  error: "Sorry, something went wrong resending this receipt" }
+    return res.status(500).send(response)
   }
 }

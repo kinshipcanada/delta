@@ -2,13 +2,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { DonorSchema } from "@lib/classes/donor";
 import { createDonor } from "@lib/functions/donor";
+import { NoDataApiResponse } from "@lib/classes/api";
 
 const requestSchema = z.object({
     donor: DonorSchema,
-})
-
-export const responseSchema = z.object({
-    error: z.string().optional()
 })
 
 /**
@@ -18,17 +15,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const response = requestSchema.safeParse(req.body);
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-  if (!response.success || !response.data.donor.donor_id) {
-    return res.status(400).send({
-        error: 'Invalid payload',
-    });
+  if (!parsedRequest.success || !parsedRequest.data.donor.donor_id) {
+    const response: NoDataApiResponse = { error: "Invalid payload" }
+    return res.status(400).send(response);
   }
 
   try {
     
-    const donor = response.data.donor
+    const donor = parsedRequest.data.donor
 
     await createDonor(
         donor.donor_id!,
@@ -42,14 +38,11 @@ export default async function handler(
         donor.address.country
     )
 
-    return res.status(200).send({
-        error: undefined
-    })
+    return res.status(200).send({ } as NoDataApiResponse)
   } catch (error) {
     // Log error
     
-    return res.status(500).send({
-        error: "Sorry, something went wrong creating your profile",
-    })
+    const response: NoDataApiResponse = { error: "Sorry, something went wrong creating your profile" }
+    return res.status(500).send(response)
   }
 }

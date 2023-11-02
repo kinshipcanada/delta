@@ -1,5 +1,4 @@
-import { BaseApiResponseSchema } from "@lib/classes/api";
-import { DonorSchema } from "@lib/classes/donor";
+import { DonorApiResponse } from "@lib/classes/api";
 import { fetchDonor } from "@lib/functions/donor";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
@@ -16,27 +15,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-    const response = requestSchema.safeParse(req.body);
+    const parsedRequest = requestSchema.safeParse(req.body);
 
-    if (!response.success || !(response.data.donor_id || response.data.donor_email)) {
-        return res.status(400).send({
-            error: 'Invalid payload',
-        });
+    if (!parsedRequest.success || !(parsedRequest.data.donor_id || parsedRequest.data.donor_email)) {
+        const response: DonorApiResponse = { error: 'Invalid payload' }
+        return res.status(400).send(response);
     }
 
     try {
-        const donor = await fetchDonor(response.data.donor_id, response.data.donor_email)
-
-        return res.status(200).send({
-            donor: donor
-        })
+        const donor = await fetchDonor(parsedRequest.data.donor_id, parsedRequest.data.donor_email)
+        const response: DonorApiResponse = { data: donor }
+        return res.status(200).send(response)
     } catch (error) {
         // Log error
         console.error(error)
         
-        return res.status(500).send({
-            error: "Sorry, something went wrong fetching this donor",
-        })
+        const response: DonorApiResponse = { error: "Sorry, something went wrong fetching this donor" }
+        return res.status(500).send(response)
     }
 }
 

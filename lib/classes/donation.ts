@@ -24,7 +24,7 @@ export interface Donation {
   amount_in_cents: number;
   fees_covered: number;
   fees_charged_by_stripe: number;
-  date_donated: Date;
+  date_donated: Date | string;
 }
 
 export const DonationSchema = z.object({
@@ -35,7 +35,7 @@ export const DonationSchema = z.object({
   amount_in_cents: z.number(),
   fees_covered: z.number(),
   fees_charged_by_stripe: z.number(),
-  date_donated: z.date(),
+  date_donated: z.date().or(z.string()),
 });
 
 export const DonationResponseSchema = z.object({

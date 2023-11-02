@@ -1,13 +1,8 @@
+import { ObjectIdApiResponse } from "@lib/classes/api";
 import { Donation } from "@lib/classes/donation";
 import { createDonation } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import { z } from "zod";
-
-export const responseSchema = z.object({
-    donation_id: z.string().optional(),
-    error: z.string().optional()
-})
 
 /**
  * @description Creates a new donation. Only to be called by Stripe's webhook
@@ -20,10 +15,8 @@ export default async function handler(
         const endpointSecret = process.env.STRIPE_CREATE_DONATION_ENDPOINT_SECRET
 
         if (!endpointSecret) {
-            return res.status(400).send({
-                error: 'Internal error: No webhook secret',
-                donation_id: undefined
-            });
+            const response: ObjectIdApiResponse = { error: 'Internal error: No webhook secret' }
+            return res.status(400).send(response);
         }
 
         const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -51,10 +44,8 @@ export default async function handler(
             stripe_charge_id: event.data.object.id
         })
 
-        return res.status(200).send({
-            donation_id: donation.identifiers.donation_id,
-            error: undefined
-        })
+        const response: ObjectIdApiResponse = { data: donation.identifiers.donation_id }
+        return res.status(200).send(response)
     } catch (error) {
         // Log error
 

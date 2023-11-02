@@ -7,7 +7,7 @@ import Stripe from "stripe";
 import { countries } from "./constants";
 import { NextApiResponse } from "next";
 import { ZodError, ZodObject, ZodType, z } from "zod";
-import { ApiResponse, BaseApiResponseSchema } from "@lib/classes/api";
+import { ApiResponse } from "@lib/classes/api";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -19,29 +19,8 @@ export function isValidCountryCode(countryCode: string): boolean {
     return countries.some(country => country.value === countryCode);
 }
 
-export async function callKinshipAPI(url: string, data?: {}) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST', 
-            mode: 'cors', 
-            cache: 'no-cache', 
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            redirect: 'follow', 
-            referrerPolicy: 'no-referrer',
-            body: JSON.stringify(data || {}), 
-        });
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-
 //const result: ApiResponse<Donation> = await callKinshipAPI3<Donation>('/api/donation', requestData);
-export async function callKinshipAPI3<T>(
+export async function callKinshipAPI<T>(
     url: string,
     data: Record<string, unknown> = {},
 ): Promise<ApiResponse<T>> {
@@ -61,65 +40,16 @@ export async function callKinshipAPI3<T>(
 
         const responseJson: ApiResponse<T> = await response.json();
 
-        if (responseJson.error) {
-            return { error: responseJson.error };
+        if (responseJson.error || !response.ok) {
+            return { error: responseJson.error ?? "An error occured during your request" };
         }
 
-        return { data: responseJson as T }
+        return { data: responseJson.data as T }
     } catch (error) {
         console.error(error);
         if (error instanceof Error) {
             return { error: error.message };
         } else {
-            return { error: 'An error occurred during the API call' };
-        }
-    }
-}
-
-export async function callKinshipAPI2<T>(
-    url: string,
-    data: Record<string, unknown> = {},
-    responseSchema: z.ZodType<T>
-): Promise<ApiResponse<T>> {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            const errorResponse = await BaseApiResponseSchema.safeParse(response.json());
-            if (errorResponse.success) {
-                return { error: errorResponse.data.error }
-            } else {
-                return { error: "Something went wrong during your request" }
-            }
-        }
-
-        const responseJson = await response.json()
-        const responseData = responseSchema.safeParse(responseJson);
-
-        if (responseData.success) {
-            return { data: responseData.data };
-        } else {
-            // Should we return response.json() here?
-            return { error: "Invalid parsing schema" }
-        }
-
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error(error);
-            return { error: error.message };
-        } else {
-            console.error(error);
             return { error: 'An error occurred during the API call' };
         }
     }

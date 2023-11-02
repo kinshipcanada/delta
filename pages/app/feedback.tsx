@@ -3,7 +3,7 @@ import React from "react";
 import { Button, JustifyEnd, CheckboxInput, TextArea, VerticalSpacer, AppPageProps, ButtonSize, ButtonStyle, SpacerSize, PageHeader, Text } from "../../components/primitives";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
-import { ErroredResponse } from "../../lib/classes/api";
+import { ErroredResponse, NoDataApiResponse } from "../../lib/classes/api";
 import { callKinshipAPI } from "../../lib/utils/helpers";
 import { useAuth } from "../../components/prebuilts/Authentication";
 
@@ -24,8 +24,7 @@ const AppFeedbackPage: React.FC<AppPageProps> = () => {
             return
         }
 
-        //MessageResponse todo
-        const response:  | ErroredResponse = await callKinshipAPI('/api/feedback/create', {
+        const response: NoDataApiResponse = await callKinshipAPI('/api/feedback/create', {
             feedback: feedback,
             donor_id: stayAnonymous ? null : donor!.donor_id
         })

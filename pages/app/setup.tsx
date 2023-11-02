@@ -63,15 +63,16 @@ const SetupForm = () => {
                 address_country: country,
             })
     
-            if (response.status == 500) { 
-                toast.error(response.error, { position: "top-right" })
-            } else if (response.status == 200) {
-                toast.success(`Successfully created your profile!`, { position: "top-right" })
-                triggerAuthReload(true)
-                router.push("/app")
-            } else {
-                toast.error("An unknown error occurred", { position: "top-right" })
-            }
+            // todo - urgent
+            // if (response.status == 500) { 
+            //     toast.error(response.error, { position: "top-right" })
+            // } else if (response.status == 200) {
+            //     toast.success(`Successfully created your profile!`, { position: "top-right" })
+            //     triggerAuthReload(true)
+            //     router.push("/app")
+            // } else {
+            //     toast.error("An unknown error occurred", { position: "top-right" })
+            // }
     
         } catch (error) {
             // todo

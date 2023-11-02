@@ -3,7 +3,7 @@ import Navigation from './Navigation';
 import Footer from './Footer';
 import { AppNavigation } from './app/Navigation';
 import { useState, useEffect, ReactNode, FC } from 'react';
-import { callKinshipAPI, callKinshipAPI2, centsToDollars, supabase } from '../../lib/utils/helpers';
+import { callKinshipAPI, centsToDollars, supabase } from '../../lib/utils/helpers';
 import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
@@ -13,6 +13,7 @@ import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
 import { Causes } from '@lib/classes/causes';
+import { DonationGroupApiResponse, DonorApiResponse } from '@lib/classes/api';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const [donor, setDonor] = useState<Donor>()
@@ -30,31 +31,39 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       if (loggedInUser.data.user) {
         if (isApp) {
           const [donorResponse, donationsResponse] = await Promise.all([
-            callKinshipAPI('/api/donor/profile/fetch', {
+            callKinshipAPI<Donor>('/api/donor/profile/fetch', {
               donor_id: loggedInUser.data.user.id,
             }),
-            callKinshipAPI('/api/donor/donations/fetch', {
+            callKinshipAPI<Donation[]>('/api/donor/donations/fetch', {
               donor_email: loggedInUser.data.user.email,
             }),
           ]);
-  
-          if (donorResponse.donor.set_up == false && router.pathname != '/app/setup') {
-            setShouldRedirect(true); // Set the redirect state
-            router.push('/app/setup');
-            return
-          } else {
-            setDonor(donorResponse.donor)
-            setDonations(donationsResponse.donations)
+          
+          if (donorResponse.data) {
+            if (donorResponse.data!.set_up == false && router.pathname != '/app/setup') {
+              setShouldRedirect(true); // Set the redirect state
+              router.push('/app/setup');
+              return
+            } else {
+              setDonor(donorResponse.data)
+            }
           }
+
+          if (donationsResponse.data) {
+            setDonations(donationsResponse.data)
+          }
+          
         } else {
-          const donorResponse = await callKinshipAPI2('/api/donor/profile/fetch', {
+          const donorResponse: DonorApiResponse = await callKinshipAPI<Donor>('/api/donor/profile/fetch', {
             donor_id: loggedInUser.data.user.id,
-          }, DonorResponseSchema)
+          })
+
+          console.log("received donor response", donorResponse)
 
           if (donorResponse.error) {
             console.error("Something went wrong loading this donor")
           } else {
-            setDonor(donorResponse.data?.donor);
+            setDonor(donorResponse.data);
           }
         }
       } else {

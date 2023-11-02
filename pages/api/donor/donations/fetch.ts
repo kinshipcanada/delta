@@ -1,3 +1,4 @@
+import { DonationGroupApiResponse } from "@lib/classes/api";
 import { Donation, DonationSchema } from "@lib/classes/donation";
 import { fetchAllDonationsForDonor } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -7,11 +8,6 @@ const requestSchema = z.object({
     donor_email: z.string().email()
 })
 
-export const responseSchema = z.object({
-    donations: z.array(DonationSchema),
-    error: z.string().optional()
-})
-
 /**
  * @description Fetches all donations for a given donor
  */
@@ -19,28 +15,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const response = requestSchema.safeParse(req.body);
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-  if (!response.success) {
-    return res.status(400).send({
-        error: 'No donor email provided',
-        donations: undefined
-    });
+  if (!parsedRequest.success) {
+    const response: DonationGroupApiResponse = { error: 'No donor email provided' }
+    return res.status(400).send(response);
   }
 
   try {
-    const donations: Donation[] = await fetchAllDonationsForDonor(response.data.donor_email);
+    const donations: Donation[] = await fetchAllDonationsForDonor(parsedRequest.data.donor_email);
 
-    return res.status(200).send({
-        donations: donations,
-        error: undefined
-    })
+
+    const response: DonationGroupApiResponse = { data: donations }
+    return res.status(200).send(response)
   } catch (error) {
     // Log error
-    
-    return res.status(500).send({
-        error: "Sorry, something went wrong fetching your donations",
-        donations: undefined
-    })
+
+    const response: DonationGroupApiResponse = { error: 'Sorry, something went wrong fetching your donations' }
+    return res.status(500).send(response);
   }
 }

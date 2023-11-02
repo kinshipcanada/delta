@@ -5,10 +5,10 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 import { Donor } from "../../lib/classes/donor";
 import { toast } from "react-hot-toast";
 import { callKinshipAPI } from "../../lib/utils/helpers";
-import { FetchDonorResponse } from "../../lib/classes/api";
 import { SelectionInput } from "../../components/primitives/Inputs";
 import { countries } from "../../lib/utils/constants";
 import { useAuth } from "../../components/prebuilts/Authentication";
+import { NoDataApiResponse } from "@lib/classes/api";
 
 const AppAccountPage: React.FC<AppPageProps> = () => {
 
@@ -47,7 +47,7 @@ const AccountInformationPanel: React.FC<{ donor?: Donor, setGlobalDonor: (donor:
                 return
             }
 
-            const response: FetchDonorResponse = await callKinshipAPI('/api/donor/profile/update', {
+            const response: NoDataApiResponse = await callKinshipAPI('/api/donor/profile/update', {
                 donor_id: donor.donor_id,
                 existing_donor_object: donor,
                 first_name: firstName,
@@ -158,7 +158,7 @@ const AddressInformationPanel: React.FC<{ donor?: Donor, setGlobalDonor: (donor:
                 return
             }
 
-            const response: FetchDonorResponse = await callKinshipAPI('/api/donor/profile/update', {
+            const response: NoDataApiResponse = await callKinshipAPI('/api/donor/profile/update', {
                 donor_id: donor.donor_id,
                 existing_donor_object: donor,
                 first_name: donor.first_name,

@@ -1,12 +1,15 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
-import { Donation } from "../../../lib/classes/donation"
+import { Donation, DonationSchema } from "../../../lib/classes/donation"
 import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
 import { countries, states_and_provinces } from "../../../lib/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
+import { ObjectIdApiResponse } from "@lib/classes/api"
+import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
+import { z } from "zod"
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()
@@ -82,19 +85,27 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 return
             }
 
-            const response = await callKinshipAPI('/api/stripe/createPaymentIntent', {
-                donation: globalDonation,
-            })
+            const createPaymentIntentPayload: ApiStripeCreatePaymentIntentRequestSchema = {
+                donation: globalDonation
+            }
 
-            if (response.status != 200) {
-                console.log("Error in stripe response, ", response)
+            const requestSchema = z.object({
+                donation: DonationSchema,
+            })
+            console.log(requestSchema.safeParse(createPaymentIntentPayload))
+            console.log("TYPEDATE", typeof globalDonation.date_donated)
+
+            const response: ObjectIdApiResponse = await callKinshipAPI<string>('/api/stripe/createPaymentIntent', createPaymentIntentPayload)
+
+            if (response.error) {
+                console.log("Error in stripe response, ", response.error)
                 setStep(DonationStep.Error)
                 setLoading(false)
                 return
             }
 
             // If the response status is 200, we can assume the shape of the response
-            setStripeClientSecret(response.clientSecret)
+            setStripeClientSecret(response.data!)
 
             // Finally, set the next step
             if (globalDonation.amount_in_cents > 10_000_00) {

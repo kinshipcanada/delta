@@ -25,11 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }}
         );
 
-        res.status(200).send({
+        res.send({
             status: 200
         });
     } catch (error) {
-        console.error(error)
         // Implement: log error here
         res.status(500).json({ status: 500 });
     }

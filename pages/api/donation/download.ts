@@ -1,3 +1,4 @@
+import { NoDataApiResponse } from "@lib/classes/api";
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**
@@ -7,7 +8,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-    return res.status(500).send({
-        error: "Method has not been implemented",
-    });
+  const response: NoDataApiResponse = { error: "Method has not been implemented" }
+  return res.status(500).send(response);
 }

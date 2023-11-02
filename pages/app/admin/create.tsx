@@ -63,16 +63,18 @@ const CreateFromKinshipCart: React.FC = () => {
             cart_id: kinshipCartId,
         })
 
-        if (response.status == 500) { 
-            toast.error("Kinship Cart not found", { position: "top-right" })
-            console.error(response) 
-        } else if (response.status == 200) {
-            setKinshipCart(response.cart)
-            toast.success(`Found Kinship Cart for ${response.cart.donor.first_name} ${response.cart.donor.last_name}`, { position: "top-right" })
-            console.log(response.cart)
-        } else {
-            toast.error("An unknown error occurred", { position: "top-right" })
-        }
+
+        // todo
+        // if (response.status == 500) { 
+        //     toast.error("Kinship Cart not found", { position: "top-right" })
+        //     console.error(response) 
+        // } else if (response.status == 200) {
+        //     setKinshipCart(response.cart)
+        //     toast.success(`Found Kinship Cart for ${response.cart.donor.first_name} ${response.cart.donor.last_name}`, { position: "top-right" })
+        //     console.log(response.cart)
+        // } else {
+        //     toast.error("An unknown error occurred", { position: "top-right" })
+        // }
 
         setLoading(false)
         return
@@ -202,14 +204,15 @@ const CreateFromScratch: React.FC = () => {
                 is_sadaqah: isSadaqah,
             })
     
-            if (response.status == 500) { 
-                console.error(response)
-                toast.error(response.error, { position: "top-right" })
-            } else if (response.status == 200) {
-                toast.success(`Created donation with ID: ${response.message}`, { position: "top-right" })
-            } else {
-                toast.error("An unknown error occurred", { position: "top-right" })
-            }
+            // todo
+            // if (response.status == 500) { 
+            //     console.error(response)
+            //     toast.error(response.error, { position: "top-right" })
+            // } else if (response.status == 200) {
+            //     toast.success(`Created donation with ID: ${response.message}`, { position: "top-right" })
+            // } else {
+            //     toast.error("An unknown error occurred", { position: "top-right" })
+            // }
     
         } catch (error) {
             console.error(error)
