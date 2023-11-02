@@ -40,6 +40,10 @@ export const DonorSchema = z.object({
     stripe_customer_ids: z.array(z.string())
 });
 
+export const DonorResponseSchema = z.object({
+    donor: DonorSchema
+})
+
 export function isDonor(obj: any): obj is Donor {
     return (
         typeof obj === 'object' &&

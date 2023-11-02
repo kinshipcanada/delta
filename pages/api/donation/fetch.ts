@@ -10,8 +10,8 @@ const requestSchema = z.object({
 })
 
 export const responseSchema = z.object({
-    donation: DonationSchema.optional(),
-    error: z.string().optional()
+  donation: DonationSchema.optional(),
+  error: z.string().optional()
 })
 
 export default async function handler(

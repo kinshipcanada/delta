@@ -38,6 +38,14 @@ export const DonationSchema = z.object({
   date_donated: z.date(),
 });
 
+export const DonationResponseSchema = z.object({
+  donation: DonationSchema
+})
+
+export const DonationGroupResponseSchema = z.object({
+  donations: z.array(DonationSchema)
+})
+
 export function isDonation(obj: any): obj is Donation {
     return (
         typeof obj === 'object' &&

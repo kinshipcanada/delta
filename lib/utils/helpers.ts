@@ -6,7 +6,8 @@ import { validate as verifyUUID } from 'uuid';
 import Stripe from "stripe";
 import { countries } from "./constants";
 import { NextApiResponse } from "next";
-import { ZodType, z } from "zod";
+import { ZodError, ZodObject, ZodType, z } from "zod";
+import { ApiResponse, BaseApiResponseSchema } from "@lib/classes/api";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -35,6 +36,92 @@ export async function callKinshipAPI(url: string, data?: {}) {
         return await response.json();
     } catch (error) {
         console.error(error);
+    }
+}
+
+
+//const result: ApiResponse<Donation> = await callKinshipAPI3<Donation>('/api/donation', requestData);
+export async function callKinshipAPI3<T>(
+    url: string,
+    data: Record<string, unknown> = {},
+): Promise<ApiResponse<T>> {
+    try {
+        const response = await fetch(url, {
+            method: 'POST', 
+            mode: 'cors', 
+            cache: 'no-cache', 
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            redirect: 'follow', 
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify(data || {}), 
+        });
+
+        const responseJson: ApiResponse<T> = await response.json();
+
+        if (responseJson.error) {
+            return { error: responseJson.error };
+        }
+
+        return { data: responseJson as T }
+    } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+            return { error: error.message };
+        } else {
+            return { error: 'An error occurred during the API call' };
+        }
+    }
+}
+
+export async function callKinshipAPI2<T>(
+    url: string,
+    data: Record<string, unknown> = {},
+    responseSchema: z.ZodType<T>
+): Promise<ApiResponse<T>> {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorResponse = await BaseApiResponseSchema.safeParse(response.json());
+            if (errorResponse.success) {
+                return { error: errorResponse.data.error }
+            } else {
+                return { error: "Something went wrong during your request" }
+            }
+        }
+
+        const responseJson = await response.json()
+        const responseData = responseSchema.safeParse(responseJson);
+
+        if (responseData.success) {
+            return { data: responseData.data };
+        } else {
+            // Should we return response.json() here?
+            return { error: "Invalid parsing schema" }
+        }
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+            return { error: error.message };
+        } else {
+            console.error(error);
+            return { error: 'An error occurred during the API call' };
+        }
     }
 }
 

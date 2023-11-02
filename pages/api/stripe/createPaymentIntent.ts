@@ -58,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             message: undefined
         } as StripeCreatePaymentIntentResponse);
     } catch (error) {
+        console.error(error)
         // Log error
         res.status(500).json({ message: "Sorry, something went wrong on our end", clientSecret: undefined } as StripeCreatePaymentIntentResponse);
     }

@@ -19,9 +19,7 @@ export function uploadDonationToDatabase(donation: Donation): Promise<any> {
     return database('donations').insert(formatDonationForDatabase(donation))
   } catch (error) {
     throw error
-  } finally {
-    database.destory()
-  }
+  } 
 }
 
 export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifiers): Promise<any> {
@@ -39,9 +37,7 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
 
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): Promise<any> {
@@ -55,9 +51,7 @@ export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): P
     return donorId ? database('donor_profiles').where('id', donorId).first() : database('donor_profiles').where('donor_email', donorEmail).first()
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export function updateDonorInDatabase(
@@ -86,9 +80,7 @@ export function updateDonorInDatabase(
     })
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export async function setupDonorInDatabase(
@@ -113,15 +105,13 @@ export async function setupDonorInDatabase(
       address_city: address_city,
       address_state: address_state,
       address_country: address_country,
-      donor_set_up: true,
+      set_up: true,
       payment_methods: JSON.stringify([]),
       stripe_customer_ids: JSON.stringify([stripe_customer_id])
     })
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export async function parameterizedDatabaseQuery(table: string, params: any, limitToFirstResult: boolean): Promise<any> {
@@ -144,9 +134,7 @@ export async function parameterizedDatabaseQuery(table: string, params: any, lim
 
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 
   return result
 }
@@ -158,9 +146,7 @@ export function uploadFeedbackToDatabase(feedback: string, donor_id?: string): P
     return database('feedback').insert({ feedback: feedback, donor_id: donor_id })
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export function uploadLogToDatabase(error_message: string, file_name: string, function_name: string): Promise<any> {
@@ -170,9 +156,7 @@ export function uploadLogToDatabase(error_message: string, file_name: string, fu
     return database('logs').insert({ error_message: error_message, file_name: file_name, function_name: function_name })
   } catch (error) {
     throw error
-  } finally {
-    database.destroy()
-  }
+  } 
 }
 
 export type Json =
@@ -290,7 +274,7 @@ export interface DatabaseTypings {
           address_state: string | null
           admin: boolean | null
           created_at: string | null
-          donor_set_up: boolean | null
+          set_up: boolean | null
           email: string | null
           first_name: string | null
           id: string
@@ -308,7 +292,7 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
-          donor_set_up?: boolean | null
+          set_up?: boolean | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -326,7 +310,7 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
-          donor_set_up?: boolean | null
+          set_up?: boolean | null
           email?: string | null
           first_name?: string | null
           id?: string

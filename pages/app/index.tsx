@@ -8,8 +8,6 @@ const AppHomePage: React.FC<AppPageProps> = () => {
 
     const { donor, donorDonations } = useAuth()
 
-    console.log(donor, donorDonations)
-
     return (
         <div>
             <JustifyBetween>

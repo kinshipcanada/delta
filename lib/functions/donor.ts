@@ -79,12 +79,7 @@ export async function fetchDonor(donorId?: string, donorEmail?: string): Promise
         throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
     }
 
-    try {
-        return formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
-    } catch (error) {
-        await logError("Error fetching donor profile", FUNCTION_NAME, FILE_NAME)
-        throw new Error("Error fetching donor from database.")
-    }
+    return formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
 }
 
 /**

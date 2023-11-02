@@ -137,16 +137,16 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
 
 export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables"]["donor_profiles"]["Row"]): Donor {
 
-    if (!isDonor(donor) || donor.donor_set_up == null) {
-        throw new Error("Donor from database is missing fields or improperly formatted")
+    if (donor.set_up == null) {
+        throw new Error("Donor is not set up")
     }
 
     return {
         donor_id: donor.id,
-        first_name: donor.first_name,
-        last_name: donor.last_name,
-        email: donor.email,
-        phone_number: donor.phone_number,
+        first_name: donor.first_name!,
+        last_name: donor.last_name!,
+        email: donor.email!,
+        phone_number: donor.phone_number ?? undefined,
         address: {
             line_address: donor.address_line_address,
             city: donor.address_city,
@@ -154,8 +154,8 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
             postal_code: donor.address_postal_code,
             country: donor.address_country
         } as Address,
-        admin: donor.admin,
-        set_up: donor.donor_set_up,
+        admin: donor.admin ?? false,
+        set_up: donor.set_up,
         stripe_customer_ids: donor.stripe_customer_ids as string[]
     }
 }
@@ -163,7 +163,7 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
 export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]): Donation {
 
     if (!isDonation(donation) || donation.email == null || donation.donation_created == null) {
-        throw new Error("Donor from database is missing fields or improperly formatted")
+        throw new Error("Donation from database is missing fields or improperly formatted")
     }
 
     const donor: Donor = {
@@ -225,7 +225,7 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
             country: rawStripeObject.customer!.address!.country as string
         },
         admin: donorFromDatabase.admin,
-        set_up: donorFromDatabase.donor_set_up,
+        set_up: donorFromDatabase.set_up,
         stripe_customer_ids: [
             rawStripeObject.customer!.id
         ]

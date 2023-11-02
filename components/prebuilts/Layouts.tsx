@@ -3,12 +3,12 @@ import Navigation from './Navigation';
 import Footer from './Footer';
 import { AppNavigation } from './app/Navigation';
 import { useState, useEffect, ReactNode, FC } from 'react';
-import { callKinshipAPI, centsToDollars, supabase } from '../../lib/utils/helpers';
+import { callKinshipAPI, callKinshipAPI2, centsToDollars, supabase } from '../../lib/utils/helpers';
 import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
-import { Donor } from '../../lib/classes/donor';
+import { Donor, DonorResponseSchema, DonorSchema } from '../../lib/classes/donor';
 import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
@@ -47,11 +47,15 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
             setDonations(donationsResponse.donations)
           }
         } else {
-          const donorResponse = await callKinshipAPI('/api/donor/profile/fetch', {
+          const donorResponse = await callKinshipAPI2('/api/donor/profile/fetch', {
             donor_id: loggedInUser.data.user.id,
-          })
-  
-          setDonor(donorResponse.donor);
+          }, DonorResponseSchema)
+
+          if (donorResponse.error) {
+            console.error("Something went wrong loading this donor")
+          } else {
+            setDonor(donorResponse.data?.donor);
+          }
         }
       } else {
         if (isApp) {
@@ -86,7 +90,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
             <div>
               {authContextLoading || shouldRedirect || !donor ? (
-                  <div className='flex min-h-screen'>
+                  <div className='flex items-center justify-center w-screen'>
                     <CenterOfPageBox>
                       <Loading color={LoadingColors.Blue} />
                     </CenterOfPageBox>

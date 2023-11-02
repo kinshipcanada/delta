@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { AuthProvider } from "../components/prebuilts/Authentication";
-import { callKinshipAPI, supabase } from "../lib/utils/helpers";
+import { useState } from "react";
 import { ConfirmationType, DonationStep } from "../components/prebuilts/donations/helpers/types";
 import { v4 as uuidv4 } from 'uuid'
 import { CurrencyList } from "../lib/classes/utils";
