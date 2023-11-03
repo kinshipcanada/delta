@@ -4,8 +4,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 
 const requestSchema = z.object({
-    existing_donor_object: DonorSchema,
-    updated_donor_object: DonorSchema
+  existing_donor_object: DonorSchema,
+  updated_donor_object: DonorSchema
 })
 
 export const responseSchema = z.object({

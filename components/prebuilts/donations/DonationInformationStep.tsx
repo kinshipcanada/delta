@@ -9,7 +9,6 @@ import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 import { ObjectIdApiResponse } from "@lib/classes/api"
 import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
-import { z } from "zod"
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()
@@ -89,16 +88,9 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 donation: globalDonation
             }
 
-            const requestSchema = z.object({
-                donation: DonationSchema,
-            })
-            console.log(requestSchema.safeParse(createPaymentIntentPayload))
-            console.log("TYPEDATE", typeof globalDonation.date_donated)
-
             const response: ObjectIdApiResponse = await callKinshipAPI<string>('/api/stripe/createPaymentIntent', createPaymentIntentPayload)
 
             if (response.error) {
-                console.log("Error in stripe response, ", response.error)
                 setStep(DonationStep.Error)
                 setLoading(false)
                 return
@@ -116,7 +108,6 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             setLoading(false)
             return
         } catch (error) {
-            console.log("Error in going to next step, ", error)
             setStep(DonationStep.Error)
             return
         }

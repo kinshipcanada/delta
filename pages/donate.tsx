@@ -12,8 +12,6 @@ import WireTransferInstructions from "../components/prebuilts/donations/WireTran
 import Confirmation from "../components/prebuilts/donations/confirmation/Confirmation";
 import DonationErrorMessage from "../components/prebuilts/donations/helpers/ErrorMessage";
 import { states_and_provinces } from "../lib/utils/constants";
-
-// todo figure out if stripeClientPromise is returned as an obj or promise
 import { Stripe } from "@stripe/stripe-js";
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
@@ -85,7 +83,6 @@ export default function Donate() {
                                 : step == DonationStep.PaymentInfo ?
                                     
                                     <StripeWrapper stripeClientSecret={stripeClientSecret ? stripeClientSecret : ""} stripeClientPromise={stripeClientPromise as Promise<Stripe>}>
-                                        {/* // todo error if the clientsecret isnt there  */}
                                         <PaymentInfoStep
                                             globalDonation={globalDonation}
                                             stripeClientSecret={stripeClientSecret ? stripeClientSecret : ""}

@@ -9,13 +9,6 @@ It's open source to allow other charities to easily replicate the functionality 
 
 Charity should be powered by good software.
 
-
-// provide params
-// Validate params
-// Call functions
-// Success -> return response
-// Error -> log, return generic response
-
 ## Folder Structure
 *Tentative, changes quickly*
 
@@ -39,20 +32,33 @@ Charity should be powered by good software.
 - **GET** `/donation/batch/[list_of_ids]` - Fetches a number of donations. ID types do not need to be the same. Uses promise.all to batch donations (effectively a `/donation/id` wrapper).
 
 ## Kinship Canada Refactor
-- [ ] Backend
-    - [ ] Unify design system + error handling
-    - [ ] Notify on error and allow the rest to go through rather than returning 500
+- [ ] Phase 1: To Prod
+    - [ ] Make sure webhooks work
+    - [x] Fix auth flow breakages
+    - [ ] Database migration
+    - [ ] Password reset function
+    - [ ] Close db gracefully
+- [ ] Phase 2: Improvements/consolidation
+    - [ ] Admin system
+        - [ ] Proof system
+        - [ ] Manual donation creation system
+        - [ ] Resend donation system
+    - [ ] Donation PDF
+    - [ ] Donation param validation
+    - [ ] Account email updating
+    - [ ] Fix country/currency changes
+    - [ ] Payment method integration
     - [ ] Logging system
-    - [ ] API key system
-    - [x] Refactor API response system
-    - [ ] Write out API reference, folder structure
-    - [x] Move core functionality over
-    - [x] Unify frontend utils
-    - [x] Swap env vars
-    - [x] Create `.env.example`
+    - [ ] Api key system
+    - [ ] Recurring donations
+    - [ ] Accept paypal donations
+    - [ ] Google maps api
+    - [ ] Refactor database uploads, maybe add an orm if it reduces errors
+    - [ ] Simplify codebase, move to shadcnui
+    - [ ] Reduce dependancies
+    - [ ] Partner dashboard
+    - [ ] Feedback notifications
+- [ ] Phase 3: Reusable by others
+    - [ ] Developer home page
     - [ ] Config/system verification script (to ensure everything is running smoothly in prod)
-- [ ] Frontend
-    - [ ] Move to typescript
-    - [ ] Remove reused components (inputs, forms, etc)
-    - [ ] Purge
-        - [ ] Navigation, Footer.tsx
+    - [ ] Document API reference

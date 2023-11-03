@@ -149,24 +149,13 @@ export function uploadFeedbackToDatabase(feedback: string, donor_id?: string): P
   } 
 }
 
-export function uploadLogToDatabase(error_message: string, file_name: string, function_name: string): Promise<any> {
-  const database = _createDatabase()
-
-  try {
-    return database('logs').insert({ error_message: error_message, file_name: file_name, function_name: function_name })
-  } catch (error) {
-    throw error
-  } 
-}
-
 export type Json =
   | string
   | number
   | boolean
   | null
-  | { [key: string]: Json }
+  | { [key: string]: Json | undefined }
   | Json[]
-  | any
 
 export interface DatabaseTypings {
   public: {
@@ -260,6 +249,7 @@ export interface DatabaseTypings {
           {
             foreignKeyName: "donations_donor_fkey"
             columns: ["donor"]
+            isOneToOne: false
             referencedRelation: "donor_profiles"
             referencedColumns: ["id"]
           }
@@ -274,7 +264,6 @@ export interface DatabaseTypings {
           address_state: string | null
           admin: boolean | null
           created_at: string | null
-          set_up: boolean | null
           email: string | null
           first_name: string | null
           id: string
@@ -282,6 +271,7 @@ export interface DatabaseTypings {
           partner: boolean | null
           payment_methods: Json | null
           phone_number: number | null
+          set_up: boolean | null
           stripe_customer_ids: Json | null
         }
         Insert: {
@@ -292,7 +282,6 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
-          set_up?: boolean | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -300,6 +289,7 @@ export interface DatabaseTypings {
           partner?: boolean | null
           payment_methods?: Json | null
           phone_number?: number | null
+          set_up?: boolean | null
           stripe_customer_ids?: Json | null
         }
         Update: {
@@ -310,7 +300,6 @@ export interface DatabaseTypings {
           address_state?: string | null
           admin?: boolean | null
           created_at?: string | null
-          set_up?: boolean | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -318,31 +307,8 @@ export interface DatabaseTypings {
           partner?: boolean | null
           payment_methods?: Json | null
           phone_number?: number | null
+          set_up?: boolean | null
           stripe_customer_ids?: Json | null
-        }
-        Relationships: []
-      }
-      events: {
-        Row: {
-          created_at: string | null
-          event_type: string | null
-          id: number
-          identifiers: Json | null
-          message: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          event_type?: string | null
-          id?: number
-          identifiers?: Json | null
-          message?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          event_type?: string | null
-          id?: number
-          identifiers?: Json | null
-          message?: string | null
         }
         Relationships: []
       }
@@ -369,6 +335,7 @@ export interface DatabaseTypings {
           {
             foreignKeyName: "feedback_donor_id_fkey"
             columns: ["donor_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -377,7 +344,7 @@ export interface DatabaseTypings {
       kinship_carts: {
         Row: {
           address_city: string | null
-          address_country: DatabaseTypings["public"]["Enums"]["country"]
+          address_country: DatabaseTypings["public"]["Enums"]["country"] | null
           address_line_address: string | null
           address_postal_code: string | null
           address_state: string | null
@@ -431,29 +398,37 @@ export interface DatabaseTypings {
         }
         Relationships: []
       }
-      logs: {
+      proof: {
         Row: {
-          created_at: string | null
-          error_message: string | null
-          file_name: string | null
-          function_name: string | null
-          id: number
+          cover_letter_url: string
+          file_attachment_urls: Json
+          id: string
+          message_to_donor: string | null
+          uploaded_at: string
         }
         Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          file_name?: string | null
-          function_name?: string | null
-          id?: number
+          cover_letter_url: string
+          file_attachment_urls: Json
+          id: string
+          message_to_donor?: string | null
+          uploaded_at?: string
         }
         Update: {
-          created_at?: string | null
-          error_message?: string | null
-          file_name?: string | null
-          function_name?: string | null
-          id?: number
+          cover_letter_url?: string
+          file_attachment_urls?: Json
+          id?: string
+          message_to_donor?: string | null
+          uploaded_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "proof_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
@@ -709,11 +684,10 @@ export interface DatabaseTypings {
         | "zm"
         | "zw"
       currencies: "cad" | "usd"
-      method: "cash" | "etransfer" | "card"
+      method: "cash" | "wire_transfer" | "card" | "acss_debit"
     }
     CompositeTypes: {
       [_ in never]: never
     }
   }
 }
-

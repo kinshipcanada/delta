@@ -68,7 +68,6 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
                     identifiers: {
                         ...globalDonation.identifiers,
                         stripe_payment_intent_id: response.paymentIntent.id,
-                        // todo: check
                         stripe_payment_method_id: response.paymentIntent.payment_method!.toString()
                     }
                 })

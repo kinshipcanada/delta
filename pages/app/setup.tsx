@@ -1,12 +1,14 @@
 
 import React, { useState } from "react";
 import { Button, InlineLink, VerticalSpacer, AppPageProps, ButtonStyle, SpacerSize, PageHeader, Text, SectionHeader, JustifyBetween, BaseHeader, TextInput, JustifyEnd, ButtonSize, Label } from  "../../components/primitives";
-import { callKinshipAPI } from "../../lib/utils/helpers";
+import { callKinshipAPI, supabase } from "../../lib/utils/helpers";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 import { SelectionInput } from "../../components/primitives/Inputs";
 import { countries, states_and_provinces } from "../../lib/utils/constants";
 import { useAuth } from "../../components/prebuilts/Authentication";
+import { Donor } from "@lib/classes/donor";
+import { NoDataApiResponse } from "@lib/classes/api";
 
 const AppSetupPage: React.FC<AppPageProps> = () => {
 
@@ -30,8 +32,8 @@ export default AppSetupPage
 const SetupForm = () => {
     
     const router = useRouter()
+    const { authReloadStatus, triggerAuthReload } = useAuth()
 
-    const { donor, triggerAuthReload } = useAuth()
     const [loading, setLoading] = useState<boolean>(false)
 
     const [firstName, setFirstName] = useState<string>("")
@@ -46,38 +48,50 @@ const SetupForm = () => {
         setLoading(true)
 
         try {
+            const loggedInUser = await supabase.auth.getUser();
+
+            if (!loggedInUser) {
+                router.push("/auth/login")
+            }
+
             if (firstName.length === 0 || lastName.length === 0 || lineAddress.length === 0 || city.length === 0 || state.length === 0 || country.length === 0 || postalCode.length === 0) {
                 setLoading(false)
                 toast.error("Please fill out all the fields", { position: "top-right" })
                 return
             }
-            const response = await callKinshipAPI('/api/donor/profile/create', {
-                email: donor!.email,
-                donor_id: donor!.donor_id,
+
+            const constructedDonor: Donor = {
+                donor_id: loggedInUser!.data.user!.id,
                 first_name: firstName,
-                last_name: lastName, 
-                address_line_address: lineAddress,
-                address_state: state,
-                address_city: city,
-                address_postal_code: postalCode,
-                address_country: country,
+                last_name: lastName,
+                email: loggedInUser!.data.user!.email!,
+                address: {
+                    line_address: lineAddress,
+                    postal_code: postalCode,
+                    city: city,
+                    state: state,
+                    country: country
+                },
+                admin: false,
+                set_up: false,
+                stripe_customer_ids: []
+            }
+
+            const response: NoDataApiResponse = await callKinshipAPI<null>('/api/donor/profile/create', {
+                donor: constructedDonor
             })
-    
-            // todo - urgent
-            // if (response.status == 500) { 
-            //     toast.error(response.error, { position: "top-right" })
-            // } else if (response.status == 200) {
-            //     toast.success(`Successfully created your profile!`, { position: "top-right" })
-            //     triggerAuthReload(true)
-            //     router.push("/app")
-            // } else {
-            //     toast.error("An unknown error occurred", { position: "top-right" })
-            // }
-    
+
+            if (response.error) {
+                toast.error(response.error, { position: "top-right" })
+                setLoading(false)
+                return
+            } else {
+                toast.success(`Successfully created your profile!`, { position: "top-right" })
+                triggerAuthReload(!authReloadStatus)
+                router.push("/app")
+            }
         } catch (error) {
-            // todo
-            console.error(error)
-            // toast.error(`Error: ${error.message}`, { position: "top-right" })
+            toast.error(`Error: ${error instanceof Error && error.message ? error.message : "Sorry, something went wrong setting up your account"}`, { position: "top-right" })
         } finally {
             setLoading(false)
             return

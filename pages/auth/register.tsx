@@ -9,7 +9,7 @@ export default function Register() {
 
 	const router = useRouter()
 
-	const { triggerAuthReload } = useAuth()
+	const { authReloadStatus, triggerAuthReload } = useAuth()
 
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState<string>("")
@@ -41,10 +41,9 @@ export default function Register() {
 			} else {
 				const { error } = await supabase
 					.from('donor_profiles')
-					// todo
 					.insert({ 
 						id: data.user!.id,
-						email: email,
+						email: data.user!.email ?? email,
 					})
 				
 				if (error) {
@@ -52,14 +51,13 @@ export default function Register() {
 					setLoading(false)
 					return
 				} else {
-					triggerAuthReload(true)
+					triggerAuthReload(!authReloadStatus)
 					router.push('/app/setup')
 				}
 			}
 
 		} catch (error) {
-			// todo
-			// toast.error(`Error: ${error.message}`, { position: "top-right" })
+			toast.error(`Error: ${error instanceof Error ? error.message : "Sorry, something went wrong creating your account"}`, { position: "top-right" })
 		} finally {
 			setLoading(false)
 			return

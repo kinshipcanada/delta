@@ -30,9 +30,8 @@ export function formatDonationForDatabase(donation: Donation): DatabaseTypings["
         donation_causes: null,
         donation_created: new Date().toDateString(),
         donation_logged: new Date().toDateString(),
-        donation_method: "etransfer",
         donor: donation.donor.donor_id ? donation.donor.donor_id : null,
-        donor_object: donation.donor,
+        donor_object: JSON.stringify(donation.donor),
         email: donation.donor.email,
         fees_charged_by_stripe: donation.fees_charged_by_stripe,
         fees_covered: donation.fees_covered,
@@ -41,12 +40,13 @@ export function formatDonationForDatabase(donation: Donation): DatabaseTypings["
         payment_method: null,
         phone_number: null,
         proof_available: false,
-        stripe_balance_transaction_id: null,
-        stripe_charge_id: null,
-        stripe_customer_id: null,
-        stripe_payment_intent_id: null,
+        stripe_balance_transaction_id: donation.identifiers.stripe_balance_transaction_id ?? null,
+        stripe_charge_id: donation.identifiers.stripe_charge_id ?? null,
+        stripe_customer_id: donation.identifiers.stripe_customer_id ?? null,
+        stripe_payment_intent_id: donation.identifiers.stripe_payment_intent_id ?? null,
         transaction_refunded: false,
-        transaction_successful: true
+        transaction_successful: true,
+        donation_method: "wire_transfer"
     }
 }
 
@@ -66,7 +66,7 @@ export function formatCartForDatabase(donation: Donation): DatabaseTypings["publ
         address_postal_code: donation.donor.address.postal_code,
         address_state: donation.donor.address.state,
         amount_in_cents: donation.amount_in_cents,
-        donation_causes: donation.causes,
+        donation_causes: JSON.stringify(donation.causes),
         donation_created: new Date().toDateString(),
         donation_logged: new Date().toDateString(),
         donor: donation.donor.donor_id,
@@ -106,7 +106,7 @@ export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]
             city: cart.address_city,
             state: cart.address_state,
             postal_code: cart.address_postal_code,
-            country: cart.address_country
+            country: cart.address_country ?? "af"
         },
         admin: false,
         set_up: true,
@@ -162,14 +162,16 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
 
 export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]): Donation {
 
-    if (!isDonation(donation) || donation.email == null || donation.donation_created == null) {
+    if (donation.email == null || donation.donation_created == null) {
         throw new Error("Donation from database is missing fields or improperly formatted")
     }
 
+    const donorObject = donation.donor_object! as any
+  
     const donor: Donor = {
-        donor_id: donation.donor,
-        first_name: donation.donor_object.first_name,
-        last_name: donation.donor_object.last_name,
+        donor_id: donation.donor ?? undefined,
+        first_name: donorObject.first_name,
+        last_name: donorObject.last_name,
         email: donation.email,
         address: {
             line_address: donation.address_line_address,

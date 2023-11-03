@@ -256,8 +256,6 @@ export const enum DatabaseTable {
     KINSHIP_CARTS = "kinship_carts",
 }
 
-
-
 export const states_and_provinces: SelectOption = {
     "ca": [
         { "label": "Ontario", "value": "ON" },

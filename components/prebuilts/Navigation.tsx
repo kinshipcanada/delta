@@ -61,14 +61,14 @@ export default function Navigation() {
                     authContextLoading ? null :
                     donor ? (
                       <Button 
-                        text = "Dashboard"
+                        text = "My Receipts"
                         href = "/app"
                         style={ButtonStyle.Secondary}
                         size={ButtonSize.Standard}
                       />
                     ) :
                     <Button 
-                      text = "Login"
+                      text = "My Receipts"
                       href = "/auth/login"
                       style={ButtonStyle.Secondary}
                       size={ButtonSize.Standard}

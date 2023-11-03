@@ -5,9 +5,6 @@ import { formatDonorFromDatabase } from "../utils/formatting";
 import { isValidCountryCode } from "../utils/helpers";
 import { validate as verifyUUID } from 'uuid';
 import { createStripeCustomer } from "../utils/stripe";
-import { logError } from "../utils/logger";
-
-const FILE_NAME = "donor.ts"
 
 export async function createDonor(
     donorId: string,
@@ -67,7 +64,7 @@ export async function createDonor(
     
         return donor
     } catch (error) {
-        await logError("Error creating donor profile", FUNCTION_NAME, FILE_NAME)
+        // log error
         throw new Error("Error setting up donor profile.")
     }
 }

@@ -11,8 +11,7 @@ export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnable
     const path = router.asPath 
 
     const navigation = [
-        { name: 'Dashboard Home', link: '/app', icon: HomeIcon, current: (path == "/app") },
-        { name: 'Recurring Donations', link: '/app/recurring', icon: ArrowPathIcon, current: (path == "/app/recurring") },
+        { name: 'My Receipts', link: '/app', icon: HomeIcon, current: (path == "/app") },
         { name: 'Account & Billing', link: '/app/account', icon: UserCircleIcon, current: (path == "/app/account") },
         { name: 'Feedback', link: '/app/feedback', icon: ChatBubbleOvalLeftIcon, current: (path == "/app/feedback") },
     ]

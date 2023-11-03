@@ -19,7 +19,6 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
       paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
     })
 
-    // todo
     setPaymentMethod(paymentMethodResponse.data);
     setLoading(false)
   }

@@ -1,69 +1,50 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { callKinshipAPI } from "../../lib/utils/helpers";
+import { callKinshipAPI, parseFrontendDate } from "../../lib/utils/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Loading } from "../../components/primitives/Loading";
+import { DonationApiResponse } from "@lib/classes/api";
+import { Donation } from "@lib/classes/donation";
+import { LoadingColors, SpacerSize, VerticalSpacer } from "@components/primitives";
 
 export default function Receipt() {
     const [loading, setLoading] = useState(true)
-    const [receipt, setReceipt] = useState(null)
-    const [error, setError] = useState(null)
+    const [receipt, setReceipt] = useState<Donation>()
+    const [error, setError] = useState<boolean>(false)
 
     const router = useRouter();
     const { id } = router.query;
 
-    async function fetchDonation(donation_id) {
-        const response = await callKinshipAPI('/api/donation/fetch', {
+    async function fetchDonation(donation_id: string) {
+        const response: DonationApiResponse = await callKinshipAPI<Donation>('/api/donation/fetch', {
             donation_id: donation_id,
         });
-        
-        if (response.status === 500) {
-            setError('Something went wrong. Please try again later')
-            setLoading(false)
-            return;
+
+        if (response.data) {
+            setReceipt(response.data)
+        } else {
+            setError(true)
         }
-    
-        if (199 < response.status && response.status < 300) {
-            setReceipt(response.donation)
-            setLoading(false)
-            return;
-        }
+
+        setLoading(false)
+        return
     }
 
-    useEffect(async ()=>{
+    useEffect(()=>{
         if (!id) { return }
-        fetchDonation(id)
+        fetchDonation(id as string)
     }, [id])
 
     if (loading) {
         return (
             <div className = 'w-screen h-screen flex items-center justify-center'>
-                <Loading color={"BLUE"} />
+                <Loading color={LoadingColors.Blue} />
             </div>
         )
     } else {
-        if (error) {
-            return (
-                
-                <div className="flex content-center justify-center m-16">
-                    <div className="rounded-md bg-red-50 p-4">
-                        <div className="flex">
-                            <div className="flex-shrink-0">
-                                <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-                            </div>
-                            <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800">Error fetching your receipt.</h3>
-                            <div className="mt-2 text-sm text-red-700">
-                                <p>Something went wrong in fetching the receipt. Please try again in 5 minutes. If the issue persists, contact us at info@kinshipcanada.com</p>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
-        } else {
+        if (receipt) {
             return (
                 <div className = 'w-screen h-screen sm:p-12 p-8'>
                     <Head>
@@ -71,7 +52,7 @@ export default function Receipt() {
                     </Head>
                     <div className="md:flex md:items-center md:justify-between flex">
                         <div className="flex-1 min-w-0">
-                            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor.first_name}&apos;{receipt.donor.first_name[receipt.donor.first_name.length-1] == "s" ? null : "s"} receipt from {(new Date(Date.parse(receipt.date_donated))).toLocaleDateString()}</h2>
+                            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor.first_name}&apos;{receipt.donor.first_name[receipt.donor.first_name.length-1] == "s" ? null : "s"} receipt from {parseFrontendDate(receipt.date_donated)}</h2>
                         </div>
                         <div className="sm:mt-4 flex md:mt-0 md:ml-4">
                             {/* <SecondaryButton iconLeft={DocumentIcon} text = "Download PDF" link = "/" /> */}
@@ -84,7 +65,7 @@ export default function Receipt() {
                             <h1 className = 'text-xl font-bold leading-7 text-gray-900 sm:text-2xl sm:truncate mb-2'>Official Receipt For Income Tax Purposes</h1>
                             <p className="font-medium text-gray-700 mb-1">Kinship Canada is a registered charity</p>
                             <p className="font-medium text-gray-700">Registration Number 855070728 RR 0001</p>
-                            <p className="font-medium text-gray-700">Date Of Donation: {(new Date(Date.parse(receipt.date_donated))).toLocaleDateString()}</p>
+                            <p className="font-medium text-gray-700">Date Of Donation: {parseFrontendDate(receipt.date_donated)}</p>
                         </div>
                         <div>
                             <p className="font-medium text-gray-700 mb-1">Signed By Vice President</p>
@@ -92,9 +73,9 @@ export default function Receipt() {
                         </div>
                     </div>
                     <div className="px-4 py-5 sm:p-6">
-                        <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your CRA-Eligible Tax Receipt. You donated a total amount of ${(receipt.amount_in_cents/100).toFixed(2)} CAD.</p>
+                        <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your {receipt.donor.address.country.toLowerCase() == "ca" ? "CRA-Eligible Tax" : "Donation"} Receipt. You donated a total amount of ${(receipt.amount_in_cents/100).toFixed(2)} CAD.</p>
                         <span className = 'flex mb-1'>
-                            <p  className="font-bold text-gray-800  mr-1">{id.substring(0, 3) == "pi_" ? "Payment ID" : id.substring(0,3) == "ch_" ? "Payment ID" : "Kinship Receipt ID"}:</p> 
+                            <p  className="font-bold text-gray-800  mr-1">{(id as string).substring(0, 3) == "pi_" ? "Payment ID" : (id as string).substring(0,3) == "ch_" ? "Payment ID" : "Kinship Receipt ID"}:</p> 
                             <p className="font-medium text-gray-800">{id}</p>
                         </span>
                         <span className = 'flex mb-1'>
@@ -117,13 +98,34 @@ export default function Receipt() {
                             <p  className="font-bold text-gray-800 mr-1">Total Amount Donated:</p>
                             <p className="font-medium text-gray-800 mb-1">${(receipt.amount_in_cents/100).toFixed(2)}</p>
                         </span>
-                        <span className = 'flex mb-1'>
-                            <p  className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
-                            <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country.toLowerCase() == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : receipt.donor.address.country.toLowerCase() == "canada" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
-                        </span>
+                        {receipt.donor.address.country.toLowerCase() == "ca" && (
+                            <span className = 'flex mb-1'>
+                                <p  className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
+                                <p className="font-medium text-gray-800 mb-1">${receipt.donor.address.country.toLowerCase() == "ca" ? (receipt.amount_in_cents/100).toFixed(2) : receipt.donor.address.country.toLowerCase() == "canada" ? (receipt.amount_in_cents/100).toFixed(2) : '0.00'}</p>
+                            </span>
+                        )}
                     </div>
                     </main>
                     <div className = 'mt-4 flex w-full text-center justify-center text text-base'>Valid with the Canada Revenue Agency ·{' '} <Link href = 'https://www.canada.ca/en/revenue-agency.html'><a className = 'ml-2 text-blue-600'>https://www.canada.ca/en/revenue-agency.html</a></Link></div>
+                </div>
+            )
+        } else {
+            return (
+                
+                <div className="flex content-center justify-center m-16">
+                    <div className="rounded-md bg-red-50 p-4">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                            </div>
+                            <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">Error fetching your receipt.</h3>
+                            <div className="mt-2 text-sm text-red-700">
+                                <p>Something went wrong in fetching the receipt. Please try again in 5 minutes. If the issue persists, contact us at info@kinshipcanada.com</p>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )
         }

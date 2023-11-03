@@ -9,7 +9,7 @@ import { useAuth } from '../../components/prebuilts/Authentication'
 export default function Register() {
 
 	const router = useRouter()
-	const { triggerAuthReload } = useAuth()
+	const { authReloadStatus, triggerAuthReload } = useAuth()
 
 	const [open, setOpen] = useState(false)
 	const cancelButtonRef = useRef(null)
@@ -17,7 +17,7 @@ export default function Register() {
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
-	const [error, setError] = useState(undefined)
+	const [error, setError] = useState<string>()
 
 	const login = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -29,10 +29,9 @@ export default function Register() {
 		})
 
 		if (error) {
-			// todo
-			// setError(error.message)
+			setError(error instanceof Error && error.message ? error.message : "Sorry, something went wrong creating your account")
 		} else {
-			triggerAuthReload(true)
+			triggerAuthReload(!authReloadStatus)
 			router.push('/app')
 		}
 

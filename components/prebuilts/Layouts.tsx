@@ -8,18 +8,18 @@ import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
-import { Donor, DonorResponseSchema, DonorSchema } from '../../lib/classes/donor';
+import { Donor } from '../../lib/classes/donor';
 import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
 import { Causes } from '@lib/classes/causes';
-import { DonationGroupApiResponse, DonorApiResponse } from '@lib/classes/api';
+import { DonorApiResponse } from '@lib/classes/api';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const [donor, setDonor] = useState<Donor>()
   const [donations, setDonations] = useState<Donation[]>([])
   const [authContextLoading, setAuthContextLoading] = useState<boolean>(true)
-  const [authReload, triggerAuthReload] = useState<boolean>(false)
+  const [authReloadStatus, triggerAuthReload] = useState<boolean>(false)
   const [shouldRedirect, setShouldRedirect] = useState<boolean>(false)
   const router = useRouter()
 
@@ -58,8 +58,6 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
             donor_id: loggedInUser.data.user.id,
           })
 
-          console.log("received donor response", donorResponse)
-
           if (donorResponse.error) {
             console.error("Something went wrong loading this donor")
           } else {
@@ -81,15 +79,13 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!donor) {
-      setupAuthContext();
-    }
-  }, [supabase, donor, authReload]);
+    setupAuthContext();
+  }, [supabase, authReloadStatus]);
 
   const isApp = router.pathname.split("/").length > 1 && router.pathname.split("/")[1] == "app"
 
   return (
-    <AuthProvider donor={donor} triggerAuthReload={triggerAuthReload} donorDonations={donations} authContextLoading={authContextLoading}>
+    <AuthProvider donor={donor} authReloadStatus={authReloadStatus} triggerAuthReload={triggerAuthReload} donorDonations={donations} authContextLoading={authContextLoading}>
       <Head>
         <title>Kinship Canada</title>
       </Head>

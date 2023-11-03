@@ -7,263 +7,225 @@ import { toast } from "react-hot-toast";
 import { callKinshipAPI } from "../../lib/utils/helpers";
 import { SelectionInput } from "../../components/primitives/Inputs";
 import { countries } from "../../lib/utils/constants";
-import { useAuth } from "../../components/prebuilts/Authentication";
 import { NoDataApiResponse } from "@lib/classes/api";
+import { useAuth } from "@components/prebuilts/Authentication";
+import _isEqual from 'lodash/isEqual';
 
 const AppAccountPage: React.FC<AppPageProps> = () => {
-
-    const { donor } = useAuth()
-    const [globalDonor, setGlobalDonor] = useState<Donor>()
-
     return (
         <div>
             <JustifyBetween>
                 <PageHeader>Your Kinship Account</PageHeader>
             </JustifyBetween>
             <VerticalSpacer size={SpacerSize.Medium} />
-            <AccountInformationPanel donor = {globalDonor} setGlobalDonor={setGlobalDonor} />
+            <AccountInformationPanel />
             <VerticalSpacer size={SpacerSize.Medium} />
-            <AddressInformationPanel donor = {globalDonor} setGlobalDonor={setGlobalDonor} />
+            {/* <AddressInformationPanel /> */}
         </div>
     )
 }
 
 export default AppAccountPage
 
-const AccountInformationPanel: React.FC<{ donor?: Donor, setGlobalDonor: (donor: Donor) => void }> = ({ donor, setGlobalDonor }) => {
-    if (donor) {
-        // todo
-        const [loading, setLoading] = useState<boolean>(false)
-        const [firstName, setFirstName] = useState<string>(donor.first_name)
-        const [lastName, setLastName] = useState<string>(donor.last_name)
-        const [email, setEmail] = useState<string>(donor.email)
-
-        const handleSaveChanges = async () => {
-            setLoading(true)
-
-            if (firstName === donor.first_name && lastName === donor.last_name && email === donor.email) {
-                setLoading(false)
-                toast.success("Successfully updated your account information!", { position: "top-right" })
-                return
-            }
-
-            const response: NoDataApiResponse = await callKinshipAPI('/api/donor/profile/update', {
-                donor_id: donor.donor_id,
-                existing_donor_object: donor,
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                address_line_address: donor.address.line_address,
-                address_city: donor.address.city,
-                address_state: donor.address.state,
-                address_country: donor.address.country,
-                address_postal_code: donor.address.postal_code
-            })
-
-            // todo
-            // if (response.status == 500) { 
-            //     toast.error("Error updating your profile, please try again later", { position: "top-right" })
-            // } else if (response.status == 200) {
-            //     setGlobalDonor(response.donor)
-            //     toast.success("Successfully updated your account information!", { position: "top-right" })
-            // } else {
-            //     toast.error("An unknown error occurred", { position: "top-right" })
-            // }
-
-            setLoading(false)
-            return
-        }
-
-        return (
-            <PanelWithLeftText
-                header={
-                    <>
-                        <BaseHeader>Personal Information</BaseHeader>
-                        <VerticalSpacer size={SpacerSize.Small} />
-                        <Text>Update your personal information, including your email address, and the name your receipts are issued to.</Text>
-                    </>
-                }
-            >
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <TextInput 
-                        placeholder="First Name" 
-                        type="text" 
-                        label="First Name"
-                        name="userFirstName" 
-                        id="userFirstName" 
-                        value={firstName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setFirstName(e.target.value) }} 
-                        required={false} 
-                    />
-                    <TextInput 
-                        placeholder="Last Name" 
-                        type="text" 
-                        label="Last Name"
-                        name="userLastName" 
-                        id="userLastName" 
-                        value={lastName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLastName(e.target.value) }} 
-                        required={false} 
-                    />
-                </div>
-                <VerticalSpacer size={SpacerSize.Medium} />
-                <TextInput 
-                    placeholder="Email Address" 
-                    type="email" 
-                    label="Email Address"
-                    name="emailAddress" 
-                    id="emailAddress" 
-                    value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setEmail(e.target.value) }} 
-                    required={false} 
-                />
-                <VerticalSpacer size={SpacerSize.Medium} />
-                <JustifyEnd>
-                    <Button 
-                        text="Save Changes" 
-                        isLoading={loading} 
-                        icon={<CheckIcon />} 
-                        style={ButtonStyle.Secondary}
-                        size={ButtonSize.Small} 
-                        onClick={handleSaveChanges}
-                    />
-                </JustifyEnd>
-            </PanelWithLeftText>
-        )
-    } else {
-        return (<div>Error</div>)
-    }
-}
-
-const AddressInformationPanel: React.FC<{ donor?: Donor, setGlobalDonor: (donor: Donor) => void }> = ({ donor, setGlobalDonor }) => {
-
+const AccountInformationPanel = () => {
+    const { donor, authReloadStatus, triggerAuthReload } = useAuth()
+    const [modifiedDonor, setModifiedDonor] = useState<Donor>({ ...donor! })
     const [loading, setLoading] = useState<boolean>(false)
 
-    if (!donor) {
-        // todo
-        return (<div>Error.</div>)
-    } else {
-        const [lineAddress, setLineAddress] = useState<string>(donor.address.line_address)
-        const [city, setCity] = useState<string>(donor.address.city)
-        const [state, setState] = useState<string>(donor.address.state)
-        const [country, setCountry] = useState<string>(donor.address.country)
-        const [postalCode, setPostalCode] = useState<string>(donor.address.postal_code)
 
-        const handleSaveChanges = async () => {
-            setLoading(true)
+    const handleSaveChanges = async () => {
+        setLoading(true)
 
-            if (lineAddress === donor.address.line_address && city === donor.address.city && state === donor.address.state && country === donor.address.country && postalCode === donor.address.postal_code) {
-                setLoading(false)
-                toast.success("Successfully updated your account information!", { position: "top-right" })
-                return
-            }
-
-            const response: NoDataApiResponse = await callKinshipAPI('/api/donor/profile/update', {
-                donor_id: donor.donor_id,
-                existing_donor_object: donor,
-                first_name: donor.first_name,
-                last_name: donor.last_name,
-                email: donor.email,
-                address_line_address: lineAddress,
-                address_city: city,
-                address_state: state,
-                address_country: country,
-                address_postal_code: postalCode
-            })
-
-            // todo
-            // if (response.status == 500) { 
-            //     toast.error("Error updating your profile, please try again later", { position: "top-right" })
-            // } else if (response.status == 200) {
-            //     setGlobalDonor(response.donor)
-            //     toast.success("Successfully updated your account information!", { position: "top-right" })
-            // } else {
-            //     toast.error("An unknown error occurred", { position: "top-right" })
-            // }
-
+        if (_isEqual(donor, modifiedDonor)) {
             setLoading(false)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
             return
         }
 
-        return (
-            <PanelWithLeftText
-                header={
-                    <>
-                        <BaseHeader>Address Information</BaseHeader>
-                        <VerticalSpacer size={SpacerSize.Small} />
-                        <Text>This is where you can set your address information, which is used to determine your tax receipt eligibility and appears on your invoice (or tax receipt).</Text>
-                    </>
-                }
-            >
+        const response: NoDataApiResponse = await callKinshipAPI('/api/donor/profile/update', {
+            existing_donor_object: donor,
+            updated_donor_object: modifiedDonor,
+        })
+
+        if (response.error) {
+            toast.error(response.error, { position: "top-right" })
+        } else {
+            triggerAuthReload(!authReloadStatus)
+            toast.success("Successfully updated your account information!", { position: "top-right" })
+        }
+
+        setLoading(false)
+        return
+    }
+
+    return (
+        <PanelWithLeftText
+            header={
+                <>
+                    <BaseHeader>Personal Information</BaseHeader>
+                    <VerticalSpacer size={SpacerSize.Small} />
+                    <Text>Update your personal information, including your email address, and the name your receipts are issued to.</Text>
+                </>
+            }
+        >
+            <div className="grid sm:grid-cols-2 gap-4">
                 <TextInput 
-                    placeholder="Line Address" 
+                    placeholder="First Name" 
                     type="text" 
-                    label="Line Address"
-                    name="lineAddress" 
-                    id="lineAddress" 
-                    value={lineAddress}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setLineAddress(e.target.value) }} 
+                    label="First Name"
+                    name="userFirstName" 
+                    id="userFirstName" 
+                    value={modifiedDonor.first_name}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            first_name: e.target.value
+                        })
+                    }} 
                     required={false} 
                 />
-                <VerticalSpacer size={SpacerSize.Medium} />
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <TextInput 
-                        placeholder="City" 
-                        type="text" 
-                        label="City"
-                        name="city" 
-                        id="city" 
-                        value={city}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setCity(e.target.value) }} 
-                        required={false} 
-                    />
-                    <TextInput 
-                        placeholder="State" 
-                        type="text" 
-                        label="State"
-                        name="state" 
-                        id="state" 
-                        value={state}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setState(e.target.value) }} 
-                        required={false} 
-                    />
-                    <TextInput 
-                        placeholder="Postal Code" 
-                        type="text" 
-                        label="Postal Code"
-                        name="postalCode" 
-                        id="postalCode" 
-                        value={postalCode}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setPostalCode(e.target.value) }} 
-                        required={false} 
-                    />
-                    <SelectionInput
-                        label="Country"
-                        name="country"
-                        id="country"
-                        value={country}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setCountry(e.target.value) }}
-                        required={false}
-                        options={countries.map((country) => {
-                            return {
-                                label: country.label,
-                                value: country.value
+                <TextInput 
+                    placeholder="Last Name" 
+                    type="text" 
+                    label="Last Name"
+                    name="userLastName" 
+                    id="userLastName" 
+                    value={modifiedDonor.last_name}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            last_name: e.target.value
+                        })
+                    }} 
+                    required={false} 
+                />
+            </div>
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <TextInput 
+                placeholder="Email Address" 
+                type="email" 
+                label="Email Address"
+                name="emailAddress" 
+                id="emailAddress" 
+                value={modifiedDonor.email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                    setModifiedDonor({
+                        ...modifiedDonor,
+                        email: e.target.value
+                    })
+                }} 
+                required={false} 
+            />
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <TextInput 
+                placeholder="Line Address" 
+                type="text" 
+                label="Line Address"
+                name="lineAddress" 
+                id="lineAddress" 
+                value={modifiedDonor.address.line_address}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                    setModifiedDonor({
+                        ...modifiedDonor,
+                        address: {
+                            ...modifiedDonor.address,
+                            line_address: e.target.value
+                        }
+                    })
+                }}
+                required={false} 
+            />
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <div className="grid sm:grid-cols-2 gap-4">
+                <TextInput 
+                    placeholder="City" 
+                    type="text" 
+                    label="City"
+                    name="city" 
+                    id="city" 
+                    value={modifiedDonor.address.city}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            address: {
+                                ...modifiedDonor.address,
+                                city: e.target.value
                             }
-                        })}
-                    />
-                </div>
-                <VerticalSpacer size={SpacerSize.Medium} />
-                <JustifyEnd>
-                    <Button 
-                        text="Save Changes" 
-                        isLoading={loading} 
-                        icon={<CheckIcon />} 
-                        style={ButtonStyle.Secondary}
-                        size={ButtonSize.Small} 
-                        onClick={handleSaveChanges}
-                    />
-                </JustifyEnd>
-            </PanelWithLeftText>
-        )
-    }
+                        })
+                    }}
+                    required={false} 
+                />
+                <TextInput 
+                    placeholder="State" 
+                    type="text" 
+                    label="State"
+                    name="state" 
+                    id="state" 
+                    value={modifiedDonor.address.state}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            address: {
+                                ...modifiedDonor.address,
+                                state: e.target.value
+                            }
+                        })
+                    }}
+                    required={false} 
+                />
+                <TextInput 
+                    placeholder="Postal Code" 
+                    type="text" 
+                    label="Postal Code"
+                    name="postalCode" 
+                    id="postalCode" 
+                    value={modifiedDonor.address.postal_code}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            address: {
+                                ...modifiedDonor.address,
+                                postal_code: e.target.value
+                            }
+                        })
+                    }}
+                    required={false} 
+                />
+                <SelectionInput
+                    label="Country"
+                    name="country"
+                    id="country"
+                    value={modifiedDonor.address.country}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                        setModifiedDonor({
+                            ...modifiedDonor,
+                            address: {
+                                ...modifiedDonor.address,
+                                country: e.target.value
+                            }
+                        })
+                    }}
+                    required={false}
+                    options={countries.map((country) => {
+                        return {
+                            label: country.label,
+                            value: country.value
+                        }
+                    })}
+                />
+            </div>
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <JustifyEnd>
+                <Button 
+                    text="Save Changes" 
+                    isLoading={loading} 
+                    icon={<CheckIcon />} 
+                    style={ButtonStyle.Secondary}
+                    size={ButtonSize.Small} 
+                    onClick={handleSaveChanges}
+                />
+            </JustifyEnd>
+        </PanelWithLeftText>
+    )
+
 }
