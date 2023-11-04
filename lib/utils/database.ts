@@ -13,6 +13,7 @@ function _createDatabase() {
 
   return database
 }
+
 export function uploadDonationToDatabase(donation: Donation): Promise<any> {
   const database = _createDatabase()
   try {
@@ -37,7 +38,7 @@ export function fetchDonationFromDatabase(donation_identifiers: DonationIdentifi
 
   } catch (error) {
     throw error
-  } 
+  }
 }
 
 export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): Promise<any> {
@@ -180,7 +181,6 @@ export interface DatabaseTypings {
           id: string
           livemode: boolean | null
           payment_method: Json | null
-          phone_number: number | null
           proof_available: boolean | null
           stripe_balance_transaction_id: string | null
           stripe_charge_id: string | null
@@ -208,7 +208,6 @@ export interface DatabaseTypings {
           id?: string
           livemode?: boolean | null
           payment_method?: Json | null
-          phone_number?: number | null
           proof_available?: boolean | null
           stripe_balance_transaction_id?: string | null
           stripe_charge_id?: string | null
@@ -236,7 +235,6 @@ export interface DatabaseTypings {
           id?: string
           livemode?: boolean | null
           payment_method?: Json | null
-          phone_number?: number | null
           proof_available?: boolean | null
           stripe_balance_transaction_id?: string | null
           stripe_charge_id?: string | null
@@ -270,7 +268,6 @@ export interface DatabaseTypings {
           last_name: string | null
           partner: boolean | null
           payment_methods: Json | null
-          phone_number: number | null
           set_up: boolean | null
           stripe_customer_ids: Json | null
         }

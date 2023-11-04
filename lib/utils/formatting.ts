@@ -1,10 +1,9 @@
 import { Stripe } from "stripe";
 import { Address } from "../classes/address";
-import { Causes, CauseMap } from "@lib/classes/causes";
 import { Donation, isDonation } from "../classes/donation";
 import { Donor, isDonor } from "../classes/donor";
 import { RawStripeTransactionObject, isRawStripeTransactionObject } from "../classes/stripe";
-import { CurrencyList, DonationIdentifiers } from "../classes/utils";
+import { CountryCode, DonationIdentifiers } from "../classes/utils";
 import { DatabaseTable } from "./constants";
 import { DatabaseTypings, parameterizedDatabaseQuery } from "./database";
 import { v4 as uuidv4 } from 'uuid';
@@ -36,9 +35,7 @@ export function formatDonationForDatabase(donation: Donation): DatabaseTypings["
         fees_charged_by_stripe: donation.fees_charged_by_stripe,
         fees_covered: donation.fees_covered,
         id: donation.identifiers.donation_id,
-        livemode: donation.live,
         payment_method: null,
-        phone_number: null,
         proof_available: false,
         stripe_balance_transaction_id: donation.identifiers.stripe_balance_transaction_id ?? null,
         stripe_charge_id: donation.identifiers.stripe_charge_id ?? null,
@@ -73,66 +70,7 @@ export function formatCartForDatabase(donation: Donation): DatabaseTypings["publ
         email: donation.donor.email,
         first_name: donation.donor.first_name,
         last_name: donation.donor.first_name,
-        livemode: donation.live,
-        phone_number: donation.donor.phone_number
     } as DatabaseTypings["public"]["Tables"]["kinship_carts"]["Row"]
-}
-
-export function formatCartFromDatabase(cart: DatabaseTypings["public"]["Tables"]["kinship_carts"]["Row"]): Donation {
-
-    if (
-        cart.first_name == null || 
-        cart.last_name == null || 
-        cart.email == null || 
-        cart.address_line_address == null || 
-        cart.address_city == null || 
-        cart.address_state == null || 
-        cart.address_country ||
-        cart.address_postal_code == null || 
-        cart.livemode == null || 
-        cart.amount_in_cents == null || 
-        cart.donation_logged == null
-    ) {
-        throw new Error("Fields are missing from cart in database")
-    }
-
-    const donor: Donor = {
-        donor_id: cart.donor ? cart.donor : undefined,
-        first_name: cart.first_name,
-        last_name: cart.last_name,
-        email: cart.email,
-        address: {
-            line_address: cart.address_line_address,
-            city: cart.address_city,
-            state: cart.address_state,
-            postal_code: cart.address_postal_code,
-            country: cart.address_country ?? "af"
-        },
-        admin: false,
-        set_up: true,
-        stripe_customer_ids: []
-    }
-
-    const constructedCart: Causes = {
-        total_amount_paid_in_cents: 50,
-        currency: CurrencyList.CAD,
-        is_imam_donation: false, // Implement
-        is_sadat_donation: false, // Implement
-        is_sadaqah: false // Implement
-    }
-    
-    return {
-        identifiers: {
-            donation_id: cart.id,
-        },
-        donor: donor,
-        causes: constructedCart,
-        live: cart.livemode,
-        amount_in_cents: cart.amount_in_cents,
-        fees_covered: 0,
-        fees_charged_by_stripe: 0,
-        date_donated: new Date(cart.donation_logged as string)
-    }
 }
 
 export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables"]["donor_profiles"]["Row"]): Donor {
@@ -146,7 +84,6 @@ export function formatDonorFromDatabase(donor: DatabaseTypings["public"]["Tables
         first_name: donor.first_name!,
         last_name: donor.last_name!,
         email: donor.email!,
-        phone_number: donor.phone_number ?? undefined,
         address: {
             line_address: donor.address_line_address,
             city: donor.address_city,
@@ -195,7 +132,6 @@ export function formatDonationFromDatabase(donation: DatabaseTypings["public"]["
             stripe_customer_id: donation.stripe_customer_id,
         } as DonationIdentifiers,
         donor: donor,
-        live: donation.livemode,
         amount_in_cents: donation.amount_in_cents,
         fees_covered: donation.fees_covered,
         fees_charged_by_stripe: donation.fees_charged_by_stripe,
@@ -218,13 +154,12 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
         first_name: rawStripeObject.charge_object!.metadata.first_name ? rawStripeObject.charge_object!.metadata.first_name : rawStripeObject.customer!.name!.split(' ')[0] as string,
         last_name: rawStripeObject.charge_object!.metadata.last_name ? rawStripeObject.charge_object!.metadata.last_name : rawStripeObject.customer!.name!.split(' ')[1] as string,
         email: rawStripeObject.customer!.email!,
-        phone_number: rawStripeObject.customer!.phone ? parseInt(rawStripeObject.customer!.phone) : undefined,
         address: {
             line_address: rawStripeObject.customer!.address!.line1 as string,
             postal_code: rawStripeObject.customer!.address!.postal_code as string,
             city: rawStripeObject.customer!.address!.city as string,
             state: rawStripeObject.customer!.address!.state as string,
-            country: rawStripeObject.customer!.address!.country as string
+            country: rawStripeObject.customer!.address!.country as CountryCode
         },
         admin: donorFromDatabase.admin,
         set_up: donorFromDatabase.set_up,
@@ -246,8 +181,8 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
             stripe_payment_method_id: rawStripeObject.payment_method!.id as string
         },
         donor: donor,
-        causes: _buildCartFromStripeMetadata(rawStripeObject.charge_object!),
-        live: rawStripeObject.charge_object!.livemode,
+        causes: [],
+        // causes: _buildCartFromStripeMetadata(rawStripeObject.charge_object!),
         amount_in_cents: rawStripeObject.charge_object!.amount_captured,
         fees_covered: rawStripeObject.charge_object!.metadata ? parseInt(rawStripeObject.charge_object!.metadata.fees_covered) : 0,
         fees_charged_by_stripe: rawStripeObject.balance_transaction_object!.fee,
@@ -258,29 +193,30 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
 
 }
 
-function _buildCartFromStripeMetadata(stripeChargeObject: Stripe.Charge): Causes {
-    if (stripeChargeObject.metadata === null || stripeChargeObject.metadata === undefined || stripeChargeObject.metadata.causes === undefined || stripeChargeObject.metadata.causes === null) {
-        throw new Error("Stripe charge object does not have metadata or metadata.causes");
-    }
+// todo
+// function _buildCartFromStripeMetadata(stripeChargeObject: Stripe.Charge): Causes {
+//     if (stripeChargeObject.metadata === null || stripeChargeObject.metadata === undefined || stripeChargeObject.metadata.causes === undefined || stripeChargeObject.metadata.causes === null) {
+//         throw new Error("Stripe charge object does not have metadata or metadata.causes");
+//     }
 
-    let total = 0;
-    let causes: CauseMap = {};
+//     let total = 0;
+//     let causes: CauseMap = {};
 
-    const stripeMetadataCauses = JSON.parse(stripeChargeObject.metadata.causes)
+//     const stripeMetadataCauses = JSON.parse(stripeChargeObject.metadata.causes)
 
-    for (const key of Object.keys(stripeMetadataCauses)) {
-        total += parseInt(stripeMetadataCauses[key]);
-        causes[key] = parseInt(stripeMetadataCauses[key]);
-    }
+//     for (const key of Object.keys(stripeMetadataCauses)) {
+//         total += parseInt(stripeMetadataCauses[key]);
+//         causes[key] = parseInt(stripeMetadataCauses[key]);
+//     }
 
-    return {
-        total_amount_paid_in_cents: total,
-        currency: stripeChargeObject.currency as CurrencyList,
-        is_imam_donation: false, // Implement
-        is_sadat_donation: false, // Implement
-        is_sadaqah: false // Implement
-    }
-}
+//     return {
+//         total_amount_paid_in_cents: total,
+//         currency: stripeChargeObject.currency as CurrencyList,
+//         is_imam_donation: false, // Implement
+//         is_sadat_donation: false, // Implement
+//         is_sadaqah: false // Implement
+//     }
+// }
 
 function _getDonationIdFromStripeMetadata(stripeChargeObject: Stripe.Charge) {
     return stripeChargeObject.metadata ? stripeChargeObject.metadata.donation_id : null;

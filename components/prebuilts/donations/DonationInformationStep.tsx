@@ -9,6 +9,8 @@ import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 import { ObjectIdApiResponse } from "@lib/classes/api"
 import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
+import { Cause } from "@lib/classes/causes"
+import { CountryCode } from "@lib/classes/utils"
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()
@@ -25,6 +27,23 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             })
         }
     }, [donor])
+
+    const sadatDonation: Cause = {
+        one_way: true,
+        label: "Sehme Sadat",
+        region: "iq"
+    }
+
+    const imamDonation: Cause = {
+        one_way: true,
+        label: "Sehme Imam",
+        region: "iq"
+    }
+
+    const sadaqahDonation: Cause = {
+        one_way: false,
+        label: "Sadaqah",
+    }
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<{ title: string, message: string } | undefined>(undefined)
@@ -75,7 +94,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             }
 
             // Validate donation customizations
-            if (isKhums && !globalDonation.causes.is_imam_donation && !globalDonation.causes.is_sadat_donation) {
+            if (isKhums && !globalDonation.causes.includes(imamDonation) && !globalDonation.causes.includes(sadatDonation)) {
                 setError({
                     title: "Please specify where to direct khums",
                     message: "To make a khums donation, please specify whether it is Imam, Sadat, or both"
@@ -321,7 +340,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                                 ...globalDonation.donor,
                                 address: {
                                     ...globalDonation.donor.address,
-                                    country: e.target.value,
+                                    country: e.target.value as CountryCode,
                                     state: states_and_provinces[e.target.value] ? states_and_provinces[e.target.value][0].value : ""
                                 }
                             }
@@ -339,16 +358,23 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             <CheckboxInput
                 label="Is this donation Saqadah"
-                checked={globalDonation.causes.is_sadaqah}
+                checked={globalDonation.causes.includes(sadaqahDonation)}
                 required={false}
                 onChange={(e) => { 
-                    setGlobalDonation({
-                        ...globalDonation,
-                        causes: {
-                            ...globalDonation.causes,
-                            is_sadaqah: e.target.checked
-                        }
-                    })
+                    if (e.target.checked) {
+                        setGlobalDonation({
+                            ...globalDonation,
+                            causes: globalDonation.causes
+                            // causes: globalDonation.causes.push(sadaqahDonation),
+                        })
+                    } else {
+                        setGlobalDonation({
+                            ...globalDonation,
+                            causes: globalDonation.causes
+                            // causes: globalDonation.causes.pop(sadaqahDonation),
+                        })
+                    }
+                    
                 }}
             />
             
@@ -365,7 +391,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             { isKhums && (
                 <div className='px-4'>
-                    <CheckboxInput
+                    TODO
+                    {/* <CheckboxInput
                         label="Sehme Imam"
                         checked={globalDonation.causes.is_imam_donation}
                         required={false}
@@ -393,7 +420,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                                 }
                             })
                         }}
-                    />
+                    /> */}
                     <VerticalSpacer size={SpacerSize.Small} />
                 </div>
             )}

@@ -2,7 +2,6 @@ import { Donation } from "../classes/donation";
 import { AdminNotificationType, DeliveryMethod, NotificationTemplate, UserNotificationType } from "../classes/notifications";
 import { countries } from "./constants";
 import * as dotenv from 'dotenv' 
-const twilio = require('twilio')
 const postmark = require('postmark')
 import { Donor } from "../classes/donor";
 
@@ -96,31 +95,6 @@ async function _sendEmail(template: NotificationTemplate, donor: Donor): Promise
     } catch (error) {
         if (error instanceof Error) {
             throw new Error("Error sending Email: " + error.message);
-        } else {
-            // Handle the case where 'error' is not an instance of 'Error'
-            throw new Error("An unknown error occurred");
-        }
-    }
-}
-
-async function _sendSMS(template: NotificationTemplate, donor: Donor): Promise<void> {
-    try {
-        const twilio_client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-
-        if (donor.phone_number == null || donor.phone_number == undefined) {
-            throw new Error("Cannot send SMS: donor does not have a phone number")
-        }
-
-        const message = await twilio_client.messages.create({
-            body: template.sms_friendly_message,
-            to: String(donor.phone_number),
-            from: process.env.TWILIO_CANADIAN_NUMBER,
-        })
-
-        return;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw new Error("Error sending SMS: " + error.message);
         } else {
             // Handle the case where 'error' is not an instance of 'Error'
             throw new Error("An unknown error occurred");

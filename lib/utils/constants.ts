@@ -1,6 +1,31 @@
+import { Cause } from "@lib/classes/causes";
+import { CountryCode } from "@lib/classes/utils";
+
 export type SelectOption = {
     [key: string]: any;
 };
+
+interface StateInfo {
+    label: string;
+    states_and_provinces: {
+      [key: string]: string; // Assuming provinces are strings, adjust as needed
+    };
+}
+  
+interface States {
+    [key: string]: StateInfo;
+}
+
+export const states2: States = {
+    "ca": {
+    "label": "Canada",
+    "states_and_provinces": {
+    "on": "Ontario"
+    // Add more provinces or states as needed
+    }
+    }
+};
+
 
 export const countries: SelectOption[] = [
     {"label": "Canada", "value": "ca"}, 
@@ -255,6 +280,31 @@ export const enum DatabaseTable {
     EVENTS = "events",
     KINSHIP_CARTS = "kinship_carts",
 }
+
+export const causes: Cause[] = [
+    {
+        one_way: false,
+        label: "Anywhere",
+    },
+    {
+        one_way: true,
+        label: "Sehme Imam",
+        region: "ca"
+    },
+    {
+        one_way: true,
+        label: "Sehme Sadat",
+        region: "ca"
+    },
+    {
+        one_way: false,
+        label: "Sadaqah",
+    },
+    {
+        one_way: true,
+        label: "Vision Kinship",
+    }
+]
 
 export const states_and_provinces: SelectOption = {
     "ca": [

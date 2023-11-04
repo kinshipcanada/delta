@@ -9,6 +9,7 @@ import { countries, states_and_provinces } from "../../lib/utils/constants";
 import { useAuth } from "../../components/prebuilts/Authentication";
 import { Donor } from "@lib/classes/donor";
 import { NoDataApiResponse } from "@lib/classes/api";
+import { CountryCode } from "@lib/classes/utils";
 
 const AppSetupPage: React.FC<AppPageProps> = () => {
 
@@ -41,7 +42,7 @@ const SetupForm = () => {
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
     const [state, setState] = useState<string>("ON")
-    const [country, setCountry] = useState<string>("ca")
+    const [country, setCountry] = useState<CountryCode>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
     const handleSaveChanges = async () => {
@@ -195,7 +196,7 @@ const SetupForm = () => {
                     options={countries}
                     value="ca"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
-                        setCountry(e.target.value)
+                        setCountry(e.target.value as CountryCode)
                      }}
                     required={true}
                 />

@@ -8,6 +8,7 @@ import { countries } from "./constants";
 import { NextApiResponse } from "next";
 import { ZodError, ZodObject, ZodType, z } from "zod";
 import { ApiResponse } from "@lib/classes/api";
+import { Cause } from "@lib/classes/causes";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -85,6 +86,7 @@ export function generateIdentifiersFromStrings(strings: string[]): DonationIdent
     return identifiers;
 }
 
+export const convertCauseLabelToInternalLabel = (cause: Cause) => cause.label.toLowerCase().replace(" ", "_")
 
 export function verifyAllParametersExist(errorMessage: string, ...args: any[]): void {
     for (let i = 0; i < args.length; i++) {

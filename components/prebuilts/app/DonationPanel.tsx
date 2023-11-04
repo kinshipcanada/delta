@@ -18,9 +18,7 @@ export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) =>
         <PanelWithFooter
             footer={
                 <JustifyEnd>
-                    <Button icon={<ArrowDownCircleIcon />} text="Download Receipt" style={ButtonStyle.Secondary} onClick={()=>{toast.error("Not Implemented. Blame the dev at hobbleabbas@gmail.com until its solved.", { position: "top-right"})}} />
-                    <HorizontalSpacer size={SpacerSize.Small} />
-                    <Button text="View Donation &rarr;" style={ButtonStyle.Primary} href={`http://${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`}></Button>
+                    <Button text="View Receipt &rarr;" style={ButtonStyle.Primary} href={`${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`}></Button>
                 </JustifyEnd>
             }
         >

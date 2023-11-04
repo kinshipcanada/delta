@@ -9,7 +9,6 @@ import { faker } from '@faker-js/faker';
  * @param middle_name - The middle name of the donor. Optional.
  * @param last_name - The last name of the donor.
  * @param email - The email of the donor.
- * @param phone_number - The phone number of the donor.
  * @param address - The address of the donor, as an Address object.
  * @param stripe_customer_ids - An array of Stripe customer ids associated with the donor.
  */
@@ -20,7 +19,6 @@ export interface Donor {
     middle_name?: string;
     last_name: string;
     email: string;
-    phone_number?: number;
     address: Address;
     admin: boolean;
     set_up: boolean;
@@ -33,7 +31,6 @@ export const DonorSchema = z.object({
     middle_name: z.string().min(1).optional(),
     last_name: z.string().min(1),
     email: z.string().email(),
-    phone_number: z.number().optional(),
     address: AddressSchema,
     admin: z.boolean(),
     set_up: z.boolean(),
@@ -71,7 +68,6 @@ export const generateFakeDonor = (): Donor => {
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
         email: faker.internet.email(),
-        phone_number: Number(faker.phone.number()),
         address: {
           line_address: faker.location.streetAddress(),
           city: faker.location.city(),

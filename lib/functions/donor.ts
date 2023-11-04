@@ -5,6 +5,7 @@ import { formatDonorFromDatabase } from "../utils/formatting";
 import { isValidCountryCode } from "../utils/helpers";
 import { validate as verifyUUID } from 'uuid';
 import { createStripeCustomer } from "../utils/stripe";
+import { CountryCode } from "@lib/classes/utils";
 
 export async function createDonor(
     donorId: string,
@@ -15,7 +16,7 @@ export async function createDonor(
     postalCode: string,
     city: string,
     state: string,
-    country: string
+    country: CountryCode
 ): Promise<Donor> {
     const FUNCTION_NAME = "createDonor"
 
@@ -98,7 +99,7 @@ export async function updateDonor(
     address_postal_code: string,
     address_city: string,
     address_state: string,
-    address_country: string
+    address_country: CountryCode
 ): Promise<Donor> {
     if (!verifyUUID(donorId)) {
         throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
@@ -131,7 +132,6 @@ export async function updateDonor(
             middle_name: existingDonorObject.middle_name,
             last_name: lastName,
             email: email,
-            phone_number: existingDonorObject.phone_number,
             admin: existingDonorObject.admin,
             address: address,
             set_up: existingDonorObject.set_up,
@@ -166,7 +166,7 @@ export async function setupDonor(
     address_postal_code: string,
     address_city: string,
     address_state: string,
-    address_country: string
+    address_country: CountryCode
 ): Promise<Donor> {
     if (!verifyUUID(donorId)) {
         throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
@@ -199,7 +199,6 @@ export async function setupDonor(
             middle_name: existingDonorObject.middle_name,
             last_name: lastName,
             email: email,
-            phone_number: existingDonorObject.phone_number,
             admin: existingDonorObject.admin,
             address: address,
             set_up: existingDonorObject.set_up,

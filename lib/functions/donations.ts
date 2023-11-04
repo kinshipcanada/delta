@@ -5,7 +5,7 @@ import { DonationIdentifiers } from "@lib/classes/utils";
 import { DatabaseTable } from "../utils/constants";
 import { DatabaseTypings, parameterizedDatabaseQuery } from "@lib/utils/database";
 import { fetchDonationFromDatabase, uploadDonationToDatabase } from "../utils/database";
-import { formatDonationFromRawStripeData, formatDonationFromDatabase, formatCartFromDatabase } from "../utils/formatting";
+import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
 import { validateEmail } from "../utils/helpers";
 import { sendNotification } from "../utils/notifications";
 import { fetchFullDonationFromStripe } from "@lib/utils/stripe";
@@ -74,15 +74,5 @@ export async function fetchAllDonationsForDonor(donorEmail: string): Promise<Don
         return donationsFromDatabase.map((donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]) => formatDonationFromDatabase(donation));
     } catch (error) {
         throw error;
-    }
-}
-
-
-export async function fetchKinshipCart(cartId: string): Promise<Donation> {
-    try {
-        const cart =  formatCartFromDatabase(await parameterizedDatabaseQuery(DatabaseTable.KINSHIP_CARTS, { id: cartId }, true));
-        return cart
-    } catch (error) {
-        throw error
     }
 }

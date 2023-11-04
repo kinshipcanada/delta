@@ -6,12 +6,10 @@ export default function Reset() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [error, setError] = useState(null)
+    const [error, setError] = useState<string>()
     const router = useRouter();
 
-    const accessToken = router.query.access_token;
-
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true)
 

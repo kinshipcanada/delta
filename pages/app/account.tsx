@@ -10,6 +10,7 @@ import { countries } from "../../lib/utils/constants";
 import { NoDataApiResponse } from "@lib/classes/api";
 import { useAuth } from "@components/prebuilts/Authentication";
 import _isEqual from 'lodash/isEqual';
+import { CountryCode } from "@lib/classes/utils";
 
 const AppAccountPage: React.FC<AppPageProps> = () => {
     return (
@@ -201,7 +202,7 @@ const AccountInformationPanel = () => {
                             ...modifiedDonor,
                             address: {
                                 ...modifiedDonor.address,
-                                country: e.target.value
+                                country: e.target.value as CountryCode
                             }
                         })
                     }}

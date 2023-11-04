@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConfirmationType, DonationStep } from "../components/prebuilts/donations/helpers/types";
 import { v4 as uuidv4 } from 'uuid'
-import { CurrencyList } from "../lib/classes/utils";
 import { Donation } from "../lib/classes/donation";
 import { loadStripe } from "@stripe/stripe-js";
 import { DonationSummary } from "../components/prebuilts/Layouts";
@@ -40,14 +39,13 @@ export default function Donate() {
             set_up: false,
             stripe_customer_ids: []
         },
-        causes: {
-            total_amount_paid_in_cents: 0,
-            currency: CurrencyList.CAD,
-            is_imam_donation: false,
-            is_sadat_donation: false,
-            is_sadaqah: false
-        },
-        live: process.env.NEXT_PUBLIC_LIVEMODE == "true" ? true : false,
+        causes: [
+            // By default, your donation can go anywhere
+            {
+                one_way: false,
+                label: "Anywhere",
+            }
+        ],
         amount_in_cents: 0,
         fees_covered: 0,
         fees_charged_by_stripe: 0, // This will be filled in based on the type of card they pay with, by the post-payment Stripe webhook
@@ -58,8 +56,8 @@ export default function Donate() {
     
     return (
         <div className="bg-white">
-            <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" />
-            <div className="fixed right-0 top-0 hidden h-full w-1/2 bg-gray-50 lg:block" />
+            <div className="z-1 fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" />
+            <div className="z-1 fixed right-0 top-0 hidden h-full w-1/2 bg-gray-50 lg:block" />
 
             <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-x-16 lg:grid-cols-2 lg:px-8 lg:pt-16">
                 <DonationSummary globalDonation={globalDonation} />

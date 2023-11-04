@@ -36,18 +36,21 @@ Charity should be powered by good software.
     - [ ] Make sure webhooks work
     - [x] Fix auth flow breakages
     - [ ] Database migration
-    - [ ] Password reset function
-    - [ ] Close db gracefully
+    - [x] Password reset function
+    - [ ] Normalize country, province codes
+    - [ ] Payment method integration
 - [ ] Phase 2: Improvements/consolidation
+    - [ ] Better mobile support
     - [ ] Admin system
         - [ ] Proof system
         - [ ] Manual donation creation system
         - [ ] Resend donation system
     - [ ] Donation PDF
+    - [ ] Dedicated proof page, where clicking on available proof links to a subpage with a nicer ui
+    - [ ] Close db gracefully
     - [ ] Donation param validation
     - [ ] Account email updating
     - [ ] Fix country/currency changes
-    - [ ] Payment method integration
     - [ ] Logging system
     - [ ] Api key system
     - [ ] Recurring donations

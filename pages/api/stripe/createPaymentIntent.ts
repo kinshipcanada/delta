@@ -71,7 +71,7 @@ export default async function handler(
         res.status(200).send(response);
     } catch (error) {
         // Log error
-        console.error(error)
+        console.error(error, "error creating payment intent")
         
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);

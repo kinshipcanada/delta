@@ -12,8 +12,8 @@ import { Donor } from '../../lib/classes/donor';
 import { Donation } from '../../lib/classes/donation';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
-import { Causes } from '@lib/classes/causes';
 import { DonorApiResponse } from '@lib/classes/api';
+import { Cause } from '@lib/classes/causes';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const [donor, setDonor] = useState<Donor>()
@@ -89,11 +89,11 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       <Head>
         <title>Kinship Canada</title>
       </Head>
-      <main id="app" className="min-h-screen">
+      <main id="app" className="min-h-screen flex flex-col justify-between">
         <Navigation />
           { isApp ?
 
-            <div>
+            <div className='flex-grow'>
               {authContextLoading || shouldRedirect || !donor ? (
                   <div className='flex items-center justify-center w-screen'>
                     <CenterOfPageBox>
@@ -115,7 +115,9 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
             :
 
-            children
+            <div className='flex-grow'>
+              { children }
+            </div>
           }
         <Footer />
       </main>
@@ -124,23 +126,13 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 }
 
 export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
-  const generateDonationTypesString = (causes: Causes) => {
-    const donationTypes = [];
-  
-    if (causes.is_sadaqah) {
-      donationTypes.push("Sadaqah");
-    }
+  const generateDonationCausesString = (causes: Cause[]) => {
+    let causesNames = []
 
-    if (causes.is_imam_donation) {
-      donationTypes.push("Sehme Imam");
-    }
-    
-    if (causes.is_sadat_donation) {
-      donationTypes.push("Sehme Sadat");
-    }
-    
-    return donationTypes.join(", ");
-  };
+    for (const cause of causes) { causesNames.push(cause.label) }
+
+    return causesNames.join(", ")
+  }
 
   return (
       <section
@@ -188,13 +180,13 @@ export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }
                 </dd>
               </div>
 
-              {globalDonation && (globalDonation.causes.is_imam_donation == true || globalDonation.causes.is_sadat_donation == true || globalDonation.causes.is_sadaqah == true) && (
+              {globalDonation && (globalDonation.causes.length > 1) && (
                 <div className="flex items-center justify-between">
                   <dt>Special Requests</dt>
                   <dd>
                     <span className='flex items-center'>
                       <InformationCircleIcon className='w-5 h-5 text-slate-600 mr-1' />
-                      {generateDonationTypesString(globalDonation.causes)}
+                      {generateDonationCausesString(globalDonation.causes)}
                     </span>
                   </dd>
                 </div>
@@ -215,16 +207,3 @@ export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }
       </section>
     )
 }
-
-const DonationFormWrapper: FC<{ children: ReactNode }> = ({ children }) => (
-    <section
-        aria-labelledby="payment-and-shipping-heading"
-        className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
-        >
-        <div>
-            <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-                { children }
-            </div>
-        </div>
-    </section>
-)

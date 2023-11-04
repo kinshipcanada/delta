@@ -21,6 +21,7 @@ export default async function handler(
 ) {
   const response = requestSchema.safeParse(req.body);
 
+  console.log("received payload,", req.body)
   if (!response.success) {
     return res.status(400).send({
         error: 'Invalid payload',

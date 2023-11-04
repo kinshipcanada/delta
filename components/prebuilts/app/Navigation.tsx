@@ -1,4 +1,4 @@
-import { ArrowLeftOnRectangleIcon, ArrowPathIcon, ChatBubbleOvalLeftIcon, Cog6ToothIcon, HomeIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftOnRectangleIcon, ArrowPathIcon, ChatBubbleOvalLeftIcon, Cog6ToothIcon, HomeIcon, ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { supabase } from "../../../lib/utils/helpers"
