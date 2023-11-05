@@ -40,6 +40,7 @@ export default async function handler(
 
     return res.status(200).send({ } as NoDataApiResponse)
   } catch (error) {
+    console.error(error)
     // Log error
     
     const response: NoDataApiResponse = { error: "Sorry, something went wrong creating your profile" }

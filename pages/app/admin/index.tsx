@@ -14,7 +14,7 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             color: EventColors.Info,
             description: 'Use this tool to find a donation and resend the donor their receipt.  The donor will automatically be emailed a receipt.',
             href: "/app/admin/resend",
-            toolEnabled: true,
+            toolEnabled: false,
         },
         {
             name: 'Manually Create Donation',
@@ -22,7 +22,7 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             color: EventColors.Success,
             description: 'Use this tool to record a cash or eTransfer donation. The donor will automatically be emailed a receipt.',
             href: "/app/admin/create",
-            toolEnabled: false,
+            toolEnabled: true,
         },
         {
             name: 'Upload Proof of Donation',
@@ -30,7 +30,7 @@ const AppAdminPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor
             color: EventColors.Warning,
             description: 'Use this tool to filter donations by causes, and upload proof of donation easily. Donors are notified.',
             href: "/app/admin/proof",
-            toolEnabled: false
+            toolEnabled: true
         },
         {
             name: 'Generate Report',

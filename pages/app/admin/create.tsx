@@ -7,18 +7,33 @@ import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
 import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../lib/utils/helpers"
 import { InputCustomizations } from "../../../components/primitives/types"
-import { countries, states_and_provinces } from "../../../lib/utils/constants"
+import { SelectOption, causes, countries, states_and_provinces } from "../../../lib/utils/constants"
+import { Address } from "@lib/classes/address"
+import { v4 as uuidv4 } from 'uuid'
+import { Cause } from "@lib/classes/causes"
+import { ApiAdminDonationsCreateRequestSchema } from "pages/api/admin/donations/create"
+import { NoDataApiResponse } from "@lib/classes/api"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
     const tabs: Tab[] = [
-        { name: "Create From Kinship Cart", component: <CreateFromKinshipCart /> },
-        { name: "Create From Existing Donor", component: <CreateFromExistingDonor /> },
+        // { name: "Create From Kinship Cart", component: <CreateFromKinshipCart /> },
+        // { name: "Create From Existing Donor", component: <CreateFromExistingDonor /> },
         { name: "Create From Scratch", component: <CreateFromScratch /> },
     ]
 
     return (
         <div>
+            <div className='flex w-full justify-start'>
+                <Button 
+                    text="Go Back" 
+                    icon={<ArrowLeftIcon />}
+                    style={ButtonStyle.OutlineUnselected}
+                    size={ButtonSize.Small} 
+                    href={"/app/admin"}
+                />
+            </div>
             <PageHeader>Create A New Donation</PageHeader>
             <VerticalSpacer size={SpacerSize.Small} />
             <Text>This tool allows you to create a new donation. Click on the corresponding tab for the type of donation you want to create.</Text>
@@ -29,124 +44,6 @@ const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ do
 }
 
 export default AdminCreatePage
-
-const CreateFromKinshipCart: React.FC = () => {
-
-    const [kinshipCartId, setKinshipCartId] = useState<string>("")
-    const [kinshipCart, setKinshipCart] = useState<Donation | undefined>(undefined)
-    const [loading, setLoading] = React.useState<boolean>(false)
-
-
-    // Donation details
-    const [amountInCents, setAmountInCents] = useState<number>(0)
-    const [dateDonated, setDateDonated] = useState<Date>(new Date())
-    const [donorAddress, setDonorAddress] = useState<string>("")
-    const [donorCity, setDonorCity] = useState<string>("")
-    const [donorState, setDonorState] = useState<string>("")
-    const [donorCountry, setDonorCountry] = useState<string>("")
-    const [donorPostalCode, setDonorPostalCode] = useState<string>("")
-    const [donorFirstName, setDonorFirstName] = useState<string>("")
-    const [donorLastName, setDonorLastName] = useState<string>("")
-    const [donorId, setDonorId] = useState<string>("")
-    const [donorEmail, setDonorEmail] = useState<string>("")
-
-    const fetchKinshipCart = async () => {
-        setLoading(true)
-
-        if (kinshipCartId.length === 0) {
-            toast.error("Please enter a Kinship Cart ID", { position: "top-right" })
-            setLoading(false)
-            return
-        }
-
-        const response = await callKinshipAPI('/api/donation/fetchKinshipCart', {
-            cart_id: kinshipCartId,
-        })
-
-
-        // todo
-        // if (response.status == 500) { 
-        //     toast.error("Kinship Cart not found", { position: "top-right" })
-        //     console.error(response) 
-        // } else if (response.status == 200) {
-        //     setKinshipCart(response.cart)
-        //     toast.success(`Found Kinship Cart for ${response.cart.donor.first_name} ${response.cart.donor.last_name}`, { position: "top-right" })
-        //     console.log(response.cart)
-        // } else {
-        //     toast.error("An unknown error occurred", { position: "top-right" })
-        // }
-
-        setLoading(false)
-        return
-    }
-
-
-    return (
-        <div>
-            <VerticalSpacer size={SpacerSize.Small} />
-            <TextInput 
-                placeholder="Kinship Cart ID" 
-                type="text" 
-                name="kinshipCartId" 
-                id="kinshipCartId" 
-                value={kinshipCartId}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ setKinshipCartId(e.target.value) }} 
-                required={true} 
-                button={{
-                    text: "Fetch Kinship Cart",
-                    icon: <EnvelopeIcon />,
-                    style: ButtonStyle.Secondary,
-                    size: ButtonSize.Standard,
-                    isLoading: loading,
-                    onClick: fetchKinshipCart
-                }} 
-            />
-            {kinshipCart && (
-                <div>
-                    <VerticalSpacer size={SpacerSize.Small} />
-                    <SectionHeader>Retrieved Cart For {kinshipCart.donor.first_name}{' '}{kinshipCart.donor.last_name} On {parseFrontendDate(kinshipCart.date_donated)}</SectionHeader>
-                    <Text>You can verify the information below, and make adjustments as needed (for example, if we received more or less funds than originally intended). Once you&apos;ve confirmed the validity of the donation, hit send and a receipt will be generated for the donor. The donor will be notified automatically.</Text>
-                    <VerticalSpacer size={SpacerSize.Small} />
-                    <form>
-                        <TextInput
-                            placeholder="Amount"
-                            type="text"
-                            name="amount"
-                            id="amount"
-                            value={centsToDollars(kinshipCart.amount_in_cents)} // use the centsToDollars function to format the amount_in_cents value
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                const newKinshipCart = { ...kinshipCart, amount_in_cents: parseFloat(e.target.value) * 100 };
-                                setKinshipCart(newKinshipCart);
-                            }}
-                            required={true}
-                        />
-
-                    </form>
-                </div>
-            )}
-        </div>
-    )
-}
-
-const CreateFromExistingDonor: React.FC = () => {
-    return (
-        <div>
-            <VerticalSpacer size={SpacerSize.Small} />
-            <Table
-                headers={["Donor Name", "Email", ""]}
-                rows={[
-                    { 
-                        "Donor Name": "Shakeel-Abbas Hussein", 
-                        "Email": "hobbleabbas@gmail.com", 
-                        "": <span className="flex justify-end">
-                            <Button text="Select Donor" icon={<PlusCircleIcon />} style={ButtonStyle.Secondary} size={ButtonSize.Small} onClick={()=>{ toast.success("Successfully resent receipt to hobbleabbas@gmail.com", { position: "top-right"}) }}/>
-                        </span> }
-                ]}
-            />
-        </div>
-    )
-}
-
 
 const CreateFromScratch: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false)
@@ -162,12 +59,36 @@ const CreateFromScratch: React.FC = () => {
     const [country, setCountry] = useState<string>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
+    const [paymentMethod, setPaymentMethod] = useState<string>("cash")
+
+    const paymentMethodOptions: SelectOption[] = [
+        { "label": "Cash Payment", "value": "cash" },
+        { "label": "Wire Transfer", "value": "wire_transfer" }
+    ]
+
     // Fields relating to religous obligations
     // Kinship has to collect this information as it there are certain religious donations that must be declared seperately (religously)
     const [isKhums, setIsKhums] = useState<boolean>(false)
     const [isImam, setIsImam] = useState<boolean>(true)
     const [isSadat, setIsSadat] = useState<boolean>(false)
     const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
+
+    const sadatDonation: Cause = {
+        one_way: true,
+        label: "Sehme Sadat",
+        region: "iq"
+    }
+
+    const imamDonation: Cause = {
+        one_way: true,
+        label: "Sehme Imam",
+        region: "iq"
+    }
+
+    const sadaqahDonation: Cause = {
+        one_way: false,
+        label: "Sadaqah",
+    }
 
     const handleSaveChanges = async () => {
         setLoading(true)
@@ -186,33 +107,54 @@ const CreateFromScratch: React.FC = () => {
                 })
                 return
             }
-    
-            const response = await callKinshipAPI('/api/donation/createManually', {
-                first_name: firstName,
-                last_name: lastName, 
-                email: email,
-                address_line_address: lineAddress,
-                address_state: stateOrProvince,
-                address_city: city,
-                address_postal_code: postalCode,
-                address_country: country,
-                amount_in_cents: dollarsToCents(unconvertedAmount),
-                date_donated: dateDonated,
 
-                is_imam_donation: isImam,
-                is_sadat_donation: isSadat,
-                is_sadaqah: isSadaqah,
-            })
+            const address: Address = {
+                line_address: lineAddress,
+                postal_code: postalCode,
+                city: city,
+                state: stateOrProvince,
+                country: country
+            }
+
+            const donor: Donor = {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                address: address,
+                admin: false,
+                set_up: false,
+                stripe_customer_ids: []
+            }
+
+            const donation: Donation = {
+                identifiers: {
+                    donation_id: uuidv4()
+                },
+                donor: donor,
+                causes: [causes[0]],
+                amount_in_cents: parseInt(dollarsToCents(unconvertedAmount)),
+                fees_covered: 0,
+                fees_charged_by_stripe: 0,
+                date_donated: dateDonated,
+                proof: []
+            }
+
+            if (isImam && isKhums) { donation.causes.push(imamDonation) }
+            if (isSadaqah) { donation.causes.push(sadaqahDonation) }
+            if (isSadat) { donation.causes.push(sadatDonation) }
+
+            const createDonationPayload: ApiAdminDonationsCreateRequestSchema = {
+                donation: donation
+            }
+
+            const response: NoDataApiResponse = await callKinshipAPI<null>('/api/admin/donations/create', createDonationPayload)
+
     
-            // todo
-            // if (response.status == 500) { 
-            //     console.error(response)
-            //     toast.error(response.error, { position: "top-right" })
-            // } else if (response.status == 200) {
-            //     toast.success(`Created donation with ID: ${response.message}`, { position: "top-right" })
-            // } else {
-            //     toast.error("An unknown error occurred", { position: "top-right" })
-            // }
+            if (response.error) {
+                toast.error("Error creating donation", { position: "top-right"})
+            } else {
+                toast.success("Successfully created donation!", { position: "top-right"})
+            }
     
         } catch (error) {
             console.error(error)
@@ -269,6 +211,19 @@ const CreateFromScratch: React.FC = () => {
                                 required = {true}
                             />
                         </div>
+                    </div>
+                    <div>
+                        <SelectionInput
+                            label="Payment Method"
+                            name="payment_method"
+                            id="payment_method"
+                            value={paymentMethod}
+                            options={paymentMethodOptions}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setPaymentMethod(e.target.value)
+                            }}
+                            required={true}
+                        />
                     </div>
                 </div>
 

@@ -8,6 +8,8 @@ const requestSchema = z.object({
     donation: DonationSchema
 })
 
+export type ApiAdminDonationsCreateRequestSchema = z.infer<typeof requestSchema>
+
 /**
  * @description Creates a new donation. Only to be called by admin panel
  */

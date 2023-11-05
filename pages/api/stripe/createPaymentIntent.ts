@@ -46,7 +46,7 @@ export default async function handler(
         const paymentIntent = await stripeClient.paymentIntents.create({
             amount: parseInt(parsedRequest.data.donation.amount_in_cents.toString()),
             // Causes is added here for backwards compatability
-            metadata: { ...convertChildrenToStrings({ ...parsedRequest.data.donation }), causes: JSON.stringify([]) },
+            metadata: { ...convertChildrenToStrings({ ...parsedRequest.data.donation }) },
             customer: stripeCustomerId,
             currency: 'cad',
             receipt_email: parsedRequest.data.donation.donor.email,

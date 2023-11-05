@@ -49,7 +49,8 @@ export default function Donate() {
         amount_in_cents: 0,
         fees_covered: 0,
         fees_charged_by_stripe: 0, // This will be filled in based on the type of card they pay with, by the post-payment Stripe webhook
-        date_donated: new Date()
+        date_donated: new Date(),
+        proof: []
     });
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed)
     const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);

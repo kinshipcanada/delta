@@ -74,10 +74,6 @@ export async function sendNotification(
         case DeliveryMethod.EMAIL: {
             return await _sendEmail(template, donation.donor)
         }
-
-        case DeliveryMethod.PHONE: {
-            return await _sendSMS(template, donation.donor)
-        }
     }
 }
 

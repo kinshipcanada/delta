@@ -14,6 +14,8 @@ import { BoldText, Text } from "../../primitives/Typography";
 import { JustifyEnd } from "../../primitives/Utils";
 
 export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
+
+    
     return (
         <PanelWithFooter
             footer={
@@ -49,7 +51,22 @@ export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) =>
                         Status
                     </BoldText>
                     <Text>
-                        <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+                        {
+                            donation.status == "processing" ?
+                            <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+
+                            : donation.status == "delivered_to_partners" ?
+                            <Badge text="Delivered To Partners" style={Style.Filled} color={EventColors.Info} />
+
+                            : donation.status == "partially_distributed" ?
+                            <Badge text="Partial Proof Available" style={Style.Filled} color={EventColors.Success} />
+
+                            : donation.status == "fully_distributed" ?
+                            <Badge text="Full Proof Available" style={Style.Filled} color={EventColors.Success} />
+
+                            : <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+                        }
+                        
                     </Text>
                 </div>
                 

@@ -89,13 +89,15 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       <Head>
         <title>Kinship Canada</title>
       </Head>
-      <main id="app" className="min-h-screen flex flex-col justify-between">
+      <main className="flex flex-col min-h-screen">
         <Navigation />
-          { isApp ?
+        <div className="flex-grow">
+          <main>
+            { isApp ?
 
-            <div className='flex-grow'>
+            <div className=''>
               {authContextLoading || shouldRedirect || !donor ? (
-                  <div className='flex items-center justify-center w-screen'>
+                  <div className='py-64 content-center items-center justify-center w-screen'>
                     <CenterOfPageBox>
                       <Loading color={LoadingColors.Blue} />
                     </CenterOfPageBox>
@@ -104,10 +106,12 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
                 :
 
-                <div className="p-10 grid grid-cols-4 gap-12">
-                  <AppNavigation adminEnabled={donor.admin} />
-                  <div className="col-span-3">
-                    { children }
+                <div className='flex-grow'>
+                  <div className="p-10 grid grid-cols-4 gap-12">
+                    <AppNavigation adminEnabled={donor.admin} />
+                    <div className="col-span-3">
+                      {children}
+                    </div>
                   </div>
                 </div>
               }
@@ -118,7 +122,9 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
             <div className='flex-grow'>
               { children }
             </div>
-          }
+            }
+          </main>
+        </div>
         <Footer />
       </main>
     </AuthProvider>

@@ -1,19 +1,14 @@
-import React, { useMemo } from "react"
-import { Tabs, ButtonSize, ButtonStyle, SpacerSize, Tab, VerticalSpacer, HorizontalSpacer, PageHeader, Text  } from "../../../components/primitives"
+import React, { useEffect, useState } from "react"
+import { ButtonSize, ButtonStyle, SpacerSize, Tab, VerticalSpacer, HorizontalSpacer, PageHeader, Text  } from "../../../components/primitives"
 import { Donation } from "../../../lib/classes/donation"
 import { Donor } from "../../../lib/classes/donor"
 import Button from "../../../components/primitives/Button"
-import { EnvelopeIcon } from "@heroicons/react/20/solid"
-import { toast } from "react-hot-toast"
 import { ArrowLeftIcon } from "@heroicons/react/24/solid"
-import App from "../../../components/prebuilts/admin/table"
+import { DataTable } from "@components/prebuilts/admin/data-table"
+import { Button as ShadcnButton } from "@components/ui/button"
 
 const AdminResendPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
-    const tabs: Tab[] = [
-        { name: "Search All Donations", component: <SearchAllDonations /> },
-        { name: "Resend With Specific Id", component: <ResendWithSpecificId /> },
-    ]
 
     return (
         <div>
@@ -31,13 +26,18 @@ const AdminResendPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ do
             <VerticalSpacer size={SpacerSize.Small} />
             <Text>This tool allows you to create a new donation. Click on the corresponding tab for the type of donation you want to create.</Text>
             <VerticalSpacer size={SpacerSize.Medium} />
-            <Tabs tabs={tabs} />
+            <SearchAllDonations />
         </div>
     )
 }
 
 export default AdminResendPage
 
+import { ColumnDef } from "@tanstack/react-table"
+import { ApiAdminDonationsFetchRequestSchema } from "pages/api/admin/donations/fetch"
+import { DonationGroupApiResponse } from "@lib/classes/api"
+import { callKinshipAPI, centsToDollars } from "@lib/utils/helpers"
+import toast from "react-hot-toast"
 
 const SearchAllDonations: React.FC = () => {
 
@@ -50,21 +50,66 @@ const SearchAllDonations: React.FC = () => {
         console.log(`Resending email to ${email}`);
     };
 
-    return (
-        <div>
-            <VerticalSpacer size={SpacerSize.Small} />
-            <Text>Find your donation below, and click resend to email the donor their receipt again. If you need to send to a different email, click the resend with custom email button. Use the search field below to search by donor or date, to filter donations down.</Text>
-            <App />
-        </div>
-    )
-}
+    async function getData() {
+        const fetchDonationsPayload: ApiAdminDonationsFetchRequestSchema = {
+            start_date: undefined,
+            end_date: undefined,
+            payment_method: undefined,
+            page: undefined,
+            offset: undefined,
+        }
+        const response: DonationGroupApiResponse = await callKinshipAPI<Donation[]>('/api/admin/donations/fetch', fetchDonationsPayload)
 
-const ResendWithSpecificId: React.FC = () => {
+        if (response.error) {
+            toast.error(`Error: ${response.error}`, { position: 'top-right'})
+        } else {
+            setDonations(response.data!)
+        }
+    }
+
+    const [donations, setDonations] = useState<Donation[]>([])
+
+    const columns: ColumnDef<Donation>[] = [
+        {
+          accessorKey: "donor.email",
+          header: "Email",
+        },
+        {
+          accessorKey: "amount_in_cents",
+          header: "Amount",
+          cell: ({ row }) => {
+            const amount = parseInt(centsToDollars(row.getValue("amount_in_cents")))
+            const formatted = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+            }).format(amount)
+        
+            return <div className="font-medium">{formatted}</div>
+          },
+        },
+        {
+            "id": "resend",
+            cell: ({ row }) => {
+                const payment = row.original
+           
+                return (
+                    <div className="content-right">
+                        <ShadcnButton variant="outline">
+                            Resend
+                        </ShadcnButton>
+                    </div>
+                )
+              },
+        }
+    ]
+
+    useEffect(()=>{
+        getData()
+    }, [])
+    
     return (
         <div>
-            <VerticalSpacer size={SpacerSize.Small} />
-            <input placeholder="Enter the ID" />
-            <Button text="Resend Email" icon={<EnvelopeIcon />} style={ButtonStyle.Secondary} size={ButtonSize.Small} onClick={()=>{ toast.success("Successfully resent receipt to hobbleabbas@gmail.com", { position: "top-right"}) }}/>
+            <DataTable data={donations} columns={columns} />
         </div>
     )
 }

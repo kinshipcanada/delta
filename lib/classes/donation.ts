@@ -16,12 +16,12 @@ import { Currencies, DonationIdentifiers, DonationIdentifiersSchema } from "./ut
  * @param date_donated The date the donation was made
  */
 
-export type PaymentMethodType = "cash" | "wire_transfer" | "acss_debit" | "card"
+export type DonationStatus = "processing" | "delivered_to_partners" | "partially_distributed" | "fully_distributed"
 
 export interface PaymentMethod {
   type: PaymentMethodType
-  card?: string
-  acss_debit?: string
+  card?: Stripe.PaymentMethod.Card
+  acss_debit?: Stripe.PaymentMethod.AcssDebit
 }
 
 export interface TransactionDetails {
@@ -29,7 +29,7 @@ export interface TransactionDetails {
   currency: Currencies
   amount_donated_in_cents: number
   amount_charged_in_cents: number
-  fees_covered_by_donor: number
+  fee_charged_by_payment_processor?: number
   payment_method: PaymentMethod
 }
 
@@ -40,38 +40,38 @@ export interface DonationDetails {
   date_logged: Date | string
 }
 
-export interface Donation {
+export interface Donation2 {
   identifiers: DonationIdentifiers,
   donor: Donor
   transaction_details: TransactionDetails
   donation_details: DonationDetails
 }
 
-// export interface Donation {
-//   identifiers: DonationIdentifiers;
-//   donor: Donor;
-//   causes: Cause[];
-//   amount_in_cents: number;
-//   fees_covered: number;
-//   fees_charged_by_stripe: number;
-//   date_donated: Date | string;
-//   proof?: ProofOfDonation[]
-//   currency?: Currencies,
-// }
+export interface Donation {
+  identifiers: DonationIdentifiers;
+  donor: Donor;
+  causes: Cause[];
+  amount_in_cents: number;
+  fees_covered: number;
+  fees_charged_by_stripe: number;
+  date_donated: Date | string;
+  proof: ProofOfDonation[]
+  status?: DonationStatus,
+  currency?: Currencies,
+  transaction_details?: TransactionDetails
+  donation_details?: DonationDetails
+}
 
 export const DonationSchema = z.object({
-
-})
-
-// export const DonationSchema = z.object({
-//   identifiers: DonationIdentifiersSchema,
-//   donor: DonorSchema,
-//   causes: z.array(CausesSchema),
-//   amount_in_cents: z.number(),
-//   fees_covered: z.number(),
-//   fees_charged_by_stripe: z.number(),
-//   date_donated: z.date().or(z.string()),
-// });
+  identifiers: DonationIdentifiersSchema,
+  donor: DonorSchema,
+  causes: z.array(CausesSchema),
+  amount_in_cents: z.number(),
+  fees_covered: z.number(),
+  fees_charged_by_stripe: z.number(),
+  date_donated: z.date().or(z.string()),
+  proof: z.array(z.any())
+});
 
 export function isDonation(obj: any): obj is Donation {
     return (
@@ -96,6 +96,7 @@ import { faker } from '@faker-js/faker';
 import { ProofOfDonation } from "./proof";
 import { StripeTags } from "./stripe";
 import Stripe from "stripe";
+import { PaymentMethodType } from "./payment_method";
 
 export const generateFakeDonation = (): Donation => {
 
@@ -116,6 +117,7 @@ export const generateFakeDonation = (): Donation => {
       fees_covered: stripeFee,
       fees_charged_by_stripe: stripeFee,
       date_donated: faker.date.past(),
+      proof: []
     };
   
     return donation;

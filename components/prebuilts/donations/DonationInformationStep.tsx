@@ -49,6 +49,9 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
     const [error, setError] = useState<{ title: string, message: string } | undefined>(undefined)
 
     const [isKhums, setIsKhums] = useState<boolean>(false)
+    const [isImam, setIsImam] = useState<boolean>(false)
+    const [isSadat, setIsSadat] = useState<boolean>(false)
+    const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
 
     const handleDonationDetailsStep = async () => {
         setLoading(true)
@@ -94,7 +97,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             }
 
             // Validate donation customizations
-            if (isKhums && !globalDonation.causes.includes(imamDonation) && !globalDonation.causes.includes(sadatDonation)) {
+            if (isKhums && !isImam && !isSadat) {
                 setError({
                     title: "Please specify where to direct khums",
                     message: "To make a khums donation, please specify whether it is Imam, Sadat, or both"
@@ -102,6 +105,10 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 setLoading(false)
                 return
             }
+
+            if (isImam) { globalDonation.causes.push(imamDonation) }
+            if (isSadat) { globalDonation.causes.push(sadatDonation) }
+            if (isSadaqah) { globalDonation.causes.push(sadaqahDonation) }
 
             const createPaymentIntentPayload: ApiStripeCreatePaymentIntentRequestSchema = {
                 donation: globalDonation
@@ -358,25 +365,13 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             <CheckboxInput
                 label="Is this donation Saqadah"
-                checked={globalDonation.causes.includes(sadaqahDonation)}
+                checked={isSadaqah}
                 required={false}
                 onChange={(e) => { 
-                    if (e.target.checked) {
-                        setGlobalDonation({
-                            ...globalDonation,
-                            causes: globalDonation.causes
-                            // causes: globalDonation.causes.push(sadaqahDonation),
-                        })
-                    } else {
-                        setGlobalDonation({
-                            ...globalDonation,
-                            causes: globalDonation.causes
-                            // causes: globalDonation.causes.pop(sadaqahDonation),
-                        })
-                    }
-                    
+                    setIsSadaqah(e.target.checked)
                 }}
             />
+
             
             <VerticalSpacer size={SpacerSize.Small} />
             
@@ -391,36 +386,23 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             { isKhums && (
                 <div className='px-4'>
-                    TODO
-                    {/* <CheckboxInput
+                    <CheckboxInput
                         label="Sehme Imam"
-                        checked={globalDonation.causes.is_imam_donation}
+                        checked={isImam}
                         required={false}
                         onChange={(e) => { 
-                            setGlobalDonation({
-                                ...globalDonation,
-                                causes: {
-                                    ...globalDonation.causes,
-                                    is_imam_donation: e.target.checked
-                                }
-                            })
+                            setIsImam(e.target.checked)
                         }}
                     />
                     <VerticalSpacer size={SpacerSize.Small} />
                     <CheckboxInput
                         label="Sehme Sadat"
-                        checked={globalDonation.causes.is_sadat_donation}
+                        checked={isSadat}
                         required={false}
                         onChange={(e) => { 
-                            setGlobalDonation({
-                                ...globalDonation,
-                                causes: {
-                                    ...globalDonation.causes,
-                                    is_sadat_donation: e.target.checked
-                                }
-                            })
+                            setIsSadat(e.target.checked)
                         }}
-                    /> */}
+                    />
                     <VerticalSpacer size={SpacerSize.Small} />
                 </div>
             )}

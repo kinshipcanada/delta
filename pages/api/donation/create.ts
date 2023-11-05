@@ -12,42 +12,19 @@ export default async function handler(
   res: NextApiResponse,
 ) {
     try {
-        const endpointSecret = process.env.STRIPE_CREATE_DONATION_ENDPOINT_SECRET
-
-        if (!endpointSecret) {
-            const response: ObjectIdApiResponse = { error: 'Internal error: No webhook secret' }
-            return res.status(400).send(response);
-        }
-
-        const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-            apiVersion: "2023-08-16"
-        })
-
-        const signature = req.headers['stripe-signature'] as string;
-
         let event = req.body
-        
-        try {
-            event = stripeClient.webhooks.constructEvent(
-                req.body,
-                signature,
-                endpointSecret
-            );
-        } catch (err) {
-            return res.status(400).send({
-                error: 'Internal error: invalid webhook signature',
-                donation_id: undefined
-            });
-        }
 
+        console.log('creating donation')
         const donation: Donation = await createDonation({
             stripe_charge_id: event.data.object.id
         })
+        console.log('created donation successfully')
 
         const response: ObjectIdApiResponse = { data: donation.identifiers.donation_id }
         return res.status(200).send(response)
     } catch (error) {
         // Log error
+        console.error('error creating donation', error)
 
         return res.status(500).send({
             error: "Sorry, something went wrong creating this donation",

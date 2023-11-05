@@ -40,10 +40,11 @@ export default function Register() {
 				return
 			} else {
 				const { error } = await supabase
-					.from('donor_profiles')
+					.from('donors')
 					.insert({ 
 						id: data.user!.id,
 						email: data.user!.email ?? email,
+						stripe_customer_ids: []
 					})
 				
 				if (error) {

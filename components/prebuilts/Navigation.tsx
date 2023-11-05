@@ -27,7 +27,7 @@ export default function Navigation() {
     ]
 
     return (
-        <Popover className="bg-white z-10">
+        <Popover className="bg-white sticky z-50 top-0">
             <div className="flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10 border border-gray-300">
                 <div>
                   <a href="#" className="flex items-center">

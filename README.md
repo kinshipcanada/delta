@@ -37,7 +37,7 @@ Charity should be powered by good software.
     - [x] Fix auth flow breakages
     - [ ] Database migration
     - [x] Password reset function
-    - [ ] Normalize country, province codes
+    - [x] Normalize country, province codes
     - [ ] Payment method integration
 - [ ] Phase 2: Improvements/consolidation
     - [ ] Better mobile support
@@ -59,6 +59,7 @@ Charity should be powered by good software.
     - [ ] Refactor database uploads, maybe add an orm if it reduces errors
     - [ ] Simplify codebase, move to shadcnui
     - [ ] Reduce dependancies
+    - [ ] Validation scripts (e.g. if its a card or acss_debit, stripe ids shouldnt be null)
     - [ ] Partner dashboard
     - [ ] Feedback notifications
 - [ ] Phase 3: Reusable by others

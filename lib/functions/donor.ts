@@ -28,51 +28,44 @@ export async function createDonor(
         throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
     }
 
-    try {
-        const address: Address = {
-            line_address: lineAddress,
-            postal_code: postalCode,
-            city: city,
-            state: state,
-            country: country
-        }
-    
-        const stripeCustomer = await createStripeCustomer(email, firstName, lastName, address, donorId);
-        await setupDonorInDatabase(
-            donorId,
-            firstName, 
-            lastName, 
-            lineAddress,
-            postalCode,
-            city,
-            state,
-            country,
-            stripeCustomer.id
-        )
-    
-        const donor: Donor = {
-            donor_id: donorId,
-            first_name: firstName,
-            last_name: lastName,
-            email: email,
-            admin: false,
-            address: address,
-            set_up: true,
-            stripe_customer_ids: [
-                stripeCustomer.id
-            ]
-        }
-    
-        return donor
-    } catch (error) {
-        // log error
-        throw new Error("Error setting up donor profile.")
+    const address: Address = {
+        line_address: lineAddress,
+        postal_code: postalCode,
+        city: city,
+        state: state,
+        country: country
     }
+
+    const stripeCustomer = await createStripeCustomer(email, firstName, lastName, address, donorId);
+    await setupDonorInDatabase(
+        donorId,
+        firstName, 
+        lastName, 
+        lineAddress,
+        postalCode,
+        city,
+        state,
+        country,
+        stripeCustomer.id
+    )
+
+    const donor: Donor = {
+        donor_id: donorId,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        admin: false,
+        address: address,
+        set_up: true,
+        stripe_customer_ids: [
+            stripeCustomer.id
+        ]
+    }
+
+    return donor
 }
 
 export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<Donor> {
-    const FUNCTION_NAME = "fetchDonor"
-
     if (donorId == null && donorEmail == null) {
         throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
     }

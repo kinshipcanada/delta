@@ -37,6 +37,7 @@ export default async function handler(
     return res.status(200).send({} as NoDataApiResponse)
   } catch (error) {
     // Log error
+    console.error(error)
     
     const response: NoDataApiResponse = {  error: "Sorry, something went wrong resending this receipt" }
     return res.status(500).send(response)

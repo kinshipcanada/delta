@@ -51,6 +51,7 @@ export default async function handler(
     })
   } catch (error) {
     // Log error
+    console.error(error)
     
     return res.status(500).send({
         error: "Sorry, something went wrong updating your profile",

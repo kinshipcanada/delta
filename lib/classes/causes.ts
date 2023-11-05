@@ -14,8 +14,6 @@ import { CountryCode } from "./utils";
 // sehme_imam: region: "ir", label: Sehme Imam, one_way true
 // sadaqah: region: none, label: Sadaqah, one_way false
 
-
-
 export interface Cause {
     one_way: boolean // can this donation only match things in the smae cateogry? vision kinship is a one way donation, an anywhere donation is not
     label: string // e.g. Anywhere
