@@ -33,7 +33,7 @@ Charity should be powered by good software.
 
 ## Kinship Canada Refactor
 - [ ] Phase 1: To Prod
-    - [ ] Make sure webhooks work
+    - [x] Make sure webhooks work
     - [x] Fix auth flow breakages
     - [ ] Database migration
     - [x] Password reset function
@@ -43,7 +43,7 @@ Charity should be powered by good software.
     - [ ] Better mobile support
     - [ ] Admin system
         - [ ] Proof system
-        - [ ] Manual donation creation system
+        - [x] Manual donation creation system
         - [ ] Resend donation system
     - [ ] Donation PDF
     - [ ] Dedicated proof page, where clicking on available proof links to a subpage with a nicer ui

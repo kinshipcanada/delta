@@ -16,7 +16,6 @@ import { Stripe } from "@stripe/stripe-js";
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
 export default function Donate() {
-
     const donationId = uuidv4();
     const [step, setStep] = useState<DonationStep>(DonationStep.AmountAndBilling);
     const [globalDonation, setGlobalDonation] = useState<Donation>({
@@ -50,7 +49,9 @@ export default function Donate() {
         fees_covered: 0,
         fees_charged_by_stripe: 0, // This will be filled in based on the type of card they pay with, by the post-payment Stripe webhook
         date_donated: new Date(),
-        proof: []
+        proof: [],
+        transaction_details: undefined,
+        donation_details: undefined
     });
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed)
     const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);

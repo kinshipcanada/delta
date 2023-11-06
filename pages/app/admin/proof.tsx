@@ -1,11 +1,11 @@
 import React, { useState } from "react"
-import { Tabs, JustifyEnd, Table, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label, SelectionInput, CheckboxInput } from "../../../components/primitives"
+import { JustifyEnd, TextInput, Button, VerticalSpacer, ButtonSize, ButtonStyle, EventColors, SpacerSize, Tab, PageHeader, SectionHeader, Text, PanelWithLeftText, BaseHeader, AnyText, TextSize, TextWeight, TextLineHeight, Label, SelectionInput, CheckboxInput } from "../../../components/primitives"
 import { Donation } from "../../../lib/classes/donation"
 import { Donor } from "../../../lib/classes/donor"
-import { CalendarDaysIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
+import { CalendarDaysIcon } from "@heroicons/react/24/outline"
 import { toast } from "react-hot-toast"
 import { PlusCircleIcon } from "@heroicons/react/20/solid"
-import { callKinshipAPI, centsToDollars, dollarsToCents, parseFrontendDate } from "../../../lib/utils/helpers"
+import { callKinshipAPI, dollarsToCents } from "../../../lib/utils/helpers"
 import { InputCustomizations } from "../../../components/primitives/types"
 import { SelectOption, causes, countries, states_and_provinces } from "../../../lib/utils/constants"
 import { Address } from "@lib/classes/address"
@@ -14,10 +14,31 @@ import { Cause } from "@lib/classes/causes"
 import { ApiAdminDonationsCreateRequestSchema } from "pages/api/admin/donations/create"
 import { NoDataApiResponse } from "@lib/classes/api"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Button as ShadcnButton } from "@components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@components/ui/form"
+import { Input } from "@components/ui/input"
+import { z } from "zod"
+import { ProofSchema } from "@lib/classes/proof"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@components/ui/select"
+  
 
 const AdminProofPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
-
-
 
     return (
         <div>
@@ -34,12 +55,126 @@ const AdminProofPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ don
             <VerticalSpacer size={SpacerSize.Small} />
             <Text>This tool allows you to create a new donation. Click on the corresponding tab for the type of donation you want to create.</Text>
             <VerticalSpacer size={SpacerSize.Medium} />
+            <UploadProof />
         </div>
     )
 }
 
 export default AdminProofPage
 
+const UploadProof = () => {
+
+    const proofUploadSchema = z.object({
+        message_to_donor: z.string().optional(),
+        amount_disbursed: z.string(),
+        region_distributed: z.string({
+            required_error: "Please select the region where the funds went.",
+        }),
+        matches_sadaqah: z.boolean(),
+        matches_sadat: z.boolean(),
+        matches_imam: z.boolean()
+    })
+
+    const form = useForm<z.infer<typeof proofUploadSchema>>({
+        resolver: zodResolver(ProofSchema),
+        defaultValues: {
+            message_to_donor: undefined,
+            amount_disbursed: undefined,
+            region_distributed: "in",
+            matches_sadaqah: false,
+            matches_sadat: false,
+            matches_imam: false
+        },
+    })
+    
+    // 2. Define a submit handler.
+    function onSubmit(values: z.infer<typeof proofUploadSchema>) {
+        // Do something with the form values.
+        // ✅ This will be type-safe and validated.
+        console.log(values)
+    }
+    
+    return (
+        <div>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <FormField
+                        control={form.control}
+                        name="amount_disbursed"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Amount Disbursed</FormLabel>
+                                <FormDescription>How many dollars does this proof cover?</FormDescription>
+                                <FormControl>
+                                    <Input placeholder="shadcn" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="region_distributed"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Region</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select which region funds went to" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent className="z-100">
+                                        <SelectItem value="m@example.com">m@example.com</SelectItem>
+                                        <SelectItem value="m@google.com">m@google.com</SelectItem>
+                                        <SelectItem value="m@support.com">m@support.com</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+
+                    <FormField
+                        control={form.control}
+                        name="message_to_donor"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Message To Donor</FormLabel>
+                                <FormDescription>If you'd like, you can enter a custom message to the donors that contributed towards this cause</FormDescription>
+                                <FormControl>
+                                    <Input placeholder="shadcn" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="message_to_donor"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Message To Donor</FormLabel>
+                                <FormDescription>If you'd like, you can enter a custom message to the donors that contributed towards this cause</FormDescription>
+                                <FormControl>
+                                    <Input placeholder="shadcn" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <Input id="proof_file" type="file" />
+
+                    <ShadcnButton type="submit" variant="outline">Upload Proof</ShadcnButton>
+                </form>
+            </Form>
+        </div>
+    )
+}
 const CreateFromScratch: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false)
 

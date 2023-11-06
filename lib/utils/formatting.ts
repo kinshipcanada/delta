@@ -99,7 +99,7 @@ export function formatProofFromDatabase(proof: DatabaseTypings["public"]["Tables
         proof_id: proof.id,
         uploaded_at: new Date(proof.uploaded_at),
         message_to_donor: proof.message_to_donor ?? undefined,
-        amount_disbursed: proof.amount_disbursed,
+        amount_distributed_in_cents: proof.amount_disbursed, // todo update types,
         donations: [],
         region_distributed: proof.region_distributed as CountryCode,
         cause_matches: []
@@ -146,7 +146,7 @@ export function formatDonationFromDatabase(
         date_donated: new Date(donation.detail_date_donated),
         causes: [causes[0]],
         status: donation.status,
-        proof: []
+        proof: [],
         // proof: listOfProof ? listOfProof.map(proof => formatProofFromDatabase(proof)) : []
     }
 
@@ -222,7 +222,7 @@ function _buildCausesFromStripeMetadata(metadata: Stripe.Metadata): Cause[] {
             region: cause.region ? cause.region : undefined
         })
     }
-    
+
     return formattedCauses
 }
 // todo

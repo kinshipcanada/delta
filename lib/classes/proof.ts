@@ -10,14 +10,14 @@
 import { z } from "zod"
 import { Cause, CausesSchema } from "./causes"
 import { CountryCode } from "./utils"
-import { DonationSchema } from "./donation"
+import { Donation, DonationSchema } from "./donation"
 
 export interface ProofOfDonation {
     proof_id: string
     uploaded_at: Date
     message_to_donor?: string
-    amount_disbursed: number
-    donations: string[]
+    amount_distributed_in_cents: number
+    donations: Donation[]
     region_distributed: CountryCode
     cause_matches: Cause[]
 }
@@ -26,7 +26,7 @@ export const ProofSchema = z.object({
     proof_id: z.string().uuid(),
     uploaded_at: z.date().or(z.string()),
     message_to_donor: z.string().optional(),
-    amount_disbursed: z.number(),
+    amount_distributed_in_cents: z.number(),
     donations: z.array(DonationSchema),
     region_distributed: z.string(),
     cause_matches: z.array(CausesSchema)

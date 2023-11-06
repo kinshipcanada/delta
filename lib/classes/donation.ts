@@ -16,29 +16,44 @@ import { Currencies, DonationIdentifiers, DonationIdentifiersSchema } from "./ut
  * @param date_donated The date the donation was made
  */
 
-export type DonationStatus = "processing" | "delivered_to_partners" | "partially_distributed" | "fully_distributed"
-
-export interface PaymentMethod {
-  type: PaymentMethodType
-  card?: Stripe.PaymentMethod.Card
-  acss_debit?: Stripe.PaymentMethod.AcssDebit
-}
+export type DonationStatus = "processing" | "delivered_to_partners" | "partially_distributed" | "fully_distributed" | string
+export type TransactionStatus = "failed" | "successful" | "pending_acss_delivery" | string
 
 export interface TransactionDetails {
-  stripe_identifiers: StripeTags
-  currency: Currencies
+  status: TransactionStatus
+  currency?: Currencies
   amount_donated_in_cents: number
   amount_charged_in_cents: number
   fee_charged_by_payment_processor?: number
-  payment_method: PaymentMethod
 }
 
+export const TransactionDetailsSchema = z.object({
+  status: z.string(),
+  currency: z.string().optional(),
+  amount_donated_in_cents: z.number(),
+  amount_charged_in_cents: z.number(),
+  fee_charged_by_payment_processor: z.number().optional()
+})
+
 export interface DonationDetails {
+  status: DonationStatus
+  distribution_restricted: boolean
+  amount_distributed_in_cents: number
   causes: Cause[]
   proof: ProofOfDonation[]
-  date_donated: Date | string
-  date_logged: Date | string
+  date_donated: Date
+  date_logged: Date
 }
+
+export const DonationDetailsSchema = z.object({
+  status: z.string(),
+  distribution_restricted: z.boolean(),
+  amount_distributed_in_cents: z.number(),
+  causes: z.array(CausesSchema),
+  proof: z.array(z.any()),
+  date_donated: z.string().pipe( z.coerce.date() ),
+  date_logged: z.string().pipe( z.coerce.date() ),
+})
 
 export interface Donation2 {
   identifiers: DonationIdentifiers,
@@ -70,7 +85,9 @@ export const DonationSchema = z.object({
   fees_covered: z.number(),
   fees_charged_by_stripe: z.number(),
   date_donated: z.date().or(z.string()),
-  proof: z.array(z.any())
+  proof: z.array(z.any()),
+  transaction_details: TransactionDetailsSchema.optional(),
+  donation_details: DonationDetailsSchema.optional()
 });
 
 export function isDonation(obj: any): obj is Donation {
@@ -93,7 +110,7 @@ export function isDonation(obj: any): obj is Donation {
 }
 
 import { faker } from '@faker-js/faker';
-import { ProofOfDonation } from "./proof";
+import { ProofOfDonation, ProofSchema } from "./proof";
 import { StripeTags } from "./stripe";
 import Stripe from "stripe";
 import { PaymentMethodType } from "./payment_method";
