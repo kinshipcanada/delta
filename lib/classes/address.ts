@@ -1,4 +1,4 @@
-import { CountryCode } from "./utils";
+import { CountryCode, zCountryCodes } from "./utils";
 import { z } from "zod"
 
 /**
@@ -18,5 +18,5 @@ export const AddressSchema = z.object({
   postal_code: z.string(),
   city: z.string(),
   state: z.string(),
-  country: z.string(),
+  country: zCountryCodes,
 });

@@ -1,9 +1,3 @@
-// This file contains enums, classes, and interfaces relating to creating and delivering notifications to donors and admins.
-export const enum DeliveryMethod {
-    EMAIL,
-    PHONE,
-}
-
 export const enum UserNotificationType {
     DONATION_MADE,
     REFUND_ISSUED,

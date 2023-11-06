@@ -1,15 +1,16 @@
 import { Donation } from "../classes/donation";
-import { AdminNotificationType, DeliveryMethod, NotificationTemplate, UserNotificationType } from "../classes/notifications";
-import { countries } from "./constants";
+import { AdminNotificationType, NotificationTemplate, UserNotificationType } from "../classes/notifications";
 import * as dotenv from 'dotenv' 
 const postmark = require('postmark')
 import { Donor } from "../classes/donor";
+import { ProofOfDonation } from "@lib/classes/proof";
 
 dotenv.config()
 
 export function generateNotificationTemplate(
   notificationType: UserNotificationType | AdminNotificationType,
-  donation: Donation
+  donation: Donation,
+  proof?: ProofOfDonation
 ): NotificationTemplate {
     const donorCountry = donation.donor.address.country
     const donationAmount = donation.amount_in_cents / 100
@@ -66,15 +67,10 @@ export function generateNotificationTemplate(
 export async function sendNotification(
     notificationType: UserNotificationType | AdminNotificationType,
     donation: Donation,
-    deliveryMethod: DeliveryMethod,
 ) {
     const template = generateNotificationTemplate(notificationType, donation)
 
-    switch (deliveryMethod) {
-        case DeliveryMethod.EMAIL: {
-            return await _sendEmail(template, donation.donor)
-        }
-    }
+    return await _sendEmail(template, donation.donor)
 }
 
 async function _sendEmail(template: NotificationTemplate, donor: Donor): Promise<void> {

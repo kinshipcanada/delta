@@ -1,4 +1,4 @@
-import { DeliveryMethod, UserNotificationType } from "../classes/notifications";
+import { UserNotificationType } from "../classes/notifications";
 import { DonationIdentifiers } from "../classes/utils";
 import { fetchDonationFromDatabase } from "../utils/database";
 import { formatDonationFromRawStripeData, formatDonationFromDatabase } from "../utils/formatting";
@@ -21,7 +21,6 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
             await sendNotification(
                 UserNotificationType.DONATION_MADE,
                 donation,
-                DeliveryMethod.EMAIL,
             )
 
             return `Successfully resent receipt of donation to ${donation.donor.email}`
@@ -30,7 +29,6 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
             await sendNotification(
                 UserNotificationType.DONATION_MADE,
                 donation,
-                DeliveryMethod.EMAIL,
             )
 
             return `Successfully generated and sent receipt of donation to ${donation.donor.email}`

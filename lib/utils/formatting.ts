@@ -9,6 +9,7 @@ import { DatabaseTypings, Json, parameterizedDatabaseQuery } from "./database";
 import { v4 as uuidv4 } from 'uuid';
 import { ProofOfDonation } from "@lib/classes/proof";
 import { Cause } from "@lib/classes/causes";
+import { isOpen } from "@lib/functions/proof";
 
 /**
  * @description Formats a donation object into one that can be uploaded into the database
@@ -62,7 +63,11 @@ export function formatDonationForDatabase(donation: Donation): DatabaseTypings["
         txn_payment_method: "cash",
         txn_processing_fee_cents: donation.fees_charged_by_stripe,
         // todo
-        status: "processing"
+        txn_status: "succeeded",
+        // todo
+        detail_distribution_status: "processing",
+        details_amount_distributed: 0,
+        details_distribution_restricted: isOpen(donation.causes)
     }
 
     return donationReadyForUpload
@@ -99,7 +104,7 @@ export function formatProofFromDatabase(proof: DatabaseTypings["public"]["Tables
         proof_id: proof.id,
         uploaded_at: new Date(proof.uploaded_at),
         message_to_donor: proof.message_to_donor ?? undefined,
-        amount_distributed_in_cents: proof.amount_disbursed, // todo update types,
+        amount_distributed_in_cents: proof.amount_distributed_in_cents, // todo update types,
         donations: [],
         region_distributed: proof.region_distributed as CountryCode,
         cause_matches: []
@@ -145,8 +150,26 @@ export function formatDonationFromDatabase(
         fees_charged_by_stripe: donation.txn_processing_fee_cents ?? 0,
         date_donated: new Date(donation.detail_date_donated),
         causes: [causes[0]],
-        status: donation.status,
-        proof: [],
+        status: donation.detail_distribution_status,
+        donation_details: {
+            status: donation.detail_distribution_status,
+            distribution_restricted: donation.details_distribution_restricted,
+            amount_distributed_in_cents: donation.details_amount_distributed,
+            // todo
+            causes: [],
+            // todo
+            proof: [],
+            date_donated: new Date(donation.detail_date_donated),
+            date_logged: new Date(donation.detail_date_donated)
+        },
+        transaction_details: {
+            status: donation.txn_status,
+            currency: donation.txn_currency,
+            amount_donated_in_cents: donation.txn_amount_donated_cents,
+            amount_charged_in_cents: donation.txn_amount_charged_cents,
+            fee_charged_by_payment_processor: (donation.txn_payment_method == "card" || donation.txn_payment_method == "acss_debit") && donation.txn_processing_fee_cents ? donation.txn_processing_fee_cents : 0 // todo: wire transfer logging?
+        },
+        proof: []
         // proof: listOfProof ? listOfProof.map(proof => formatProofFromDatabase(proof)) : []
     }
 

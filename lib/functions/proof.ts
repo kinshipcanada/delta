@@ -2,13 +2,14 @@ import { Cause } from "@lib/classes/causes"
 import { Donation } from "@lib/classes/donation"
 import { ProofOfDonation } from "@lib/classes/proof"
 import { CountryCode } from "@lib/classes/utils"
-import { v4 as uuidv4 } from "uuid"
+import { DatabaseTypings, fetchOpenProofFromDatabase, updateDonationDistributed } from "@lib/utils/database"
+import { formatDonationFromDatabase } from "@lib/utils/formatting"
 
-const isOpen = (causes: Cause[]) => {
+export const isOpen = (causes: Cause[]) => {
     let isOpen = true
 
     for (const cause of causes) {
-        if (cause.one_way === false) {
+        if (cause.one_way === true) {
             isOpen = false
         }
     }
@@ -16,14 +17,14 @@ const isOpen = (causes: Cause[]) => {
     return isOpen
 }
 
-const allocateProof = async (
+export const allocateProof = async (
+    proof_id: string,
     amount_disbursed: number,
-    message_to_donor: string, 
     region_distributed: CountryCode,
-    causes: Cause[]
+    causes: Cause[],
+    message_to_donor?: string, 
 ) => {
-    const proofId = uuidv4()
-
+    console.log("causes received", causes)
     // take in proof, consider amount and directions
     if (!isOpen(causes)) {
         // Query specifically for closed donations
@@ -31,27 +32,9 @@ const allocateProof = async (
     }
 
     // Query for open donations
-    const runningTotalCTEQuery = `
-        WITH RunningTotalCTE AS (
-            SELECT
-                id_donation_id,
-                txn_amount_donated_cents,
-                amount_distributed_in_cents,
-                detail_date_donated,
-                SUM(txn_amount_donated_cents - amount_distributed_in_cents) OVER (ORDER BY detail_date_donated) AS running_total
-            FROM
-                donations
-            WHERE
-                distribution_restricted = false
-        )
-        SELECT *
-        FROM RunningTotalCTE
-        WHERE running_total <= ${amount_disbursed}
-        ORDER BY
-            detail_date_donated;
-    `
+    const donationsFromDatabase = await fetchOpenProofFromDatabase(amount_disbursed)
+    const donations: Donation[] = donationsFromDatabase.rows.map((donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]) => formatDonationFromDatabase(donation)); // get the first n donations where amount_donated - amount_distributed_in_cents < total_amount
     
-    const donations: Donation[] = [] // get the first n donations where amount_donated - amount_distributed_in_cents < total_amount
     let distributed = 0
 
     let updatePromises = []
@@ -74,13 +57,17 @@ const allocateProof = async (
         updatePromises.push(updateDonationDistributed(donation.identifiers.donation_id, donation.donation_details.amount_distributed_in_cents))
     }
     
+    if (distributed > amount_disbursed) {
+        throw Error("Total distribution is greater than amount actually distributed")
+    }
+
     // update the donation amount_distributed accordingly
     await Promise.all(updatePromises)
 
     // create object and notify donors
     let proof: ProofOfDonation = {
         amount_distributed_in_cents: amount_disbursed,
-        proof_id: proofId,
+        proof_id: proof_id,
         uploaded_at: new Date(),
         message_to_donor: message_to_donor,
         donations: donations,
@@ -88,24 +75,20 @@ const allocateProof = async (
         cause_matches: causes
     }
 
+    await Promise.all(donations.map(donation => generateProofEmail(donation, proof)))
+
     return proof
 }
 
-const updateDonationDistributed = async (donationId: string, amount_distributed_in_cents: number) => {}
+const generateProofEmail = (donation: Donation, proofOfDonation: ProofOfDonation) => {
+    console.log(`Dear ${donation.donor.first_name}, your proof (${proofOfDonation.proof_id}) is available.`)
+}
 
 const generateCoverLetterUrl = (proof: ProofOfDonation) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/coverletters/${proof.proof_id}`
 const generateProofAttachmentUrl = (proof: ProofOfDonation) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/proof/${proof.proof_id}`
 
-const verifyProofInLimit = () => {
-    // helper function to make sure the sum of allocations is not greater than the donations
-}
-
 const generateCoverLetter = () => {
     // storage proof/cover_letters/proof_id/donation_uuid
     // generate cover letter and upload to storage
-    return
-}
-
-const notifyOfProof = () => {
     return
 }

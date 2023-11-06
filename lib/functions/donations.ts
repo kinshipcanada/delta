@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Donation } from '../classes/donation';
-import { DeliveryMethod, UserNotificationType } from "@lib/classes/notifications";
+import { UserNotificationType } from "@lib/classes/notifications";
 import { DonationIdentifiers } from "@lib/classes/utils";
 import { DatabaseTable } from "../utils/constants";
 import { DatabaseTypings, fetchAllDonationsForEmail, fetchProofFromDatabase, parameterizedDatabaseQuery } from "@lib/utils/database";
@@ -17,7 +17,6 @@ export async function createDonation(identifiers: DonationIdentifiers): Promise<
         await sendNotification(
             UserNotificationType.DONATION_MADE,
             donation,
-            DeliveryMethod.EMAIL,
         )
 
         return donation
@@ -34,7 +33,6 @@ export async function createManualDonation(donation: Donation): Promise<Donation
         await sendNotification(
             UserNotificationType.DONATION_MADE,
             donation,
-            DeliveryMethod.EMAIL,
         )
         return donation
     } catch (error) {

@@ -17,7 +17,8 @@ import { Currencies, DonationIdentifiers, DonationIdentifiersSchema } from "./ut
  */
 
 export type DonationStatus = "processing" | "delivered_to_partners" | "partially_distributed" | "fully_distributed" | string
-export type TransactionStatus = "failed" | "successful" | "pending_acss_delivery" | string
+// todo: remove string and see if there is an assignment error
+export type TransactionStatus = "processing" | "payment_failed" | "succeeded" | string
 
 export interface TransactionDetails {
   status: TransactionStatus

@@ -21,7 +21,6 @@ const AppAccountPage: React.FC<AppPageProps> = () => {
             <VerticalSpacer size={SpacerSize.Medium} />
             <AccountInformationPanel />
             <VerticalSpacer size={SpacerSize.Medium} />
-            {/* <AddressInformationPanel /> */}
         </div>
     )
 }
