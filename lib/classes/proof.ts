@@ -9,7 +9,7 @@
 
 import { z } from "zod"
 import { Cause, CausesSchema } from "./causes"
-import { CountryCode } from "./utils"
+import { CountryCode, CountryCodeSchema } from "./utils"
 import { Donation, DonationSchema } from "./donation"
 
 export interface ProofOfDonation {
@@ -28,6 +28,6 @@ export const ProofSchema = z.object({
     message_to_donor: z.string().optional(),
     amount_distributed_in_cents: z.number(),
     donations: z.array(DonationSchema),
-    region_distributed: z.string(),
+    region_distributed: CountryCodeSchema,
     cause_matches: z.array(CausesSchema)
 });

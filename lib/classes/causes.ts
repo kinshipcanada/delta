@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CountryCode } from "./utils";
+import { CountryCode, CountryCodeSchema } from "./utils";
 
 /**
  * @description Represents a cart, with each cause the donor is donating to and the total amount paid in cents (of all causes)
@@ -21,7 +21,7 @@ export interface Cause {
 }
 
 export const CausesSchema = z.object({
-    region: z.string().optional(),
+    region: CountryCodeSchema.optional(),
     one_way: z.boolean(),
     label: z.string()
 });

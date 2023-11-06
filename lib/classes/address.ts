@@ -1,4 +1,4 @@
-import { CountryCode, zCountryCodes } from "./utils";
+import { CountryCode, CountryCodeSchema } from "./utils";
 import { z } from "zod"
 
 /**
@@ -6,11 +6,11 @@ import { z } from "zod"
  * @param line_address The line address of the address
  */
 export interface Address {
-    line_address: string;
-    postal_code: string;
-    city: string;
-    state: string;
-    country: CountryCode;
+  line_address: string;
+  postal_code: string;
+  city: string;
+  state: string;
+  country: CountryCode;
 }
 
 export const AddressSchema = z.object({
@@ -18,5 +18,5 @@ export const AddressSchema = z.object({
   postal_code: z.string(),
   city: z.string(),
   state: z.string(),
-  country: zCountryCodes,
+  country: CountryCodeSchema,
 });

@@ -16,6 +16,7 @@ import { NoDataApiResponse } from "@lib/classes/api"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
 import { z } from "zod"
 import { ApiAdminProofUploadRequestSchema } from "pages/api/admin/proof/upload"
+import { CountryCode } from "@lib/classes/utils"
 
 const AdminProofPage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -78,7 +79,7 @@ const UploadProof = () => {
 
 
         const causes: Cause[] = [{
-            region: proofToUpload.region_distributed,
+            region: proofToUpload.region_distributed as CountryCode,
             one_way: false,
             label: proofToUpload.cause_distributed
         }]
@@ -109,7 +110,8 @@ const UploadProof = () => {
             message_to_donor: proofToUpload.message_to_donor,
             causes: causes,
             proof_id: proofId,
-            region_distributed: proofToUpload.region_distributed
+            // todo replace with countrycode select
+            region_distributed: proofToUpload.region_distributed as CountryCode
         }
 
         const response: NoDataApiResponse = await callKinshipAPI<null>('/api/admin/proof/upload', uploadProofPayload)

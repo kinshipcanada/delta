@@ -14,6 +14,7 @@ import { Cause } from "@lib/classes/causes"
 import { ApiAdminDonationsCreateRequestSchema } from "pages/api/admin/donations/create"
 import { NoDataApiResponse } from "@lib/classes/api"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
+import { CountryCode } from "@lib/classes/utils"
 
 const AdminCreatePage: React.FC<{ donor: Donor, donations: Donation[] }> = ({ donor, donations }) => {
 
@@ -56,7 +57,7 @@ const CreateFromScratch: React.FC = () => {
     const [lineAddress, setLineAddress] = useState<string>("")
     const [city, setCity] = useState<string>("")
     const [stateOrProvince, setStateOrProvince] = useState<string>("on")
-    const [country, setCountry] = useState<string>("ca")
+    const [country, setCountry] = useState<CountryCode>("ca")
     const [postalCode, setPostalCode] = useState<string>("")
 
     const [paymentMethod, setPaymentMethod] = useState<string>("cash")
@@ -333,7 +334,7 @@ const CreateFromScratch: React.FC = () => {
                         options={countries}
                         value={country}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
-                            setCountry(e.target.value);
+                            setCountry(e.target.value as CountryCode);
 
                             if (states_and_provinces[e.target.value]) {
                                 setStateOrProvince(states_and_provinces[e.target.value][0].value)

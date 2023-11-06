@@ -1,5 +1,6 @@
 import { NoDataApiResponse } from "@lib/classes/api";
 import { CausesSchema } from "@lib/classes/causes";
+import { CountryCodeSchema } from "@lib/classes/utils";
 import { allocateProof } from "@lib/functions/proof";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
@@ -8,7 +9,7 @@ const requestSchema = z.object({
   proof_id: z.string().uuid(),
   amount_disbursed: z.number(),
   message_to_donor: z.string().optional(),
-  region_distributed: z.string(),
+  region_distributed: CountryCodeSchema,
   causes: z.array(CausesSchema)
 })
 

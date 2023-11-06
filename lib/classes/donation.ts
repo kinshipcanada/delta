@@ -2,7 +2,7 @@ import { z } from "zod";
 import { calculateStripeFee } from "../utils/helpers";
 import { Cause, CausesSchema, generateFakeCauses } from "./causes";
 import { Donor, DonorSchema, generateFakeDonor } from "./donor";
-import { Currencies, DonationIdentifiers, DonationIdentifiersSchema } from "./utils";
+import { Currencies, CurrenciesSchema, DonationIdentifiers, DonationIdentifiersSchema } from "./utils";
 
 /**
  * @description Represents a donation object
@@ -16,9 +16,14 @@ import { Currencies, DonationIdentifiers, DonationIdentifiersSchema } from "./ut
  * @param date_donated The date the donation was made
  */
 
-export type DonationStatus = "processing" | "delivered_to_partners" | "partially_distributed" | "fully_distributed" | string
-// todo: remove string and see if there is an assignment error
-export type TransactionStatus = "processing" | "payment_failed" | "succeeded" | string
+
+export const TRANSACTION_STATUSES = ["processing", "payment_failed", "succeeded"] as const
+export const TransactionStatusSchema = z.enum(TRANSACTION_STATUSES)
+export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number]
+
+export const DONATION_STATUSES = ["processing", "delivered_to_partners", "partially_distributed", "fully_distributed"] as const
+export const DonationStatusSchema = z.enum(DONATION_STATUSES)
+export type DonationStatus = (typeof DONATION_STATUSES)[number]
 
 export interface TransactionDetails {
   status: TransactionStatus
@@ -29,8 +34,8 @@ export interface TransactionDetails {
 }
 
 export const TransactionDetailsSchema = z.object({
-  status: z.string(),
-  currency: z.string().optional(),
+  status: TransactionStatusSchema,
+  currency: CurrenciesSchema.optional(),
   amount_donated_in_cents: z.number(),
   amount_charged_in_cents: z.number(),
   fee_charged_by_payment_processor: z.number().optional()
@@ -47,7 +52,7 @@ export interface DonationDetails {
 }
 
 export const DonationDetailsSchema = z.object({
-  status: z.string(),
+  status: DonationStatusSchema,
   distribution_restricted: z.boolean(),
   amount_distributed_in_cents: z.number(),
   causes: z.array(CausesSchema),
@@ -70,7 +75,7 @@ export interface Donation {
   amount_in_cents: number;
   fees_covered: number;
   fees_charged_by_stripe: number;
-  date_donated: Date | string;
+  date_donated: Date;
   proof: ProofOfDonation[]
   status?: DonationStatus,
   currency?: Currencies,
@@ -85,7 +90,7 @@ export const DonationSchema = z.object({
   amount_in_cents: z.number(),
   fees_covered: z.number(),
   fees_charged_by_stripe: z.number(),
-  date_donated: z.date().or(z.string()),
+  date_donated: z.string().pipe( z.coerce.date() ),
   proof: z.array(z.any()),
   transaction_details: TransactionDetailsSchema.optional(),
   donation_details: DonationDetailsSchema.optional()
@@ -112,9 +117,6 @@ export function isDonation(obj: any): obj is Donation {
 
 import { faker } from '@faker-js/faker';
 import { ProofOfDonation, ProofSchema } from "./proof";
-import { StripeTags } from "./stripe";
-import Stripe from "stripe";
-import { PaymentMethodType } from "./payment_method";
 
 export const generateFakeDonation = (): Donation => {
 
