@@ -1,5 +1,3 @@
-import { ArrowRightIcon } from "@heroicons/react/20/solid"
-import { PrimaryButton, SecondaryButton } from '../components/core/Buttons';
 import {
   AcademicCapIcon,
   BuildingLibraryIcon,
@@ -8,6 +6,7 @@ import {
   HomeModernIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline'
+import { AnyText, Button, ButtonSize, ButtonStyle, TextSize, TextWeight } from "../components/primitives";
 import * as React from "react";
 
 let Globe = () => null;
@@ -19,7 +18,6 @@ export default function Index() {
       <Hero />
       <Incentives />
       <Causes />
-      {/* <Partners /> */}
       <CTA />
     </div>
   );
@@ -77,9 +75,19 @@ export function Hero() {
                   </p>
                   <div className='m-4' />
                   <div className='flex'>
-                    <PrimaryButton link = "/donate" text = "Make A Donation" iconRight = {ArrowRightIcon} />
+                    <Button 
+                      text = "Make A Donation &rarr;"
+                      href = "/donate"
+                      style={ButtonStyle.Primary}
+                      size={ButtonSize.Standard}
+                    />
                     <div className='m-1' />
-                    <SecondaryButton link = "/about" text= "About Kinship" />
+                    <Button 
+                      text = "About Kinship"
+                      href = "/about"
+                      style={ButtonStyle.Secondary}
+                      size={ButtonSize.Standard}
+                    />
                   </div>
                 </div>
               </div>
@@ -211,47 +219,7 @@ export function Causes() {
   )
 }
 
-function Partners() {
-  const logos = [
-    { name: 'Transistor', url: 'https://tailwindui.com/img/logos/transistor-logo-gray-400.svg' },
-    { name: 'Mirage', url: 'https://tailwindui.com/img/logos/mirage-logo-gray-400.svg' },
-    { name: 'Tuple', url: 'https://tailwindui.com/img/logos/tuple-logo-gray-400.svg' },
-    { name: 'Laravel', url: 'https://tailwindui.com/img/logos/laravel-logo-gray-400.svg' },
-    { name: 'StaticKit', url: 'https://tailwindui.com/img/logos/statickit-logo-gray-400.svg' },
-    { name: 'Workcation', url: 'https://tailwindui.com/img/logos/workcation-logo-gray-400.svg' },
-  ]
-
-  return (
-    <div className="py-16">
-          <div className="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-            <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-24">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  Vetted Partners On The Ground
-                </h2>
-                <p className="mt-6 max-w-3xl text-lg leading-7 text-gray-500">
-                  Kinship works with a number of trusted partners on the ground, and receives proof of where funds went and who was helped. Our partners also help find those in most need to direct funds to, and continue to monitor for their health, wellbeing, and progress.
-                </p>
-                <div className="mt-6">
-                  <a href="#" className="text-base font-medium text-blue-600">
-                    About Kinship &rarr;
-                  </a>
-                </div>
-              </div>
-              <div className="mt-12 grid grid-cols-2 gap-0.5 md:grid-cols-3 lg:mt-0 lg:grid-cols-2">
-                {logos.map((logo) => (
-                  <div key={logo.name} className="col-span-1 flex justify-center bg-gray-50 py-8 px-8">
-                    <img className="max-h-12" src={logo.url} alt={logo.name} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-  )
-}
-
-function CTA () {
+function CTA() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:flex lg:items-center lg:justify-between lg:py-16 lg:px-8">
@@ -267,7 +235,12 @@ function CTA () {
             >
             </a>
           </div>
-          <PrimaryButton link = "/donate" text = {<>Donate Now &rarr;</>} />
+          <Button 
+            text = "Donate Now &rarr;"
+            href = "/donate"
+            style={ButtonStyle.Primary}
+            size={ButtonSize.Large}
+          />
         </div>
       </div>
     </div>

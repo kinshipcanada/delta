@@ -1,11 +1,6 @@
-import { supabase } from '../../systems/helpers/supabaseClient';
-import { callKinshipAPI } from '../../systems/functions/helpers';
+import { callKinshipAPI, supabase } from "../../lib/utils/helpers";
 import { useState } from 'react';
 import Head from 'next/head'
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
 
 export default function Home() {
 

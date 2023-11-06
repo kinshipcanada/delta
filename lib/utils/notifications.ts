@@ -1,0 +1,95 @@
+import { Donation } from "../classes/donation";
+import { AdminNotificationType, NotificationTemplate, UserNotificationType } from "../classes/notifications";
+import * as dotenv from 'dotenv' 
+const postmark = require('postmark')
+import { Donor } from "../classes/donor";
+import { ProofOfDonation } from "@lib/classes/proof";
+
+dotenv.config()
+
+export function generateNotificationTemplate(
+  notificationType: UserNotificationType | AdminNotificationType,
+  donation: Donation,
+  proof?: ProofOfDonation
+): NotificationTemplate {
+    const donorCountry = donation.donor.address.country
+    const donationAmount = donation.amount_in_cents / 100
+    const donorFirstName = donation.donor.first_name
+    const donationUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.identifiers.donation_id}`
+    
+    switch (notificationType) {
+        case UserNotificationType.DONATION_MADE: {
+            return {
+                email_body: `
+                    Dear ${donorFirstName},
+
+                    Thank you for your donation of ${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "CAD" : null }.
+
+                    You can access your ${donorCountry == "ca" ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                `,
+                email_subject: `Thank you for your donation on ${donation.date_donated}.`,
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }. Access your receipt of donation here: ${donationUrl}`
+            }
+        }
+
+        case UserNotificationType.PROOF_AVAILABLE: {
+            return {
+                email_body: `
+                    Dear ${donorFirstName},
+
+                    Thank you for your donation of ${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }.
+
+                    You can access your ${donorCountry == "ca" ? "CRA-eligible" : null } receipt of donation here: ${donationUrl}
+                `,
+                email_subject: `Thank you for your donation on ${donation.date_donated}.`,
+                sms_friendly_message: `Thank you for your donation of $${donationAmount} ${donorCountry == "ca" ? "CAD" : "us" ? "USD" : null }. Access your receipt of donation here: ${donationUrl}`
+            }
+        }
+
+        case UserNotificationType.REFUND_ISSUED: {
+            throw new Error("Not implemented")
+        }
+
+        case UserNotificationType.REFUND_PROCESSING: {
+            throw new Error("Not implemented")
+        }
+
+        case AdminNotificationType.REPORT_GENERATED: {
+            throw new Error("Not implemented")
+        }
+
+        case AdminNotificationType.RECEIPT_MANUALLY_ISSUED: {
+            throw new Error("Not implemented")
+        }
+    }
+}
+
+export async function sendNotification(
+    notificationType: UserNotificationType | AdminNotificationType,
+    donation: Donation,
+) {
+    const template = generateNotificationTemplate(notificationType, donation)
+
+    return await _sendEmail(template, donation.donor)
+}
+
+async function _sendEmail(template: NotificationTemplate, donor: Donor): Promise<void> {
+    try {
+        const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
+        await client.sendEmail({
+            "From": process.env.FROM_EMAIL,
+            "To": donor.email,
+            "Subject": template.email_subject,
+            "TextBody": template.email_body
+        });
+
+        return;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error("Error sending Email: " + error.message);
+        } else {
+            // Handle the case where 'error' is not an instance of 'Error'
+            throw new Error("An unknown error occurred");
+        }
+    }
+}

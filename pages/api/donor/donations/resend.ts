@@ -1,28 +1,45 @@
-import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
-import fetch_donation from "../../../../systems/methods/fetch_donation";
+import { NoDataApiResponse } from "@lib/classes/api";
+import { DonationIdentifiers } from "@lib/classes/utils";
+import { checkAndResendReceipt } from "@lib/functions/notifications";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-export default async function handler(req, res) {
-    const donation_id = req.body.donation_id
+const requestSchema = z.object({
+    donation_id: z.string().uuid().optional(),
+    stripe_charge_id: z.string().optional(), 
+    stripe_payment_intent_id: z.string().optional(),
+})
 
-    try {
-        fetch_donation(donation_id).then((donation_object)=>{
-            const successful_response: DonationResponse = {
-                status: 200,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                donation: donation_object
-            }
-            return res.status(200).send(successful_response);
-        }).catch((error)=>{
-            const error_response: SimpleMessageResponse = {
-                status: 500,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                message: error.message
-            }
-            return res.status(500).send(error_response);
-        })
-    } catch (error) {
-        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/src/api/router", "api_router.get('/fetch_donation')", true)
-        res.status(500).send(error.message);
+/**
+ * @description Resends a donation receipt to a donor, given the donation's identifiers
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const parsedRequest = requestSchema.safeParse(req.body);
+
+  if (!parsedRequest.success || !(parsedRequest.data.donation_id || parsedRequest.data.stripe_charge_id || parsedRequest.data.stripe_payment_intent_id)) {
+    const response: NoDataApiResponse = { error: "Invalid payload" }
+    return res.status(400).send(response);
+  }
+
+  try {
+    // To do: update generateIdentifiersFromStrings to include optionals so that we verify by prefix
+    const identifiers: DonationIdentifiers = {
+        donation_id: parsedRequest.data.donation_id, 
+        stripe_charge_id: parsedRequest.data.stripe_charge_id, 
+        stripe_payment_intent_id: parsedRequest.data.stripe_payment_intent_id
     }
-};
+    
+    await checkAndResendReceipt(identifiers)
+
+    return res.status(200).send({} as NoDataApiResponse)
+  } catch (error) {
+    // Log error
+    console.error(error)
+    
+    const response: NoDataApiResponse = {  error: "Sorry, something went wrong resending this receipt" }
+    return res.status(500).send(response)
+  }
+}

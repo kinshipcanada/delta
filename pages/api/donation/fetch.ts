@@ -1,63 +1,35 @@
-import { KinshipError } from "../../../systems/classes/errors/KinshipError";
-import { DonationResponse, BatchedDonationResponse, SimpleMessageResponse } from "../../../systems/classes/utility_classes";
-import fetch_donation from "../../../systems/methods/fetch_donation";
+import { DonationApiResponse } from "@lib/classes/api";
+import { Donation } from "@lib/classes/donation";
+import { DonationIdentifiers } from "@lib/classes/utils";
+import { fetchDonation } from "@lib/functions/donations";
+import { generateIdentifiersFromStrings } from "@lib/utils/helpers";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-export default async function handler(req, res) {
-    const donation_id = req.body.donation_id
-    const donation_ids = req.body.donation_ids
+const requestSchema = z.object({
+  donation_id: z.string().min(8)
+})
 
-    if (!donation_id && !donation_ids) {
-        const error_response: SimpleMessageResponse = {
-            status: 500,
-            endpoint_called: `/donation/fetch`,
-            message: "No donation_id or donation_ids provided"
-        }
-        return res.status(500).send(error_response);
-    }
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-    try {
-        if (donation_id) {
-            fetch_donation(donation_id).then((donation_object)=>{
-                const successful_response: DonationResponse = {
-                    status: 200,
-                    endpoint_called: `/donation/fetch`,
-                    donation: donation_object
-                }
-                return res.status(200).send(successful_response);
-            }).catch((error)=>{
-                const error_response: SimpleMessageResponse = {
-                    status: 500,
-                    endpoint_called: `/donation/fetch`,
-                    message: error.message
-                }
-                return res.status(500).send(error_response);
-            })
-        } else {
-            let donation_promises = []
+  if (!parsedRequest.success) {
+    const response: DonationApiResponse = { error: 'No donation_id provided. You must pass either a Kinship ID, Stripe charge id, or Stripe payment intent id.' }
+    return res.status(400).send(response);
+  }
 
-            for (const donation_id of donation_ids) {
-                donation_promises.push(fetch_donation(donation_id))
-            }
+  try {
+    const identifiers: DonationIdentifiers = generateIdentifiersFromStrings([parsedRequest.data.donation_id])
+    const donation: Donation = await fetchDonation(identifiers)
 
-            Promise.all(donation_promises).then((donation_objects)=>{
-                const successful_response: BatchedDonationResponse = {
-                    status: 200,
-                    endpoint_called: `/donation/fetch`,
-                    donations: donation_objects
-                }
-
-                return res.status(200).send(successful_response);
-            }).catch((error)=>{
-                const error_response: SimpleMessageResponse = {
-                    status: 500,
-                    endpoint_called: `/donation/fetch`,
-                    message: error.message
-                }
-                return res.status(500).send(error_response);
-            })
-        }
-    } catch (error) {
-        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/pages/api/donation/fetch.ts", "api_router.get('/fetch_donation')", true)
-        res.status(500).send(error.message);
-    }
-};
+    const response: DonationApiResponse = { data: donation }
+    return res.status(200).send(response)
+  } catch (error) {
+    // Log error
+    const response: DonationApiResponse = { error: "Sorry, something went wrong fetching this donation" }
+    return res.status(500).send(response)
+  }
+}

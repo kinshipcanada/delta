@@ -1,28 +1,60 @@
-import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonationResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
-import fetch_donation from "../../../../systems/methods/fetch_donation";
+import { DonorSchema } from "@lib/classes/donor";
+import { updateDonor } from "@lib/functions/donor";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-export default async function handler(req, res) {
-    const donation_id = req.body.donation_id
+const requestSchema = z.object({
+  existing_donor_object: DonorSchema,
+  updated_donor_object: DonorSchema
+})
 
-    try {
-        fetch_donation(donation_id).then((donation_object)=>{
-            const successful_response: DonationResponse = {
-                status: 200,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                donation: donation_object
-            }
-            return res.status(200).send(successful_response);
-        }).catch((error)=>{
-            const error_response: SimpleMessageResponse = {
-                status: 500,
-                endpoint_called: `/backend/donation/${donation_id}`,
-                message: error.message
-            }
-            return res.status(500).send(error_response);
-        })
-    } catch (error) {
-        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/src/api/router", "api_router.get('/fetch_donation')", true)
-        res.status(500).send(error.message);
-    }
-};
+export const responseSchema = z.object({
+    error: z.string().optional()
+})
+
+/**
+ * @description Updates a customers profile. Only intended to be used by the frontend account management page UI
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const response = requestSchema.safeParse(req.body);
+
+  console.log("received payload,", req.body)
+  if (!response.success) {
+    return res.status(400).send({
+        error: 'Invalid payload',
+    });
+  }
+
+  try {
+    const existing_donor_object = response.data.existing_donor_object
+    const updated_donor_object = response.data.updated_donor_object
+
+    // To do: fix this
+    await updateDonor(
+        existing_donor_object.donor_id!,
+        existing_donor_object,
+        updated_donor_object.first_name,
+        updated_donor_object.last_name,
+        updated_donor_object.email,
+        updated_donor_object.address.line_address,
+        updated_donor_object.address.postal_code,
+        updated_donor_object.address.city,
+        updated_donor_object.address.state,
+        updated_donor_object.address.country
+    )
+
+    return res.status(200).send({
+        error: undefined
+    })
+  } catch (error) {
+    // Log error
+    console.error(error)
+    
+    return res.status(500).send({
+        error: "Sorry, something went wrong updating your profile",
+    })
+  }
+}

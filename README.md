@@ -24,15 +24,45 @@ Charity should be powered by good software.
 - `stripe`: stripe engine and helper classes, including building objects from stripe
 
 ## API Reference
+// We could also potentially simplify partially setups users setup process by saving these details and autofilling later 
+// By checking for profiles with the same email during profile setup
 
 **Get Requests (e.g. fetching donations, donors, etc)**
 - **GET** `/donation/[id]` - Fetches an individual donation from it's Kinship ID, Stripe charge ID, or Stripe payment intent id
 - **GET** `/donation/batch/[list_of_ids]` - Fetches a number of donations. ID types do not need to be the same. Uses promise.all to batch donations (effectively a `/donation/id` wrapper).
 
-## To Do
-- [ ] Add full state list
-- [ ] Add custom log info
-- [ ] Add phone number validation from stripe
-- [x] Allow donation retrieval from charge id + payment id
-- [ ] Implement fetching donations from Kinship donation ID
-- [ ] API key system?
+## Kinship Canada Refactor
+- [ ] Phase 1: To Prod
+    - [x] Make sure webhooks work
+    - [x] Fix auth flow breakages
+    - [ ] Database migration
+    - [x] Password reset function
+    - [x] Normalize country, province codes
+    - [ ] Payment method integration
+- [ ] Phase 2: Improvements/consolidation
+    - [ ] Better mobile support
+    - [ ] Admin system
+        - [ ] Proof system
+        - [x] Manual donation creation system
+        - [ ] Resend donation system
+    - [ ] Donation PDF
+    - [ ] Dedicated proof page, where clicking on available proof links to a subpage with a nicer ui
+    - [ ] Close db gracefully
+    - [ ] Donation param validation
+    - [ ] Account email updating
+    - [ ] Fix country/currency changes
+    - [ ] Logging system
+    - [ ] Api key system
+    - [ ] Recurring donations
+    - [ ] Accept paypal donations
+    - [ ] Google maps api
+    - [ ] Refactor database uploads, maybe add an orm if it reduces errors
+    - [ ] Simplify codebase, move to shadcnui
+    - [ ] Reduce dependancies
+    - [ ] Validation scripts (e.g. if its a card or acss_debit, stripe ids shouldnt be null)
+    - [ ] Partner dashboard
+    - [ ] Feedback notifications
+- [ ] Phase 3: Reusable by others
+    - [ ] Developer home page
+    - [ ] Config/system verification script (to ensure everything is running smoothly in prod)
+    - [ ] Document API reference

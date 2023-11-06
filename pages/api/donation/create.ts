@@ -1,15 +1,31 @@
-import { EventTypes } from "../../../systems/classes/utility_classes";
-import { KinshipLogger } from "../../../systems/functions/logger";
-import create_donation from "../../../systems/methods/create_donation";
+import { ObjectIdApiResponse } from "@lib/classes/api";
+import { Donation } from "@lib/classes/donation";
+import { createDonation } from "@lib/functions/donations";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req, res) {
+/**
+ * @description Creates a new donation. Only to be called by Stripe's webhook
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
     try {
-        const donation_id = req.body.data.object.id
-        await KinshipLogger(EventTypes.DONATION_MADE, "Donation received from stripe", [donation_id])
-        const donation = await create_donation(donation_id)
-        res.status(200).send({ "status": 200, donation: donation });
+        let event = req.body
 
-    } catch (e) {
-        res.status(500).send(e.message);
+        const donation: Donation = await createDonation({
+            stripe_charge_id: event.data.object.id
+        })
+
+        const response: ObjectIdApiResponse = { data: donation.identifiers.donation_id }
+        return res.status(200).send(response)
+    } catch (error) {
+        // Log error
+        console.error('error creating donation', error)
+
+        return res.status(500).send({
+            error: "Sorry, something went wrong creating this donation",
+            donation: undefined
+        })
     }
-};
+}

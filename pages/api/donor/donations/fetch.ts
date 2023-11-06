@@ -1,30 +1,38 @@
-import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { BatchedSimpleDonationResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
-import fetch_donations_from_params from "../../../../systems/methods/fetch_donations_from_params";
+import { DonationGroupApiResponse } from "@lib/classes/api";
+import { Donation } from "@lib/classes/donation";
+import { fetchAllDonationsForDonor } from "@lib/functions/donations";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-export default async function handler(req, res) {
+const requestSchema = z.object({
+    donor_email: z.string().email()
+})
 
-    const user_email = req.body.user_email
+/**
+ * @description Fetches all donations for a given donor
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-    try {
-        fetch_donations_from_params(true, { email: user_email }).then((donations)=>{
-            const successful_response: BatchedSimpleDonationResponse = {
-                status: 200,
-                endpoint_called: `/donor/donations/fetch`,
-                donations: donations
-            }
+  if (!parsedRequest.success) {
+    const response: DonationGroupApiResponse = { error: 'No donor email provided' }
+    return res.status(400).send(response);
+  }
 
-            return res.status(200).send(successful_response);
-        }).catch((error)=>{
-            const error_response: SimpleMessageResponse = {
-                status: 500,
-                endpoint_called: `/donor/donations/fetch`,
-                message: error.message
-            }
-            return res.status(500).send(error_response);
-        })
-    } catch (error) {
-        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/src/api/router", "api_router.get('/fetch_donation')", true)
-        res.status(500).send(error.message);
-    }
-};
+  try {
+    const donations: Donation[] = await fetchAllDonationsForDonor(parsedRequest.data.donor_email);
+
+
+    const response: DonationGroupApiResponse = { data: donations }
+    return res.status(200).send(response)
+  } catch (error) {
+    // Log error
+    console.error(error)
+
+    const response: DonationGroupApiResponse = { error: 'Sorry, something went wrong fetching your donations' }
+    return res.status(500).send(response);
+  }
+}

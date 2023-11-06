@@ -1,28 +1,37 @@
-import { KinshipError } from "../../../../systems/classes/errors/KinshipError";
-import { DonorResponse, SimpleMessageResponse } from "../../../../systems/classes/utility_classes";
-import fetch_donor from "../../../../systems/methods/fetch_donor";
+import { DonorApiResponse } from "@lib/classes/api";
+import { fetchDonor } from "@lib/functions/donor";
+import { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 
-export default async function handler(req, res) {
-    const user_id = req.body.user_id
+const requestSchema = z.object({
+    donor_id: z.string().uuid().optional(),
+    donor_email: z.string().email().optional()
+})
+
+/**
+ * @description Fetches a donors profile
+ */
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+    const parsedRequest = requestSchema.safeParse(req.body);
+
+    if (!parsedRequest.success || !(parsedRequest.data.donor_id || parsedRequest.data.donor_email)) {
+        const response: DonorApiResponse = { error: 'Invalid payload' }
+        return res.status(400).send(response);
+    }
 
     try {
-        fetch_donor(user_id).then((donor_object)=>{
-            const successful_response: DonorResponse = {
-                status: 200,
-                endpoint_called: `/donor/profile/fetch`,
-                donor: donor_object
-            }
-            return res.status(200).send(successful_response);
-        }).catch((error)=>{
-            const error_response: SimpleMessageResponse = {
-                status: 500,
-                endpoint_called: `/donor/profile/fetch`,
-                message: error.message
-            }
-            return res.status(500).send(error_response);
-        })
+        const donor = await fetchDonor(parsedRequest.data.donor_id, parsedRequest.data.donor_email)
+        const response: DonorApiResponse = { data: donor }
+        return res.status(200).send(response)
     } catch (error) {
-        new KinshipError(`Error in api request : ${JSON.stringify(error)}`, "/src/api/router", "api_router.get('/fetch_donation')", true)
-        res.status(500).send(error.message);
+        // Log error
+        console.error(error)
+        
+        const response: DonorApiResponse = { error: "Sorry, something went wrong fetching this donor" }
+        return res.status(500).send(response)
     }
-};
+}
+
