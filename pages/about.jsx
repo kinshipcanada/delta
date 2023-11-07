@@ -2,6 +2,7 @@ import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import * as Sentry from "@sentry/nextjs"
 
 // Highlighted principles. These get mapped automatically.
 const principles = [
@@ -217,6 +218,27 @@ export default function About() {
                     </div>
                 </div>
                 </div>
+
+                <button onClick={async () => {
+                    const transaction = Sentry.startTransaction({
+                    name: "Example Frontend Transaction",
+                    });
+
+                    Sentry.configureScope((scope) => {
+                    scope.setSpan(transaction);
+                    });
+
+                    try {
+                        const res = await fetch("/api/sentry-example-api");
+                        if (!res.ok) {
+                            throw new Error("Sentry Example Frontend Error");
+                        }
+                        } finally {
+                        transaction.finish();
+                    }
+                }}>
+                    test
+                </button>
             
         </div>
     )
