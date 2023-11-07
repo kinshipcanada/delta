@@ -95,7 +95,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
           <div className=''>
             {authContextLoading || shouldRedirect || !donor ? (
-                <div className='py-64 content-center items-center justify-center w-screen'>
+                <div className='flex-grow content-center items-center justify-center w-screen'>
                   <CenterOfPageBox>
                     <Loading color={LoadingColors.Blue} />
                   </CenterOfPageBox>
