@@ -24,7 +24,6 @@ export const allocateProof = async (
     causes: Cause[],
     message_to_donor?: string, 
 ) => {
-    console.log("causes received", causes)
     // take in proof, consider amount and directions
     if (!isOpen(causes)) {
         // Query specifically for closed donations

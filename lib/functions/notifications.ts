@@ -14,27 +14,23 @@ export async function checkAndResendReceipt(identifiers: DonationIdentifiers): P
         throw new Error("No valid identifiers provided. You must provide at least one of the following: donation_id, stripe_charge_id, stripe_payment_intent_id.")
     }
 
-    try {
-        const donation = formatDonationFromDatabase(await fetchDonationFromDatabase(identifiers))
+    const donation = formatDonationFromDatabase(await fetchDonationFromDatabase(identifiers))
 
-        if (donation) {
-            await sendNotification(
-                UserNotificationType.DONATION_MADE,
-                donation,
-            )
+    if (donation) {
+        await sendNotification(
+            UserNotificationType.DONATION_MADE,
+            donation,
+        )
 
-            return `Successfully resent receipt of donation to ${donation.donor.email}`
-        } else {
-            const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
-            await sendNotification(
-                UserNotificationType.DONATION_MADE,
-                donation,
-            )
+        return `Successfully resent receipt of donation to ${donation.donor.email}`
+    } else {
+        const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers))
+        await sendNotification(
+            UserNotificationType.DONATION_MADE,
+            donation,
+        )
 
-            return `Successfully generated and sent receipt of donation to ${donation.donor.email}`
-        }
-    } catch (error) {
-        throw error
+        return `Successfully generated and sent receipt of donation to ${donation.donor.email}`
     }
 }
 

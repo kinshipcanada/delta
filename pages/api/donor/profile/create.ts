@@ -3,9 +3,10 @@ import { z } from "zod";
 import { DonorSchema } from "@lib/classes/donor";
 import { createDonor } from "@lib/functions/donor";
 import { NoDataApiResponse } from "@lib/classes/api";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
-    donor: DonorSchema,
+  donor: DonorSchema,
 })
 
 /**
@@ -18,6 +19,7 @@ export default async function handler(
   const parsedRequest = requestSchema.safeParse(req.body);
 
   if (!parsedRequest.success || !parsedRequest.data.donor.donor_id) {
+    Sentry.captureException("Invalid payload")
     const response: NoDataApiResponse = { error: "Invalid payload" }
     return res.status(400).send(response);
   }
@@ -40,8 +42,7 @@ export default async function handler(
 
     return res.status(200).send({ } as NoDataApiResponse)
   } catch (error) {
-    console.error(error)
-    // Log error
+    Sentry.captureException(error)
     
     const response: NoDataApiResponse = { error: "Sorry, something went wrong creating your profile" }
     return res.status(500).send(response)

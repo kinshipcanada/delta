@@ -32,7 +32,7 @@ export default function Reset() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center sm:px-6 lg:px-8">
+        <div className="sm:px-6 lg:px-8 flex-grow flex flex-col justify-center">
 
 			<div className="sm:mx-auto sm:w-full sm:max-w-md">
 				<img

@@ -29,7 +29,7 @@ export async function callKinshipAPI<T>(
         const response = await fetch(url, {
             method: 'POST', 
             mode: 'cors', 
-            cache: 'no-cache', 
+            cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',

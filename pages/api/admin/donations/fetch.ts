@@ -3,6 +3,7 @@ import { Donation } from "@lib/classes/donation";
 import { adminFetchDonationsBySpecs, fetchAllDonationsForDonor } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
     start_date: z.string().pipe( z.coerce.date() ).optional(),
@@ -24,6 +25,7 @@ export default async function handler(
   const parsedRequest = requestSchema.safeParse(req.body);
 
   if (!parsedRequest.success) {
+    Sentry.captureException("Invalid payload")
     const response: DonationGroupApiResponse = { error: 'No donor email provided' }
     return res.status(400).send(response);
   }
@@ -34,9 +36,7 @@ export default async function handler(
     const response: DonationGroupApiResponse = { data: donations }
     return res.status(200).send(response)
   } catch (error) {
-    // Log error
-    console.error(error)
-
+    Sentry.captureException(error)
     const response: DonationGroupApiResponse = { error: 'Sorry, something went wrong fetching your donations' }
     return res.status(500).send(response);
   }

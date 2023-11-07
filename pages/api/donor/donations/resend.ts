@@ -3,11 +3,12 @@ import { DonationIdentifiers } from "@lib/classes/utils";
 import { checkAndResendReceipt } from "@lib/functions/notifications";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
-    donation_id: z.string().uuid().optional(),
-    stripe_charge_id: z.string().optional(), 
-    stripe_payment_intent_id: z.string().optional(),
+  donation_id: z.string().uuid().optional(),
+  stripe_charge_id: z.string().optional(), 
+  stripe_payment_intent_id: z.string().optional(),
 })
 
 /**
@@ -20,6 +21,7 @@ export default async function handler(
   const parsedRequest = requestSchema.safeParse(req.body);
 
   if (!parsedRequest.success || !(parsedRequest.data.donation_id || parsedRequest.data.stripe_charge_id || parsedRequest.data.stripe_payment_intent_id)) {
+    Sentry.captureException("Invalid payload")
     const response: NoDataApiResponse = { error: "Invalid payload" }
     return res.status(400).send(response);
   }
@@ -36,9 +38,7 @@ export default async function handler(
 
     return res.status(200).send({} as NoDataApiResponse)
   } catch (error) {
-    // Log error
-    console.error(error)
-    
+    Sentry.captureException(error)
     const response: NoDataApiResponse = {  error: "Sorry, something went wrong resending this receipt" }
     return res.status(500).send(response)
   }

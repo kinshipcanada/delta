@@ -3,9 +3,10 @@ import { Donation } from "@lib/classes/donation";
 import { fetchAllDonationsForDonor } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
-    donor_email: z.string().email()
+  donor_email: z.string().email()
 })
 
 /**
@@ -25,13 +26,10 @@ export default async function handler(
   try {
     const donations: Donation[] = await fetchAllDonationsForDonor(parsedRequest.data.donor_email);
 
-
     const response: DonationGroupApiResponse = { data: donations }
     return res.status(200).send(response)
   } catch (error) {
-    // Log error
-    console.error(error)
-
+    Sentry.captureException(error)
     const response: DonationGroupApiResponse = { error: 'Sorry, something went wrong fetching your donations' }
     return res.status(500).send(response);
   }
