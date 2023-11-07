@@ -5,8 +5,8 @@ import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
-    donor_gid: z.string().uuid().optional(),
-    donor_gemail: z.string().email().optional()
+    donor_id: z.string().uuid().optional(),
+    donor_email: z.string().email().optional()
 })
 
 /**
@@ -18,14 +18,14 @@ export default async function handler(
 ) {
     const parsedRequest = requestSchema.safeParse(req.body);
 
-    if (!parsedRequest.success || !(parsedRequest.data.donor_gid || parsedRequest.data.donor_gemail)) {
+    if (!parsedRequest.success || !(parsedRequest.data.donor_id || parsedRequest.data.donor_email)) {
         Sentry.captureException("Invalid payload");
         const response: DonorApiResponse = { error: 'Invalid payload' }
         return res.status(400).send(response);
     }
 
     try {
-        const donor = await fetchDonor(parsedRequest.data.donor_gid, parsedRequest.data.donor_gemail)
+        const donor = await fetchDonor(parsedRequest.data.donor_id, parsedRequest.data.donor_email)
         const response: DonorApiResponse = { data: donor }
         return res.status(200).send(response)
     } catch (error) {
