@@ -91,40 +91,34 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       </Head>
       <main className="flex flex-col min-h-screen">
         <Navigation />
-        <div className="flex-grow">
-          <main>
-            { isApp ?
+        { isApp ?
 
-            <div className=''>
-              {authContextLoading || shouldRedirect || !donor ? (
-                  <div className='py-64 content-center items-center justify-center w-screen'>
-                    <CenterOfPageBox>
-                      <Loading color={LoadingColors.Blue} />
-                    </CenterOfPageBox>
-                  </div>
-                )
+          <div className=''>
+            {authContextLoading || shouldRedirect || !donor ? (
+                <div className='py-64 content-center items-center justify-center w-screen'>
+                  <CenterOfPageBox>
+                    <Loading color={LoadingColors.Blue} />
+                  </CenterOfPageBox>
+                </div>
+              )
 
-                :
+              :
 
-                <div className='flex-grow'>
-                  <div className="p-10 grid grid-cols-4 gap-12">
-                    <AppNavigation adminEnabled={donor.admin} />
-                    <div className="col-span-3">
-                      {children}
-                    </div>
+              <div className='flex-grow'>
+                <div className="p-10 grid grid-cols-4 gap-12">
+                  <AppNavigation adminEnabled={donor.admin} />
+                  <div className="col-span-3">
+                    {children}
                   </div>
                 </div>
-              }
-            </div>
-
-            :
-
-            <div className='flex-grow'>
-              { children }
-            </div>
+              </div>
             }
-          </main>
-        </div>
+          </div>
+
+          :
+
+          children
+          }
         <Footer />
       </main>
     </AuthProvider>

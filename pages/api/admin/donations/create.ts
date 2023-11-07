@@ -3,6 +3,7 @@ import { DonationSchema } from "@lib/classes/donation";
 import { createManualDonation } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
     donation: DonationSchema
@@ -20,6 +21,7 @@ export default async function handler(
     const parsedRequest = requestSchema.safeParse(req.body);
 
     if (!parsedRequest.success) {
+        Sentry.captureException("Invalid payload")
         return res.status(400).send({
             error: "Invalid payload",
         } as NoDataApiResponse);
@@ -30,8 +32,7 @@ export default async function handler(
 
         return res.status(200).send({} as NoDataApiResponse)
     } catch (error) {
-        // Log error
-
+        Sentry.captureException(error)
         const response: NoDataApiResponse = { error: "Sorry, something went wrong creating this donation" }
         return res.status(500).send(response)
     }

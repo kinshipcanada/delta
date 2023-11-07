@@ -18,8 +18,6 @@ export async function createDonor(
     state: string,
     country: CountryCode
 ): Promise<Donor> {
-    const FUNCTION_NAME = "createDonor"
-
     if (!isValidCountryCode(country)) {
         throw new Error("Invalid country code provided. Please use a valid ISO 3166-1 alpha-2 country code.")
     }
@@ -98,53 +96,50 @@ export async function updateDonor(
         throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
     }
 
-    try {
-        if (existingDonorObject.first_name === firstName 
-            && existingDonorObject.last_name === lastName 
-            && existingDonorObject.email === email 
-            && existingDonorObject.address.line_address === address_line_address 
-            && existingDonorObject.address.postal_code === address_postal_code 
-            && existingDonorObject.address.city === address_city 
-            && existingDonorObject.address.state === address_state 
-            && existingDonorObject.address.country === address_country
-        ) {
-            throw new Error("No changes detected. Please provide at least one field to update.")
-        }
-    
-        const address: Address = {
-            line_address: address_line_address,
-            postal_code: address_postal_code,
-            city: address_city,
-            state: address_state,
-            country: address_country
-        }
-            
-        const updatedDonor: Donor = {
-            donor_id: donorId,
-            first_name: firstName,
-            middle_name: existingDonorObject.middle_name,
-            last_name: lastName,
-            email: email,
-            admin: existingDonorObject.admin,
-            address: address,
-            set_up: existingDonorObject.set_up,
-            stripe_customer_ids: existingDonorObject.stripe_customer_ids
-        }
-    
-        await updateDonorInDatabase(
-            donorId,
-            firstName,
-            lastName,
-            email,
-            address_line_address,
-            address_postal_code,
-            address_city,
-            address_state,
-            address_country
-        )
-
-        return updatedDonor
-    } catch (error) {
-        throw error
+    if (existingDonorObject.first_name === firstName 
+        && existingDonorObject.last_name === lastName 
+        && existingDonorObject.email === email 
+        && existingDonorObject.address.line_address === address_line_address 
+        && existingDonorObject.address.postal_code === address_postal_code 
+        && existingDonorObject.address.city === address_city 
+        && existingDonorObject.address.state === address_state 
+        && existingDonorObject.address.country === address_country
+    ) {
+        throw new Error("No changes detected. Please provide at least one field to update.")
     }
+
+    const address: Address = {
+        line_address: address_line_address,
+        postal_code: address_postal_code,
+        city: address_city,
+        state: address_state,
+        country: address_country
+    }
+        
+    const updatedDonor: Donor = {
+        donor_id: donorId,
+        first_name: firstName,
+        middle_name: existingDonorObject.middle_name,
+        last_name: lastName,
+        email: email,
+        admin: existingDonorObject.admin,
+        address: address,
+        set_up: existingDonorObject.set_up,
+        stripe_customer_ids: existingDonorObject.stripe_customer_ids
+    }
+
+    await updateDonorInDatabase(
+        donorId,
+        firstName,
+        lastName,
+        email,
+        address_line_address,
+        address_postal_code,
+        address_city,
+        address_state,
+        address_country
+    )
+
+    return updatedDonor
+
 }

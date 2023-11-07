@@ -4,6 +4,7 @@ import { CountryCodeSchema } from "@lib/classes/utils";
 import { allocateProof } from "@lib/functions/proof";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
   proof_id: z.string().uuid(),
@@ -25,6 +26,7 @@ export default async function handler(
   const parsedRequest = requestSchema.safeParse(req.body);
 
   if (!parsedRequest.success) {
+    Sentry.captureException("Invalid payload")
     const response: NoDataApiResponse = { error: 'Invalid payload' }
     return res.status(400).send(response);
   }
@@ -41,8 +43,7 @@ export default async function handler(
     return res.status(200).send(response);
 
   } catch (error) {
-    console.error(error)
-
+    Sentry.captureException(error)
     const response: NoDataApiResponse = { error: "Sorry, something went wrong uploading the proof" }
     return res.status(500).send(response);
   }

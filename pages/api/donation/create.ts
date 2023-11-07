@@ -2,6 +2,7 @@ import { ObjectIdApiResponse } from "@lib/classes/api";
 import { Donation } from "@lib/classes/donation";
 import { createDonation } from "@lib/functions/donations";
 import { NextApiRequest, NextApiResponse } from "next";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * @description Creates a new donation. Only to be called by Stripe's webhook
@@ -20,9 +21,7 @@ export default async function handler(
         const response: ObjectIdApiResponse = { data: donation.identifiers.donation_id }
         return res.status(200).send(response)
     } catch (error) {
-        // Log error
-        console.error('error creating donation', error)
-
+        Sentry.captureException(error)
         return res.status(500).send({
             error: "Sorry, something went wrong creating this donation",
             donation: undefined

@@ -5,6 +5,7 @@ import { convertChildrenToStrings } from '../../../lib/utils/helpers';
 import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
     donation: DonationSchema,
@@ -22,6 +23,7 @@ export default async function handler(
     const parsedRequest = requestSchema.safeParse(req.body);
 
     if (!parsedRequest.success) {
+        Sentry.captureException("Invalid payload")
         const response: ObjectIdApiResponse = { error: 'Invalid payload' }
         return res.status(400).send(response);
     }
@@ -70,9 +72,7 @@ export default async function handler(
         }
         res.status(200).send(response);
     } catch (error) {
-        // Log error
-        console.error(error, "error creating payment intent")
-        
+        Sentry.captureException(error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);
     }

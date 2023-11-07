@@ -2,6 +2,7 @@ import { DonorSchema } from "@lib/classes/donor";
 import { updateDonor } from "@lib/functions/donor";
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const requestSchema = z.object({
   existing_donor_object: DonorSchema,
@@ -9,7 +10,7 @@ const requestSchema = z.object({
 })
 
 export const responseSchema = z.object({
-    error: z.string().optional()
+  error: z.string().optional()
 })
 
 /**
@@ -19,18 +20,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const response = requestSchema.safeParse(req.body);
+  const parsedRequest = requestSchema.safeParse(req.body);
 
-  console.log("received payload,", req.body)
-  if (!response.success) {
+  if (!parsedRequest.success) {
+    Sentry.captureException("Invalid payload")
     return res.status(400).send({
-        error: 'Invalid payload',
+      error: 'Invalid payload',
     });
   }
 
   try {
-    const existing_donor_object = response.data.existing_donor_object
-    const updated_donor_object = response.data.updated_donor_object
+    const existing_donor_object = parsedRequest.data.existing_donor_object
+    const updated_donor_object = parsedRequest.data.updated_donor_object
 
     // To do: fix this
     await updateDonor(
@@ -50,11 +51,10 @@ export default async function handler(
         error: undefined
     })
   } catch (error) {
-    // Log error
-    console.error(error)
-    
+    Sentry.captureException(error)  
+     
     return res.status(500).send({
-        error: "Sorry, something went wrong updating your profile",
+      error: "Sorry, something went wrong updating your profile",
     })
   }
 }
