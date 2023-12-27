@@ -21,7 +21,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "@sentry/nextjs": "^7.77.0",
+    "@sentry/nextjs": "^7.91.0",
     "@stripe/react-stripe-js": "^1.13.0",
     "@stripe/stripe-js": "^1.41.0",
     "@supabase/supabase-js": "^2.0.0",
@@ -63,6 +63,7 @@
     "react-hot-toast": "^2.4.0",
     "react-tooltip": "^4.5.0",
     "reactstrap": "^8.10.1",
+    "sentry": "^0.1.2",
     "stripe": "^13.4.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
@@ -117,4 +118,3 @@
     ]
   }
 }
-//a
