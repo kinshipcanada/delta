@@ -196,7 +196,7 @@ export async function formatDonationFromRawStripeData(rawStripeObject: RawStripe
             postal_code: rawStripeObject.customer!.address!.postal_code as string,
             city: rawStripeObject.customer!.address!.city as string,
             state: rawStripeObject.customer!.address!.state as string,
-            country: rawStripeObject.customer!.address!.country as CountryCode
+            country: rawStripeObject.customer!.address!.country?.toLowerCase() as CountryCode
         },
         admin: donorFromDatabase.is_admin,
         set_up: donorFromDatabase.set_up,

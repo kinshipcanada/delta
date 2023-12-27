@@ -1,6 +1,6 @@
 import { ObjectIdApiResponse } from "@lib/classes/api";
-import { Donation } from "@lib/classes/donation";
-import { createDonation } from "@lib/functions/donations";
+import { createDonation2 } from "@lib/functions/donations";
+import { Donation } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**
@@ -13,11 +13,11 @@ export default async function handler(
     try {
         let event = req.body
 
-        const donation: Donation = await createDonation({
+        const donation: Donation = await createDonation2({
             stripe_charge_id: event.data.object.id
         })
 
-        const response: ObjectIdApiResponse = { data: donation.identifiers.donation_id }
+        const response: ObjectIdApiResponse = { data: donation.id }
         return res.status(200).send(response)
     } catch (error) {
         // Log error
