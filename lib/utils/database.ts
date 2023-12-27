@@ -23,6 +23,18 @@ export function uploadDonationToDatabase(donation: Donation): Promise<any> {
   } 
 }
 
+import { Prisma, Donation as PrismaDonation } from '@prisma/client'
+import prisma from '@lib/prisma'
+
+export async function uploadNewDonationToDatabase(donation: PrismaDonation) {
+  return await prisma.donation.create({
+    data: {
+        ...donation,
+        allocationBreakdown: donation.allocationBreakdown as Prisma.JsonObject
+      }
+    })
+}
+
 //todo
 export interface DonationResponse {
   row_count: number

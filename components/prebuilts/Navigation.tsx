@@ -57,7 +57,7 @@ export default function Navigation() {
                 </div>
 
                 <div className="flex items-center md:ml-12">
-                  {
+                  {/* {
                     authContextLoading ? null :
                     donor ? (
                       <Button 
@@ -73,9 +73,9 @@ export default function Navigation() {
                       style={ButtonStyle.Secondary}
                       size={ButtonSize.Standard}
                     />
-                  }
+                  } */}
 
-                  <div className='m-1' />
+                  {/* <div className='m-1' /> */}
 
                   <Button 
                     text = "Donate"
