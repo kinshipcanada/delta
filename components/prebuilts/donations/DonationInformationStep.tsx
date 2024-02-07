@@ -11,6 +11,11 @@ import { ObjectIdApiResponse } from "@lib/classes/api"
 import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
 import { Cause } from "@lib/classes/causes"
 import { CountryCode } from "@lib/classes/utils"
+import dynamic from "next/dynamic"
+const AddressAutofill = dynamic(
+    () => import("@mapbox/search-js-react").then((mod) => mod.AddressAutofill),
+    { ssr: false }
+);
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()
@@ -222,7 +227,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             <VerticalSpacer size={SpacerSize.Large} />
 
-            <BaseHeader>Address Information (Will Appear On Receipt)</BaseHeader>
+            <BaseHeader>Address Information</BaseHeader>
             <VerticalSpacer size={SpacerSize.Medium} />
             <TextInput 
                 placeholder="Line Address" 

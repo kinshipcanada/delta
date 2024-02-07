@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { AnyText, Button, ButtonSize, ButtonStyle, TextSize, TextWeight } from "../components/primitives";
 import * as React from "react";
+import { Text } from '@radix-ui/themes';
 
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
