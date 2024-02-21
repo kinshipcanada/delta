@@ -1,6 +1,6 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
-import { Donation, DonationSchema } from "../../../lib/classes/donation"
+import { Donation } from "@prisma/client"
 import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
@@ -8,14 +8,9 @@ import { countries, states_and_provinces } from "../../../lib/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 import { ObjectIdApiResponse } from "@lib/classes/api"
-import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
 import { Cause } from "@lib/classes/causes"
 import { CountryCode } from "@lib/classes/utils"
-import dynamic from "next/dynamic"
-const AddressAutofill = dynamic(
-    () => import("@mapbox/search-js-react").then((mod) => mod.AddressAutofill),
-    { ssr: false }
-);
+import { v4 as uuidv4 } from 'uuid'
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()

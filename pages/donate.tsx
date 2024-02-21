@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ConfirmationType, DonationStep } from "../components/prebuilts/donations/helpers/types";
 import { v4 as uuidv4 } from 'uuid'
-import { Donation } from "../lib/classes/donation";
+import { Donation } from "@prisma/client";
 import { loadStripe } from "@stripe/stripe-js";
 import { DonationSummary } from "../components/prebuilts/Layouts";
 import DonationInformationStep from "../components/prebuilts/donations/DonationInformationStep";

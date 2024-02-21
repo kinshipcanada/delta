@@ -22,7 +22,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     })
 
-    console.log(donation)
     return {
       props: { 
         isGenerating: isStripeId,

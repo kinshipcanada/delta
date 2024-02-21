@@ -13,8 +13,11 @@ export default async function handler(
     try {
         const donationEngine = new DonationEngine()
         const donation: Donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
+        console.log("Donation created!")
+        console.log(donation)
         return res.status(200).send({ donation })
     } catch (error) {
+        console.error(error)
         Sentry.captureException(error)
         return res.status(500).send({
             error: "Sorry, something went wrong creating this donation",

@@ -31,7 +31,11 @@ export class DonorEngine {
         this.prismaClient = prisma
     }
 
-    private async createStripeProfile(donor: NoIdDonorProfile) {
+    public async createStripeProfile(donor: NoIdDonorProfile) {
+        if (donor.stripeCustomerIds.length > 0) {
+            return donor.stripeCustomerIds[0]
+        }
+
         const stripeCustomer = await this.stripeClient.customers.create({
             email: donor.donorEmail,
             name: `${donor.donorFirstName} ${donor.donorMiddleName ? `${donor.donorMiddleName} ` : ''}${donor.donorLastName}`,
