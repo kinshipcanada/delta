@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { Country, Currency, Donation, DonationRegion, DonationStatus, PaymentMethodType, PrismaClient, TransactionStatus } from "@prisma/client";
+import { JsonObject } from "@prisma/client/runtime/library";
 import Stripe from "stripe"
 
 interface BuildDonationFromStripeProps {
@@ -7,11 +8,11 @@ interface BuildDonationFromStripeProps {
     stripeChargeId?: string
 }
 
-interface FetchDonationProps extends BuildDonationFromStripeProps {
+export interface FetchDonationProps extends BuildDonationFromStripeProps {
     donationId: string
 }
 
-class DonationEngine {
+export class DonationEngine {
     readonly stripeClient: Stripe;
     readonly prismaClient: PrismaClient
 
@@ -26,7 +27,31 @@ class DonationEngine {
         this.prismaClient = prisma
     }
 
-    public async createDonation() {}
+    public async createDonationByWebhook(stripeChargeId: string) {
+        const donation = await this.fetchDonationFromStripe({
+            stripeChargeId
+        })
+
+        return await this.insertDonationObject(donation)
+    }
+
+    private async insertDonationObject(donation: Donation): Promise<Donation> {
+        return await prisma.donation.create({
+            data: {
+                ...donation,
+                allocationBreakdown: donation.allocationBreakdown as JsonObject
+            }
+        })
+    }
+
+    public async createDonationManually(donation: Donation) {
+        // to do: backend validation of manual donation creation
+        if (donation.amountDonatedInCents == 0) {
+            throw new Error("Amount donated must be greater than 0")
+        }
+
+        return await this.insertDonationObject(donation)
+    }
 
     public async fetchDonation(props: FetchDonationProps): Promise<Donation> {
         if (!(props.donationId || props.stripeChargeId || props.stripePaymentIntentId)) {
@@ -64,6 +89,7 @@ class DonationEngine {
                     "loggedAt": donation.loggedAt.toString(),
                     "adheringLabels": donation.adheringLabels.toString(),
                     "allocatedToCauses": donation.allocatedToCauses,
+                    "allocationBreakdown": JSON.stringify(donation.allocationBreakdown),
                     "unallocatedToCauses": donation.unallocatedToCauses,
                     "causeName": donation.causeName,
                     "causeRegion": donation.causeRegion,
@@ -193,6 +219,7 @@ class DonationEngine {
             donationId,
             loggedAt,
             syncStatus,
+            allocationBreakdown,
             status,
             adheringLabels,
             allocatedToCauses,
@@ -235,7 +262,7 @@ class DonationEngine {
             adheringLabels: adheringLabels.split(','),
             allocatedToCauses: Number(allocatedToCauses),
             unallocatedToCauses: Number(unallocatedToCauses),
-            allocationBreakdown: null,
+            allocationBreakdown: JSON.parse(allocationBreakdown),
             causeName: causeName,
             causeRegion: causeRegion as DonationRegion,
             transactionStatus: chargeObject.status.toUpperCase() as TransactionStatus,
@@ -267,10 +294,10 @@ class DonationEngine {
             pmCardExpMonth: paymentMethod == "CARD" ? cardPaymentMethodDetails!.exp_month : null,
             pmCardExpYear: paymentMethod == "CARD" ? cardPaymentMethodDetails!.exp_year : null,
             legacyIdV0: metadataObject["legacyIdV0"],
-            legacyIdV1: metadataObject["legacyIdV1"]
+            legacyIdV1: metadataObject["legacyIdV1"],
+            donorId: null,
         }
 
         return donation
-        
     }
 }

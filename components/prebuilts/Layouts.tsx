@@ -31,11 +31,11 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       if (loggedInUser.data.user) {
         if (isApp) {
           const [donorResponse, donationsResponse] = await Promise.all([
-            callKinshipAPI<Donor>('/api/donor/profile/fetch', {
-              donor_id: loggedInUser.data.user.id,
+            callKinshipAPI<Donor>("/api/v2/donor/fetch_profile", {
+              id: loggedInUser.data.user.id,
             }),
-            callKinshipAPI<Donation[]>('/api/donor/donations/fetch', {
-              donor_email: loggedInUser.data.user.email,
+            callKinshipAPI<Donation[]>('/api/v2/donor/fetch_donations', {
+              email: loggedInUser.data.user.email,
             }),
           ]);
           
