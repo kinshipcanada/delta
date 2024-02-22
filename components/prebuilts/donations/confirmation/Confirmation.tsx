@@ -101,7 +101,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
             </div>
           </dl>
 
-          { showLink && 
+          {/* { showLink && 
           
             <div className="mt-16 border-t border-gray-200 py-6 text-right">
               <Link href={`/receipts/${globalDonation.stripePaymentIntentId}`}>
@@ -111,7 +111,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
                   </a>
               </Link>
             </div>
-          }
+          } */}
         </div>
       </div>
     </div>
@@ -214,7 +214,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
             </div>
           </dl>
 
-          { showLink && 
+          {/* { showLink && 
           
             <div className="mt-16 border-t border-gray-200 py-6 text-right">
               <Link href={`/receipts/${globalDonation.stripePaymentIntentId}`}>
@@ -224,7 +224,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
                   </a>
               </Link>
             </div>
-          }
+          } */}
         </div>
       </div>
     </div>
