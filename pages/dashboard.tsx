@@ -11,7 +11,7 @@ export default function Dashboard() {
 
     return (
         <div>
-            Dashboard, {donor?.first_name}
+            Dashboard, {donor!.donorFirstName}
         </div>
     )
 }
