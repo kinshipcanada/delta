@@ -255,7 +255,7 @@ export class DonationEngine {
         const cardPaymentMethodDetails: Stripe.Charge.PaymentMethodDetails.Card | undefined = chargeObject.payment_method_details.card
 
         const donation: Donation = {
-            id: syncStatus == "synced" ? donationId : "",
+            id: donationId,
             loggedAt: syncStatus == "synced" ? new Date(loggedAt) : new Date(),
             status: status as DonationStatus,
             donatedAt: new Date(chargeObject.created * 1000),
@@ -271,7 +271,7 @@ export class DonationEngine {
             amountChargedInCents: chargeObject.amount_captured,
             feesChargedInCents: balanceTransactionObject ? balanceTransactionObject.fee : -1,
             feesDonatedInCents: Number(feesDonatedInCents),
-            currency: chargeObject.currency as Currency,
+            currency: chargeObject.currency.toUpperCase() as Currency,
             donorFirstName: donorFirstName,
             donorMiddleName: donorMiddleName,
             donorLastName: donorLastName,

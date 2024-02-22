@@ -51,7 +51,7 @@ export class DonorEngine {
         return stripeCustomer.id
     }
     
-    public async createDonorProfile(donor: NoIdDonorProfile) {
+    public async createDonorProfile(donor: Donor) {
         if (donor.stripeCustomerIds.length == 0) {
             const stripeCustomerId = await this.createStripeProfile(donor)
             donor.stripeCustomerIds.push(stripeCustomerId)
@@ -108,6 +108,22 @@ export class DonorEngine {
         }
 
         return donorProfile
+    }
+
+    public async checkIfDonorExists(donorEmail: string): Promise<Boolean> {
+        try {
+            const resp = await this.prismaClient.donor.findFirstOrThrow({
+                where: {
+                    donorEmail
+                },
+            })
+    
+            console.log(resp)
+
+            return true
+        } catch (error) {
+            return false
+        }
     }
 
     async fetchDonationsForDonor(donorEmail: string): Promise<Donation[]> {

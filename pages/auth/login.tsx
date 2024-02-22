@@ -29,10 +29,10 @@ export default function Register() {
 		})
 
 		if (error) {
-			setError(error instanceof Error && error.message ? error.message : "Sorry, something went wrong creating your account")
+			setError(error instanceof Error && error.message ? error.message : "Sorry, something went wrong logging into your account")
 		} else {
 			triggerAuthReload(!authReloadStatus)
-			router.push('/app')
+			router.push('/dashboard')
 		}
 
 		setLoading(false)

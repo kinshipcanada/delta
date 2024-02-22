@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Donation } from "../../../lib/classes/donation"
+import { Donation } from "@prisma/client"
 
 const WireTransferInstructions: FC<{ globalDonation: Donation }> = ({ globalDonation }) => {
     return (

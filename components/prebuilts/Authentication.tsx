@@ -1,13 +1,11 @@
 // AuthContext.tsx
+import { Donor } from '@prisma/client';
 import { createContext, useContext, ReactNode } from 'react';
-import { Donor } from '../../lib/classes/donor';
-import { Donation } from '../../lib/classes/donation';
 
 type AuthContextType = {
   donor?: Donor;
   authReloadStatus: boolean;
   triggerAuthReload: (value: boolean) => void;
-  donorDonations: Donation[];
   authContextLoading: boolean;
 };
 
@@ -17,8 +15,8 @@ type AuthProviderContextType = AuthContextType & {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderContextType> = ({ donor, authReloadStatus, triggerAuthReload, donorDonations, authContextLoading, children }) => {
-  return <AuthContext.Provider value={{ donor, authReloadStatus, triggerAuthReload, donorDonations, authContextLoading }}>{children}</AuthContext.Provider>;
+export const AuthProvider: React.FC<AuthProviderContextType> = ({ donor, authReloadStatus, triggerAuthReload, authContextLoading, children }) => {
+  return <AuthContext.Provider value={{ donor, authReloadStatus, triggerAuthReload, authContextLoading }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

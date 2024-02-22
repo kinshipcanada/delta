@@ -18,40 +18,51 @@ const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABL
 export default function Donate() {
     const donationId = uuidv4();
     const [step, setStep] = useState<DonationStep>(DonationStep.AmountAndBilling);
+
     const [globalDonation, setGlobalDonation] = useState<Donation>({
-        identifiers: {
-            donation_id: donationId,
-            donor_id: undefined,
-        },
-        donor: {
-            first_name: "",
-            last_name: "",
-            email: "",
-            address: {
-                line_address: "",
-                postal_code: "",
-                city: "",
-                state: states_and_provinces["ca"][0].value,
-                country: "ca"
-            },
-            admin: false,
-            set_up: false,
-            stripe_customer_ids: []
-        },
-        causes: [
-            // By default, your donation can go anywhere
-            {
-                one_way: false,
-                label: "Anywhere",
-            }
+        id: uuidv4(),
+        loggedAt: new Date(),
+        status: "PROCESSING",
+        donatedAt: new Date(),
+        adheringLabels: [
+            "V3_STRIPE_PAYMENT"
         ],
-        amount_in_cents: 0,
-        fees_covered: 0,
-        fees_charged_by_stripe: 0, // This will be filled in based on the type of card they pay with, by the post-payment Stripe webhook
-        date_donated: new Date(),
-        proof: [],
-        transaction_details: undefined,
-        donation_details: undefined
+        allocatedToCauses: 0,
+        unallocatedToCauses: 0,
+        allocationBreakdown: { v3Causes: [] },
+        causeName: null,
+        causeRegion: "ANYWHERE",
+        transactionStatus: "PENDING",
+        amountDonatedInCents: 0,
+        amountRefunded: 0,
+        amountChargedInCents: 0,
+        feesChargedInCents: 0,
+        feesDonatedInCents: 0,
+        currency: "CAD",
+        donorId: null,
+        donorFirstName: "",
+        donorMiddleName: null,
+        donorLastName: "",
+        donorEmail: "",
+        donorAddressLineAddress: "",
+        donorAddressCity: "",
+        donorAddressState: "ON",
+        donorAddressCountry: "CA",
+        donorAddressPostalCode: "",
+        billingAddressPostalCode: "",
+        stripeCustomerId: null,
+        stripePaymentIntentId: null,
+        stripePaymentMethodId: null,
+        stripeChargeId: null,
+        stripeBalanceTxnId: null,
+        paymentMethodType: "CARD",
+        pmCardFunding: null,
+        pmCardBrand: null,
+        pmCardLast4: null,
+        pmCardExpMonth: null,
+        pmCardExpYear: null,
+        legacyIdV0: null,
+        legacyIdV1: null
     });
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed)
     const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);

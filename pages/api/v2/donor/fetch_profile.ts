@@ -12,8 +12,8 @@ export default async function handler(
     try {
         const payload = req.body as FetchDonorProfileProps
         const donorEngine = new DonorEngine()
-        const profile = await donorEngine.fetchDonorProfile(payload)
-        return res.status(200).send({ profile })
+        const donor = await donorEngine.fetchDonorProfile(payload)
+        return res.status(200).send(donor)
     } catch (error) {
         Sentry.captureException(error)
         console.error(error)
