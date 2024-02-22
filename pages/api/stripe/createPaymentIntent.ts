@@ -6,12 +6,34 @@ import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
+import { Donation, DonationStatus } from '@prisma/client';
+import { DonorEngine } from '@lib/methods/donors';
 
-const requestSchema = z.object({
-    donation: DonationSchema,
-})
-
-export type ApiStripeCreatePaymentIntentRequestSchema = z.infer<typeof requestSchema>
+const createDonationMetadata = (donation: Donation) => {
+    return {
+        donationId: donation.id,
+        loggedAt: new Date().toDateString(),
+        syncStatus: "unsynced",
+        allocationBreakdown: JSON.stringify({ v2Causes: [] }),
+        status: DonationStatus.PROCESSING,
+        adheringLabels: JSON.stringify(donation.adheringLabels),
+        allocatedToCauses: donation.allocatedToCauses,
+        unallocatedToCauses: donation.unallocatedToCauses,
+        causeName: donation.causeName,
+        causeRegion: donation.causeRegion,
+        amountDonatedInCents: donation.amountDonatedInCents,
+        feesDonatedInCents: donation.feesDonatedInCents,
+        donorFirstName: donation.donorFirstName,
+        donorMiddleName: donation.donorMiddleName,
+        donorLastName: donation.donorLastName,
+        donorEmail: donation.donorEmail,
+        donorAddressLineAddress: donation.donorAddressLineAddress,
+        donorAddressCity: donation.donorAddressCity,
+        donorAddressState: donation.donorAddressState,
+        donorAddressCountry: donation.donorAddressCountry,
+        donorAddressPostalCode: donation.donorAddressCountry,
+    }
+}
 
 /**
  * @description Fetches a donors profile
@@ -20,13 +42,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-    const parsedRequest = requestSchema.safeParse(req.body);
 
-    if (!parsedRequest.success) {
-        Sentry.captureException("Invalid payload")
-        const response: ObjectIdApiResponse = { error: 'Invalid payload' }
-        return res.status(400).send(response);
-    }
+    const donation: Donation = req.body.donation
 
     try {
 
@@ -36,22 +53,34 @@ export default async function handler(
 
         let stripeCustomerId: string;
 
-        if (parsedRequest.data.donation.donor.stripe_customer_ids.length > 0) {
+        if (donation.stripeCustomerId) {
             // Get the first stripe customer id to use for this donor
-            stripeCustomerId = parsedRequest.data.donation.donor.stripe_customer_ids[0]
+            stripeCustomerId = donation.stripeCustomerId
         } else {
             // If there is no created customer_id, see if we can fetch one from stripe, otherwise create one.
             // We have to do this, because we can't attach a billing address or customer objects directly to Stripe payment intents, just the id as a string
-            stripeCustomerId = await createStripeCustomerIfNotExists(parsedRequest.data.donation.donor)
+            const donorEngine = new DonorEngine()
+            stripeCustomerId = await donorEngine.createStripeProfile({
+                donorFirstName: donation.donorFirstName,
+                donorMiddleName: donation.donorMiddleName,
+                donorLastName: donation.donorLastName,
+                donorEmail: donation.donorEmail,
+                donorAddressLineAddress: donation.donorAddressLineAddress,
+                donorAddressCity: donation.donorAddressCity,
+                donorAddressState: donation.donorAddressState,
+                donorAddressCountry: donation.donorAddressCountry,
+                donorAddressPostalCode: donation.donorAddressPostalCode,
+                stripeCustomerIds: []
+            })
         }
 
         const paymentIntent = await stripeClient.paymentIntents.create({
-            amount: parseInt(parsedRequest.data.donation.amount_in_cents.toString()),
+            amount: donation.amountChargedInCents,
             // Causes is added here for backwards compatability
-            metadata: { ...convertChildrenToStrings({ ...parsedRequest.data.donation }) },
+            metadata: createDonationMetadata(donation),
             customer: stripeCustomerId,
             currency: 'cad',
-            receipt_email: parsedRequest.data.donation.donor.email,
+            receipt_email: donation.donorEmail,
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {
@@ -72,6 +101,7 @@ export default async function handler(
         }
         res.status(200).send(response);
     } catch (error) {
+        console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
         Sentry.captureException(error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);

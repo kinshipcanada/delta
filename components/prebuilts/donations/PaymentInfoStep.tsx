@@ -1,7 +1,7 @@
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useState, FC, useRef } from "react";
 import { ConfirmationType, DonationStep } from "./helpers/types";
-import { Donation } from "../../../lib/classes/donation";
+import { Donation } from "@prisma/client";
 import { callKinshipAPI } from "../../../lib/utils/helpers";
 import GoBackHelper from "./helpers/GoBackButton";
 import { Alert, BaseHeader, Button, ButtonSize, ButtonStyle, CheckboxInput, EventColors, InlineLink, Loading, LoadingColors, SpacerSize, Text, VerticalSpacer } from "../../primitives";
@@ -65,11 +65,8 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
             } else {
                 setGlobalDonation({
                     ...globalDonation,
-                    identifiers: {
-                        ...globalDonation.identifiers,
-                        stripe_payment_intent_id: response.paymentIntent.id,
-                        stripe_payment_method_id: response.paymentIntent.payment_method!.toString()
-                    }
+                    stripePaymentIntentId: response.paymentIntent.id,
+                    stripePaymentMethodId: response.paymentIntent.payment_method!.toString()
                 })
 
                 if (response.paymentIntent.status == "succeeded") {
@@ -92,14 +89,14 @@ const PaymentInfoStep: FC<{ globalDonation: Donation, stripeClientSecret: string
         const paymentElementOptions: StripePaymentElementOptions = {
             defaultValues: {
                 billingDetails: {
-                    name: `${globalDonation.donor.first_name} ${globalDonation.donor.last_name}`,
-                    email: globalDonation.donor.email,
+                    name: `${globalDonation.donorFirstName} ${globalDonation.donorMiddleName && globalDonation.donorMiddleName} ${globalDonation.donorLastName}`,
+                    email: globalDonation.donorEmail,
                     address: {
-                      country: globalDonation.donor.address.country,
-                      postal_code: globalDonation.donor.address.postal_code,
-                      state: globalDonation.donor.address.state,
-                      city: globalDonation.donor.address.city,
-                      line1: globalDonation.donor.address.line_address
+                      country: globalDonation.donorAddressCountry,
+                      postal_code: globalDonation.donorAddressPostalCode,
+                      state: globalDonation.donorAddressState,
+                      city: globalDonation.donorAddressCity,
+                      line1: globalDonation.donorAddressLineAddress
                     }
                 }
             }

@@ -10,6 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Donor {
+  id        String   @id @default(uuid())
+  donorFirstName            String
+  donorMiddleName String?
+  donorLastName             String
+  donorEmail                String
+  donorAddressLineAddress String
+  donorAddressCity         String
+  donorAddressState        String
+  donorAddressCountry      Country @default(CA)
+  donorAddressPostalCode  String
+  stripeCustomerIds String[]
+  donations Donation[]
+}
+
 model Donation {
   id        String   @id @default(uuid())
   loggedAt DateTime @default(now())
@@ -37,6 +52,8 @@ model Donation {
   currency             Currency @default(CAD)
 
   // Donor details
+  donorId String?
+  donor   Donor? @relation(fields: [donorId], references: [id])
   donorFirstName            String
   donorMiddleName String?
   donorLastName             String

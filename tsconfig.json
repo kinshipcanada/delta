@@ -12,6 +12,7 @@
       "esnext"
     ],
     "allowJs": true,
+    "strictNullChecks": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -29,7 +30,7 @@
     "**/*.ts",
     "**/*.tsx",
     "components/NavBar.jsx"
-, "pages/api__/donor/profile/create.js", "components/core/Typography.jsx"  ],
+, "pages/api__/donor/profile/create.js", "components/core/Typography.jsx", "pages/campaigns/ramadhan.jsx"  ],
   "exclude": [
     "node_modules"
   ]

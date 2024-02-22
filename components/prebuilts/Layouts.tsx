@@ -8,8 +8,8 @@ import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
-import { Donor } from '../../lib/classes/donor';
-import { Donation } from '../../lib/classes/donation';
+import { Donor } from '@prisma/client';
+import { Donation } from '@prisma/client';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
 import { DonorApiResponse } from '@lib/classes/api';
@@ -31,22 +31,16 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       if (loggedInUser.data.user) {
         if (isApp) {
           const [donorResponse, donationsResponse] = await Promise.all([
-            callKinshipAPI<Donor>('/api/donor/profile/fetch', {
-              donor_id: loggedInUser.data.user.id,
+            callKinshipAPI<Donor>("/api/v2/donor/fetch_profile", {
+              id: loggedInUser.data.user.id,
             }),
-            callKinshipAPI<Donation[]>('/api/donor/donations/fetch', {
-              donor_email: loggedInUser.data.user.email,
+            callKinshipAPI<Donation[]>('/api/v2/donor/fetch_donations', {
+              email: loggedInUser.data.user.email,
             }),
           ]);
           
           if (donorResponse.data) {
-            if (donorResponse.data!.set_up == false && router.pathname != '/app/setup') {
-              setShouldRedirect(true); // Set the redirect state
-              router.push('/app/setup');
-              return
-            } else {
-              setDonor(donorResponse.data)
-            }
+            setDonor(donorResponse.data)
           }
 
           if (donationsResponse.data) {
@@ -54,14 +48,13 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
           }
           
         } else {
-          const donorResponse: DonorApiResponse = await callKinshipAPI<Donor>('/api/donor/profile/fetch', {
-            donor_id: loggedInUser.data.user.id,
+          const donorResponse = await callKinshipAPI<Donor>("/api/v2/donor/fetch_profile", {
+            id: loggedInUser.data.user.id,
           })
-
-          if (donorResponse.error) {
-            console.error("Something went wrong loading this donor")
-          } else {
-            setDonor(donorResponse.data);
+            
+          
+          if (donorResponse) {
+            setDonor(donorResponse.data)
           }
         }
       } else {
@@ -82,10 +75,10 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     setupAuthContext();
   }, [supabase, authReloadStatus]);
 
-  const isApp = router.pathname.split("/").length > 1 && router.pathname.split("/")[1] == "app"
+  const isApp = router.pathname == "/dashboard"
 
   return (
-    <AuthProvider donor={donor} authReloadStatus={authReloadStatus} triggerAuthReload={triggerAuthReload} donorDonations={donations} authContextLoading={authContextLoading}>
+    <AuthProvider donor={donor} authReloadStatus={authReloadStatus} triggerAuthReload={triggerAuthReload} authContextLoading={authContextLoading}>
       <Head>
         <title>Kinship Canada</title>
       </Head>
@@ -106,7 +99,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
               <div className='flex-grow'>
                 <div className="p-10 grid grid-cols-4 gap-12">
-                  <AppNavigation adminEnabled={donor.admin} />
+                  <AppNavigation adminEnabled={false} />
                   <div className="col-span-3">
                     {children}
                   </div>
@@ -142,65 +135,57 @@ export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }
           <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
             <dl>
               <dt className="text-sm font-medium">Amount Donating</dt>
-              <dd className="mt-1 mb-4 text-3xl font-bold tracking-tight text-slate-600">${globalDonation ? centsToDollars(globalDonation.amount_in_cents) : 0.00}</dd>
+              <dd className="mt-1 mb-4 text-3xl font-bold tracking-tight text-slate-600">${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents) : 0.00}</dd>
             </dl>
 
             <dl className="space-y-6 border-t border-slate-800 border-opacity-10 pt-6 text-sm font-medium">
               <div className="flex items-center justify-between">
                 <dt>Tax Receipt Eligibility</dt>
                 <dd>
-                  {globalDonation && globalDonation.donor ? (
+                  {globalDonation.donorAddressCountry == "CA" ? (
                     <span className='flex items-center'>
-                      {globalDonation.donor.address.country.toLowerCase() === "ca" ? (
-                        <>
-                          <CheckCircleIcon className='w-5 h-5 text-green-500 mr-1' />
-                          Eligible (issued immediately)
-                        </>
-                      ) : (
-                        <>
-                          <XCircleIcon className='w-5 h-5 text-red-500 mr-1' />
-                          Ineligible
-                        </>
-                      )}
+                      <CheckCircleIcon className='w-5 h-5 text-green-500 mr-1' />
+                      Eligible (issued immediately)
                     </span>
                   ) : (
                     <span className='flex items-center'>
-                      <ClockIcon className='w-5 h-5 text-slate-500 mr-1' />
-                      Pending (eligibility is based on region)
+                      <XCircleIcon className='w-5 h-5 text-red-500 mr-1' />
+                      Ineligible (Tax Receipts only available in Canada)
                     </span>
                   )}
                 </dd>
               </div>                  
                
-              <div className="flex items-center justify-between">
-                <dt>Receipt Will Be Issued To</dt>
-                <dd className='flex items-center'>
-                  <UserIcon className='w-5 h-5 text-blue-600 mr-1' />
-                  {globalDonation && globalDonation.donor ? `${globalDonation.donor.first_name} ${globalDonation.donor.last_name}` : ""}
-                </dd>
-              </div>
-
-              {globalDonation && (globalDonation.causes.length > 1) && (
+              {globalDonation && (globalDonation.donorFirstName.length > 0 || globalDonation.donorLastName.length > 0) && (
                 <div className="flex items-center justify-between">
-                  <dt>Special Requests</dt>
-                  <dd>
-                    <span className='flex items-center'>
-                      <InformationCircleIcon className='w-5 h-5 text-slate-600 mr-1' />
-                      {generateDonationCausesString(globalDonation.causes)}
-                    </span>
+                  <dt>Receipt Will Be Issued To</dt>
+                  <dd className='flex items-center'>
+                    <UserIcon className='w-5 h-5 text-blue-600 mr-1' />
+                    {globalDonation.donorFirstName} {globalDonation.donorLastName}
                   </dd>
                 </div>
               )}
 
-              
+              {/**
+               * {globalDonation && (globalDonation.adheringLabels > 1) && (
+                <div className="flex items-center justify-between">
+                  <dt>Special Requests</dt>
+                  {/* <dd>
+                  FIX BEFORE DEPLOY
+                    <span className='flex items-center'>
+                      <InformationCircleIcon className='w-5 h-5 text-slate-600 mr-1' />
+                      {generateDonationCausesString(globalDonation.adheringLabels)}
+                    </span>
+                  </dd> */}
+
               <div className="flex items-center justify-between">
                 <dt>Credit Card Processing Fees</dt>
-                <dd>${globalDonation ? centsToDollars(globalDonation.amount_in_cents * 0.029) : 0.00}</dd>
+                <dd>${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents * 0.029) : 0.00}</dd>
               </div>
 
               <div className="flex items-center justify-between border-t border-slate-800 border-opacity-10 pt-6 text-slate-600">
                 <dt className="text-base">Total</dt>
-                <dd className="text-base">${globalDonation ? centsToDollars(globalDonation.amount_in_cents * 0.029 + globalDonation.amount_in_cents) : 0.00}</dd>
+                <dd className="text-base">${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents * 0.029 + globalDonation.amountDonatedInCents) : 0.00}</dd>
               </div>
             </dl>
           </div>

@@ -1,6 +1,6 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
-import { Donation, DonationSchema } from "../../../lib/classes/donation"
+import { Country, Donation } from "@prisma/client"
 import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
@@ -8,23 +8,20 @@ import { countries, states_and_provinces } from "../../../lib/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 import { ObjectIdApiResponse } from "@lib/classes/api"
-import { ApiStripeCreatePaymentIntentRequestSchema } from "pages/api/stripe/createPaymentIntent"
 import { Cause } from "@lib/classes/causes"
 import { CountryCode } from "@lib/classes/utils"
+import { v4 as uuidv4 } from 'uuid'
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
     const { donor } = useAuth()
 
     useEffect(()=>{
         if (donor) {
-            setGlobalDonation({
-                ...globalDonation,
-                identifiers: {
-                    ...globalDonation.identifiers,
-                    donor_id: donor.donor_id
-                },
-                donor: donor
-            })
+            // setGlobalDonation({
+            //     ...globalDonation,
+            //     donor: donor
+            // })
+            console.log('donor is logged in')
         }
     }, [donor])
 
@@ -61,11 +58,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             // Validate that there is a valid amount being donated
             try {
-                if (!isFloatOrInteger(globalDonation.amount_in_cents)) {
+                if (!isFloatOrInteger(globalDonation.amountDonatedInCents)) {
                     throw new Error("Enter a valid amount to donate")
                 }
 
-                const amountDonatedInCents = parseFloat(String(globalDonation.amount_in_cents)) * 100
+                const amountDonatedInCents = globalDonation.amountDonatedInCents
 
                 if (amountDonatedInCents < 500) {
                     // We require a minimum of $5 because there are fixed costs associated with credit card fees
@@ -87,7 +84,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 return
             }
 
-            if (!validateEmail(globalDonation.donor.email)) {
+            if (!validateEmail(globalDonation.donorEmail)) {
                 setError({
                     title: "invalid email",
                     message: "Please enter a valid email"
@@ -106,15 +103,13 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 return
             }
 
-            if (isImam) { globalDonation.causes.push(imamDonation) }
-            if (isSadat) { globalDonation.causes.push(sadatDonation) }
-            if (isSadaqah) { globalDonation.causes.push(sadaqahDonation) }
+            if (isImam) { globalDonation.adheringLabels.push("IMAM_DONATION") }
+            if (isSadat) { globalDonation.adheringLabels.push("SADAT_DONATION") }
+            if (isSadaqah) { globalDonation.adheringLabels.push("SADAQAH_DONATION") }
 
-            const createPaymentIntentPayload: ApiStripeCreatePaymentIntentRequestSchema = {
+            const response: ObjectIdApiResponse = await callKinshipAPI<string>('/api/stripe/createPaymentIntent', {
                 donation: globalDonation
-            }
-
-            const response: ObjectIdApiResponse = await callKinshipAPI<string>('/api/stripe/createPaymentIntent', createPaymentIntentPayload)
+            })
 
             if (response.error) {
                 setStep(DonationStep.Error)
@@ -126,7 +121,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             setStripeClientSecret(response.data!)
 
             // Finally, set the next step
-            if (globalDonation.amount_in_cents > 10_000_00) {
+            if (globalDonation.amountDonatedInCents > 10_000_00) {
                 setStep(DonationStep.WireTransferInstructions)
             } else {
                 setStep(DonationStep.PaymentInfo)
@@ -152,7 +147,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                     setGlobalDonation({
                         ...globalDonation,
-                        amount_in_cents: parseInt(dollarsToCents(e.target.value))
+                        amountDonatedInCents: parseInt(dollarsToCents(e.target.value)),
+                        amountChargedInCents: parseInt(String(parseInt(dollarsToCents(e.target.value)) * 1.029))
                     })
                 }}
                 required={true}
@@ -169,14 +165,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     label="First Name"
                     name="userFirstName" 
                     id="userFirstName" 
-                    value={globalDonation.donor.first_name}
+                    value={globalDonation.donorFirstName}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                         setGlobalDonation({
                             ...globalDonation,
-                            donor: {
-                                ...globalDonation.donor,
-                                first_name: e.target.value
-                            }
+                            donorFirstName: e.target.value
                         })
                     }} 
                     required={true} 
@@ -187,14 +180,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     label="Last Name"
                     name="userLastName" 
                     id="userLastName" 
-                    value={globalDonation.donor.last_name}
+                    value={globalDonation.donorLastName}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                         setGlobalDonation({
                             ...globalDonation,
-                            donor: {
-                                ...globalDonation.donor,
-                                last_name: e.target.value
-                            }
+                            donorLastName: e.target.value
                         })
                     }} 
                     required={true} 
@@ -207,14 +197,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 label="Email Address"
                 name="emailAddress" 
                 id="emailAddress" 
-                value={globalDonation.donor.email}
+                value={globalDonation.donorEmail}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
                     setGlobalDonation({
                         ...globalDonation,
-                        donor: {
-                            ...globalDonation.donor,
-                            email: e.target.value
-                        }
+                        donorEmail: e.target.value
                     })
                 }} 
                 required={true} 
@@ -222,7 +209,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
 
             <VerticalSpacer size={SpacerSize.Large} />
 
-            <BaseHeader>Address Information (Will Appear On Receipt)</BaseHeader>
+            <BaseHeader>Address Information</BaseHeader>
             <VerticalSpacer size={SpacerSize.Medium} />
             <TextInput 
                 placeholder="Line Address" 
@@ -230,17 +217,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 label="Line Address"
                 name="lineAddress" 
                 id="lineAddress" 
-                value={globalDonation.donor.address.line_address}
+                value={globalDonation.donorAddressLineAddress}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                     setGlobalDonation({
                         ...globalDonation,
-                        donor: {
-                            ...globalDonation.donor,
-                            address: {
-                                ...globalDonation.donor.address,
-                                line_address: e.target.value
-                            }
-                        }
+                        donorAddressLineAddress: e.target.value
                     })
                 }}
                 required={true} 
@@ -253,39 +234,27 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     label="City"
                     name="city" 
                     id="city" 
-                    value={globalDonation.donor.address.city}
+                    value={globalDonation.donorAddressCity}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                         setGlobalDonation({
                             ...globalDonation,
-                            donor: {
-                                ...globalDonation.donor,
-                                address: {
-                                    ...globalDonation.donor.address,
-                                    city: e.target.value
-                                }
-                            }
+                            donorAddressCity: e.target.value
                         })
                     }}
                     required={true} 
                 />
-                {states_and_provinces[globalDonation.donor.address.country] === null || states_and_provinces[globalDonation.donor.address.country] === undefined ? (
+                {states_and_provinces[globalDonation.donorAddressCountry] === null || states_and_provinces[globalDonation.donorAddressCountry] === undefined ? (
                     <TextInput
                         placeholder="State or Province"
                         type="text"
                         label="State or Province"
                         name="state_or_province"
                         id="state_or_province"
-                        value={globalDonation.donor.address.state}
+                        value={globalDonation.donorAddressState}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setGlobalDonation({
                                 ...globalDonation,
-                                donor: {
-                                    ...globalDonation.donor,
-                                    address: {
-                                        ...globalDonation.donor.address,
-                                        state: e.target.value
-                                    }
-                                }
+                                donorAddressState: e.target.value
                             })
                         }}
                         required={true}
@@ -295,18 +264,12 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                         label="State or Province"
                         name="state_or_province"
                         id="state_or_province"
-                        value={globalDonation.donor.address.state}
-                        options={states_and_provinces[globalDonation.donor.address.country]}
+                        value={globalDonation.donorAddressState}
+                        options={states_and_provinces[globalDonation.donorAddressCountry]}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setGlobalDonation({
                                 ...globalDonation,
-                                donor: {
-                                    ...globalDonation.donor,
-                                    address: {
-                                        ...globalDonation.donor.address,
-                                        state: e.target.value
-                                    }
-                                }
+                                donorAddressState: e.target.value
                             })
                         }}
                         required={true}
@@ -318,17 +281,11 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     label="Postal Code"
                     name="postalCode" 
                     id="postalCode" 
-                    value={globalDonation.donor.address.postal_code}
+                    value={globalDonation.donorAddressPostalCode}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{
                         setGlobalDonation({
                             ...globalDonation,
-                            donor: {
-                                ...globalDonation.donor,
-                                address: {
-                                    ...globalDonation.donor.address,
-                                    postal_code: e.target.value
-                                }
-                            }
+                            donorAddressPostalCode: e.target.value
                         })
                     }} 
                     required={true} 
@@ -339,19 +296,19 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     name="country" 
                     id="country" 
                     options={countries}
-                    value={globalDonation.donor.address.country}
+                    value={globalDonation.donorAddressCountry}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
-                        setGlobalDonation({
-                            ...globalDonation,
-                            donor: {
-                                ...globalDonation.donor,
-                                address: {
-                                    ...globalDonation.donor.address,
-                                    country: e.target.value as CountryCode,
-                                    state: states_and_provinces[e.target.value] ? states_and_provinces[e.target.value][0].value : ""
-                                }
-                            }
-                        })
+                        const countrySelected = e.target.value
+                        const validCountries = Object.values(Country)
+                        if (validCountries.includes(countrySelected.toUpperCase() as any)) {
+                            setGlobalDonation({
+                                ...globalDonation,
+                                donorAddressCountry: countrySelected.toUpperCase() as Country
+                            })
+                        } else {
+                            alert(`Unsupported country: ${countrySelected}`)
+                        }
+                        
                     }}
                     required={true}
                 />

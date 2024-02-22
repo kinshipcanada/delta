@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react"
-import { Donation } from "../../../../lib/classes/donation"
+import { Donation } from "@prisma/client"
 import { ConfirmationType } from "../helpers/types"
 import { InlineLink, SpacerSize, VerticalSpacer } from "../../../primitives"
 import { calculateStripeFee, callKinshipAPI, centsToDollars } from "../../../../lib/utils/helpers"
@@ -16,7 +16,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
 
   const fetchPaymentMethod = async () => {
     const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
-      paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
+      paymentMethodId: globalDonation.stripePaymentMethodId,
     })
 
     setPaymentMethod(paymentMethodResponse.data);
@@ -42,7 +42,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
           <h1 className="text-sm font-medium text-blue-600">Payment successful</h1>
           <p className="mt-2 text-2xl font-bold tracking-tight text-slate-800 sm:text-4xl">Thanks for donating!</p>
           <p className="mt-2 text-base text-gray-500">
-            We appreciate your donation, and will let you know once it is processed. In the meantime, you should receive a {globalDonation.donor.address.country == "ca" ? "CRA-eligible tax " : ""} receipt in your email shortly.
+            We appreciate your donation, and will let you know once it is processed. In the meantime, you should receive a {globalDonation.donorAddressCountry == "CA" ? "CRA-eligible tax " : ""} receipt in your email shortly.
             Once your donation has been distributed, you will also receive a letter containing proof of where your donation went.
           </p>
 
@@ -51,17 +51,17 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
           <dl className="space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-gray-500">
             <div className="flex justify-between">
               <dt>Total Donated</dt>
-              <dd className="text-gray-900">${centsToDollars(globalDonation.amount_in_cents)}</dd>
+              <dd className="text-gray-900">${centsToDollars(globalDonation.amountDonatedInCents)}</dd>
             </div>
 
             <div className="flex justify-between">
               <dt>Credit Card Fees</dt>
-              <dd className="text-gray-900">${centsToDollars(calculateStripeFee(globalDonation.amount_in_cents))}</dd>
+              <dd className="text-gray-900">${centsToDollars(globalDonation.amountChargedInCents - globalDonation.amountDonatedInCents)}</dd>
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900">
               <dt className="text-base">Total Eligible On Tax Receipt</dt>
-              <dd className="text-base">${centsToDollars(globalDonation.amount_in_cents + calculateStripeFee(globalDonation.amount_in_cents))}</dd>
+              <dd className="text-base">${centsToDollars(globalDonation.amountChargedInCents)}</dd>
             </div>
           </dl>
 
@@ -70,9 +70,9 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
               <dt className="font-medium text-gray-900">Donor Address</dt>
               <dd className="mt-2">
                 <address className="not-italic">
-                  <span className="block font-semibold">{globalDonation.donor.first_name} {globalDonation.donor.last_name}</span>
-                  <span className="block">{globalDonation.donor.address.line_address}</span>
-                  <span className="block">{globalDonation.donor.address.city}, {globalDonation.donor.address.state.toUpperCase()} {globalDonation.donor.address.postal_code.toUpperCase()}</span>
+                  <span className="block font-semibold">{globalDonation.donorFirstName} {globalDonation.donorLastName}</span>
+                  <span className="block">{globalDonation.donorAddressLineAddress}</span>
+                  <span className="block">{globalDonation.donorAddressCity}, {globalDonation.donorAddressState.toUpperCase()} {globalDonation.donorAddressPostalCode.toUpperCase()}</span>
                 </address>
               </dd>
             </div>
@@ -104,7 +104,7 @@ const ConfirmedAndReceived: FC<{ globalDonation: Donation }> = ({ globalDonation
           { showLink && 
           
             <div className="mt-16 border-t border-gray-200 py-6 text-right">
-              <Link href={`/receipts/${globalDonation.identifiers.stripe_payment_intent_id}`}>
+              <Link href={`/receipts/${globalDonation.stripePaymentIntentId}`}>
                   <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                   View Tax Receipt
                   <span aria-hidden="true"> &rarr;</span>
@@ -126,7 +126,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
 
   const fetchPaymentMethod = async () => {
     const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
-      paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
+      paymentMethodId: globalDonation.stripePaymentMethodId,
     })
 
     setPaymentMethod(paymentMethodResponse.data!);
@@ -152,7 +152,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
           <h1 className="text-sm font-medium text-blue-600">Thanks for donating!</h1>
           <p className="mt-2 text-2xl font-bold tracking-tight text-slate-800 sm:text-4xl">Your Donation Is Processing</p>
           <p className="mt-2 text-base text-gray-500">
-            We appreciate your donation. In the next 2-5 business days, you should see a withdrawal from your account. As soon as we funds are received, you will be issued and emailed a {globalDonation.donor.address.country == "ca" ? "CRA-eligible tax " : "donation"} receipt.
+            We appreciate your donation. In the next 2-5 business days, you should see a withdrawal from your account. As soon as we funds are received, you will be issued and emailed a {globalDonation.donorAddressCountry == "CA" ? "CRA-eligible tax " : "donation"} receipt.
             Once your donation has been distributed, you will also receive a letter containing proof of where your donation went.
           </p>
 
@@ -161,7 +161,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
           <dl className="space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-gray-500">
             <div className="flex justify-between">
               <dt>Total Donated</dt>
-              <dd className="text-gray-900">${centsToDollars(globalDonation.amount_in_cents)}</dd>
+              <dd className="text-gray-900">${centsToDollars(globalDonation.amountDonatedInCents)}</dd>
             </div>
 
             <div className="flex justify-between">
@@ -174,7 +174,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
 
             <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900">
               <dt className="text-base">Total Eligible On Tax Receipt</dt>
-              <dd className="text-base">${centsToDollars(globalDonation.amount_in_cents)}</dd>
+              <dd className="text-base">${centsToDollars(globalDonation.amountChargedInCents)}</dd>
             </div>
           </dl>
 
@@ -183,9 +183,9 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
               <dt className="font-medium text-gray-900">Donor Address</dt>
               <dd className="mt-2">
                 <address className="not-italic">
-                  <span className="block font-semibold">{globalDonation.donor.first_name} {globalDonation.donor.last_name}</span>
-                  <span className="block">{globalDonation.donor.address.line_address}</span>
-                  <span className="block">{globalDonation.donor.address.city}, {globalDonation.donor.address.state.toUpperCase()} {globalDonation.donor.address.postal_code.toUpperCase()}</span>
+                  <span className="block font-semibold">{globalDonation.donorFirstName} {globalDonation.donorLastName}</span>
+                  <span className="block">{globalDonation.donorAddressLineAddress}</span>
+                  <span className="block">{globalDonation.donorAddressCity}, {globalDonation.donorAddressState.toUpperCase()} {globalDonation.donorAddressPostalCode.toUpperCase()}</span>
                 </address>
               </dd>
             </div>
@@ -217,7 +217,7 @@ const ConfirmedProcessing: FC<{ globalDonation: Donation }> = ({ globalDonation 
           { showLink && 
           
             <div className="mt-16 border-t border-gray-200 py-6 text-right">
-              <Link href={`/receipts/${globalDonation.identifiers.stripe_payment_intent_id}`}>
+              <Link href={`/receipts/${globalDonation.stripePaymentIntentId}`}>
                   <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                   View Tax Receipt
                   <span aria-hidden="true"> &rarr;</span>
@@ -238,7 +238,7 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
 
   const fetchPaymentMethod = async () => {
     const paymentMethodResponse = await callKinshipAPI<any>('/api/stripe/fetchPaymentMethod', {
-      paymentMethodId: globalDonation.identifiers.stripe_payment_method_id,
+      paymentMethodId: globalDonation.stripePaymentMethodId,
     })
 
     setPaymentMethod(paymentMethodResponse.data);
@@ -265,7 +265,7 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
           <dl className="space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-gray-500">
             <div className="flex justify-between">
               <dt>Total Donating</dt>
-              <dd className="text-gray-900">${centsToDollars(globalDonation.amount_in_cents)}</dd>
+              <dd className="text-gray-900">${centsToDollars(globalDonation.amountDonatedInCents)}</dd>
             </div>
 
             <div className="flex justify-between">
@@ -278,7 +278,7 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
 
             <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900">
               <dt className="text-base">Total Eligible On Tax Receipt</dt>
-              <dd className="text-base">${centsToDollars(globalDonation.amount_in_cents)}</dd>
+              <dd className="text-base">${centsToDollars(globalDonation.amountChargedInCents)}</dd>
             </div>
           </dl>
 
@@ -287,9 +287,9 @@ const FurtherStepsRequired: FC<{ globalDonation: Donation }> = ({ globalDonation
               <dt className="font-medium text-gray-900">Donor Address</dt>
               <dd className="mt-2">
                 <address className="not-italic">
-                  <span className="block font-semibold">{globalDonation.donor.first_name} {globalDonation.donor.last_name}</span>
-                  <span className="block">{globalDonation.donor.address.line_address}</span>
-                  <span className="block">{globalDonation.donor.address.city}, {globalDonation.donor.address.state.toUpperCase()} {globalDonation.donor.address.postal_code.toUpperCase()}</span>
+                  <span className="block font-semibold">{globalDonation.donorFirstName} {globalDonation.donorLastName}</span>
+                  <span className="block">{globalDonation.donorAddressLineAddress}</span>
+                  <span className="block">{globalDonation.donorAddressCity}, {globalDonation.donorAddressState.toUpperCase()} {globalDonation.donorAddressPostalCode.toUpperCase()}</span>
                 </address>
               </dd>
             </div>

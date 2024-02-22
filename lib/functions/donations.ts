@@ -50,6 +50,7 @@ export const createDonation2 = async (identifiers: DonationIdentifiers): Promise
         stripePaymentMethodId: rawStripeData.payment_method!.id,
         paymentMethodType: PaymentMethodType.CARD,
         causeName: null,
+        donorId: null,
         donorMiddleName: null,
         stripeBalanceTxnId: null,
         pmCardFunding: null,
