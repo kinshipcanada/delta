@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import Navigation from './Navigation';
 import Footer from './Footer';
-import { AppNavigation } from './app/Navigation';
 import { useState, useEffect, ReactNode, FC } from 'react';
 import { callKinshipAPI, centsToDollars, supabase } from '../../lib/utils/helpers';
 import { useRouter } from 'next/router';
@@ -88,7 +87,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
           <div className=''>
             {authContextLoading || shouldRedirect || !donor ? (
-                <div className='flex-grow content-center items-center justify-center w-screen'>
+                <div className='p-48 flex-grow content-center items-center justify-center w-screen'>
                   <CenterOfPageBox>
                     <Loading color={LoadingColors.Blue} />
                   </CenterOfPageBox>
@@ -98,12 +97,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
               :
 
               <div className='flex-grow'>
-                <div className="p-10 grid grid-cols-4 gap-12">
-                  <AppNavigation adminEnabled={false} />
-                  <div className="col-span-3">
-                    {children}
-                  </div>
-                </div>
+                  {children}
               </div>
             }
           </div>

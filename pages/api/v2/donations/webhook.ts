@@ -16,7 +16,7 @@ export default async function handler(
         const donation: Donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
         const notificationEngine = new NotificationEngine()
         await notificationEngine.emailDonationReceipt(donation)
-        return res.status(200).send({ donation })
+        return res.status(200).send({ data: donation })
     } catch (error) {
         console.error(error)
         Sentry.captureException(error)

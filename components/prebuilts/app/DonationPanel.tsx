@@ -12,10 +12,9 @@ import { HorizontalSpacer } from "../../primitives/Spacer";
 import { ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../primitives/types";
 import { BoldText, Text } from "../../primitives/Typography";
 import { JustifyEnd } from "../../primitives/Utils";
+import { Donation as PrismaDonation } from "@prisma/client";
 
 export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) => {
-
-    
     return (
         <PanelWithFooter
             footer={
@@ -77,6 +76,77 @@ export const DonationPanel: React.FC<{ donation: Donation }> = ({ donation }) =>
                     </BoldText>
                     <Text>
                         { parseFrontendDate(donation.date_donated) }
+                    </Text>
+                </div>
+            </dl>                
+
+        </PanelWithFooter>
+    )
+}
+
+
+export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation }> = ({ donation }) => {
+    return (
+        <PanelWithFooter
+            footer={
+                <JustifyEnd>
+                    <Button text="View Receipt &rarr;" style={ButtonStyle.Primary} href={`${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}`}></Button>
+                </JustifyEnd>
+            }
+        >
+            <dl className="divide-y space-y-4 divide-gray-100">
+                <div className="w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <UserCircleIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
+                        Donor
+                    </BoldText>
+                    <Text>
+                        { donation.donorFirstName } {donation.donorMiddleName ? donation.donorMiddleName : ""} { donation.donorLastName }
+                    </Text>
+                </div>
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <CurrencyDollarIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
+                        Amount Donated
+                    </BoldText>
+                    <Text>
+                        ${ centsToDollars(donation.amountChargedInCents) }
+                        <HorizontalSpacer size={SpacerSize.Small} />
+                        <Badge text={donation.donorAddressCountry == "CA" ? "Tax Receipt" : "Donation Receipt"} style={Style.Outlined} color={donation.donorAddressCountry == "CA" ? EventColors.Success : EventColors.Neutral } />
+                    </Text>
+                </div>
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <EnvelopeIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
+                        Status
+                    </BoldText>
+                    <Text>
+                        {
+                            donation.status == "PROCESSING" ?
+                            <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+
+                            : donation.status == "DELIVERED_TO_PARTNERS" ?
+                            <Badge text="Delivered To Partners" style={Style.Filled} color={EventColors.Info} />
+
+                            : donation.status == "PARTIALLY_DISTRIBUTED" ?
+                            <Badge text="Partial Proof Available" style={Style.Filled} color={EventColors.Success} />
+
+                            : donation.status == "FULLY_DISTRIBUTED" ?
+                            <Badge text="Full Proof Available" style={Style.Filled} color={EventColors.Success} />
+
+                            : <Badge text="Donation Processing..." style={Style.Filled} color={EventColors.Neutral} />
+                        }
+                        
+                    </Text>
+                </div>
+                
+                <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
+                    <BoldText>
+                        <CalendarDaysIcon className={`${StandardIconSizing} text-slate-600 mr-2`} />
+                        Date Of Donation
+                    </BoldText>
+                    <Text>
+                        { parseFrontendDate(donation.donatedAt) }
                     </Text>
                 </div>
             </dl>                

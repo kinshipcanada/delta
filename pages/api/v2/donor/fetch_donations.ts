@@ -13,7 +13,7 @@ export default async function handler(
         const payload = req.body.donorEmail as string
         const donorEngine = new DonorEngine()
         const donations = await donorEngine.fetchDonationsForDonor(payload)
-        return res.status(200).send({ donations })
+        return res.status(200).send({ data: donations })
     } catch (error) {
         Sentry.captureException(error)
         console.error(error)

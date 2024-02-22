@@ -27,7 +27,7 @@ export default function Reset() {
                 setError("Sorry, something went wrong. Please try again later")
             });
         
-        router.push('/app')
+        router.push('/dashboard')
         setLoading(false)
     };
 
