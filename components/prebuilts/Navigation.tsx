@@ -62,7 +62,7 @@ export default function Navigation() {
                     donor ? (
                       <Button 
                         text = "My Receipts"
-                        href = "/app"
+                        href = "/dashboard"
                         style={ButtonStyle.Secondary}
                         size={ButtonSize.Standard}
                       />

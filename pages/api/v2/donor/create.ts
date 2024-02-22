@@ -14,7 +14,7 @@ export default async function handler(
         const payload = req.body.donor as Donor
         const donorEngine = new DonorEngine()
         const profile = await donorEngine.createDonorProfile(payload)
-        return res.status(200).send({ profile })
+        return res.status(200).send({ data: profile })
     } catch (error) {
         Sentry.captureException(error)
         console.error(`Error calling api/v2/donor/create: ${error}`)

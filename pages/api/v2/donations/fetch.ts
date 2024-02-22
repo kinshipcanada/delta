@@ -14,7 +14,7 @@ export default async function handler(
         const payload = req.body as FetchDonationProps
         const donationEngine = new DonationEngine()
         const donation: Donation = await donationEngine.fetchDonation(payload)
-        return res.status(200).send({ donation })
+        return res.status(200).send({ data: donation })
     } catch (error) {
         Sentry.captureException(error)
         return res.status(500).send({

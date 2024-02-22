@@ -31,7 +31,7 @@ const createDonationMetadata = (donation: Donation) => {
         donorAddressCity: donation.donorAddressCity,
         donorAddressState: donation.donorAddressState,
         donorAddressCountry: donation.donorAddressCountry,
-        donorAddressPostalCode: donation.donorAddressCountry,
+        donorAddressPostalCode: donation.donorAddressPostalCode,
     }
 }
 

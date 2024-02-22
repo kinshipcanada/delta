@@ -13,7 +13,6 @@ export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnable
     const navigation = [
         { name: 'My Receipts', link: '/app', icon: HomeIcon, current: (path == "/app") },
         { name: 'Account & Billing', link: '/app/account', icon: UserCircleIcon, current: (path == "/app/account") },
-        { name: 'Feedback', link: '/app/feedback', icon: ChatBubbleOvalLeftIcon, current: (path == "/app/feedback") },
     ]
 
     const [signOutLoading, setSignOutLoading] = useState(false)
@@ -37,17 +36,6 @@ export const AppNavigation: React.FC<{ adminEnabled: boolean }> = ({ adminEnable
                     href={'/app/admin'}
                 />
             )}
-            <Button
-                text="Logout"
-                style={ButtonStyle.OutlineUnselected}
-                icon={<ArrowLeftOnRectangleIcon className={`${LargeIconSizing} text-gray-400 group-hover:text-slate-500 flex-shrink-0 -ml-1 mr-3 -mt-0.5`} />}
-                onClick={async () => {
-                    await supabase.auth.signOut()
-                    router.replace("/").then(() => router.reload());
-                }}
-                setter={setSignOutLoading}
-                isLoading={signOutLoading}
-            />
       </nav>
     )
 }
