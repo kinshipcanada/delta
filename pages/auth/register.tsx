@@ -44,9 +44,9 @@ export default function Register() {
 
 			const donorProfile: Donor = {
 				id: data.user.id,
-				donorFirstName: "Shakeel-Abbas",
+				donorFirstName: "",
 				donorMiddleName: null,
-				donorLastName: "Hussein",
+				donorLastName: "",
 				donorEmail: email,
 				donorAddressLineAddress: "43 Matson Drive",
 				donorAddressCity: "Bolton",

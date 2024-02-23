@@ -49,6 +49,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
     const [isImam, setIsImam] = useState<boolean>(false)
     const [isSadat, setIsSadat] = useState<boolean>(false)
     const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
+    const [isRamadhan, setIsRamadhan] = useState<boolean>(false)
 
     const handleDonationDetailsStep = async () => {
         setLoading(true)
@@ -106,6 +107,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             if (isImam) { globalDonation.adheringLabels.push("IMAM_DONATION") }
             if (isSadat) { globalDonation.adheringLabels.push("SADAT_DONATION") }
             if (isSadaqah) { globalDonation.adheringLabels.push("SADAQAH_DONATION") }
+            if (isRamadhan) { globalDonation.adheringLabels.push("RAMADHAN_DONATION") }
 
             const response: ObjectIdApiResponse = await callKinshipAPI<string>('/api/stripe/createPaymentIntent', {
                 donation: globalDonation
@@ -321,7 +323,18 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             <VerticalSpacer size={SpacerSize.Medium} />
 
             <CheckboxInput
-                label="Is this donation Saqadah"
+                label="Is this donation for the Ramadhan Campaign?"
+                checked={isRamadhan}
+                required={false}
+                onChange={(e) => { 
+                    setIsRamadhan(e.target.checked)
+                }}
+            />
+
+            <VerticalSpacer size={SpacerSize.Small} />
+
+            <CheckboxInput
+                label="Is this donation Sadaqah"
                 checked={isSadaqah}
                 required={false}
                 onChange={(e) => { 
@@ -329,7 +342,6 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 }}
             />
 
-            
             <VerticalSpacer size={SpacerSize.Small} />
             
             <CheckboxInput
