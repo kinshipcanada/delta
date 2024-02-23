@@ -77,7 +77,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             try {
 
                 if (selectedPriceTier.ramadhanCampaign == true) {
-                    if (!onBehalfOf) {
+                    if (onBehalfOf.length == 0) {
                         setError({
                             title: "Please list someone to recite on behalf of",
                             message: "Please specify who to recite the Salat, Quran, or Qadha Roza for"
@@ -85,7 +85,9 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                         setLoading(false)
                         return
                     } else {
-                        globalDonation.adheringLabels.push(`ON_BEHALF_OF_${onBehalfOf}`)
+                        for (const sponsored of onBehalfOf) {
+                            globalDonation.adheringLabels.push(`ON_BEHALF_OF_${sponsored}`)
+                        }
                     }
                 } 
 
@@ -167,7 +169,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
     }
 
     const [selectedPriceTier, setSelectedPriceTier] = useState(pricingTiers[3])
-    const [onBehalfOf, setOnBehalfOf] = useState<string>()
+    const [onBehalfOf, setOnBehalfOf] = useState<string[]>([])
+    const [numberSponsoring, setNumberSponsoring] = useState<number>(1)
 
     return (
         <div>
@@ -178,8 +181,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 setSelectedPriceTier(priceTier)
                 setGlobalDonation({
                     ...globalDonation,
-                    amountDonatedInCents: priceTier.amountInCents,
-                    amountChargedInCents: priceTier.amountInCents == 0 ? 0 : parseInt(String(priceTier.amountInCents * 1.029))
+                    amountDonatedInCents: priceTier.amountInCents * numberSponsoring,
+                    amountChargedInCents: priceTier.amountInCents == 0 ? 0 : parseInt(String(priceTier.amountInCents * 1.029 * numberSponsoring))
                 })
             }}>
                 <div className="mt-4  grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
@@ -217,7 +220,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                                     </RadioGroup.Label>
                                 </span>
                             </span>
-                            {/* <CheckCircleIcon
+                            <CheckCircleIcon
                                 className={classNames(!checked ? 'invisible' : '', 'h-5 w-5 text-blue-600')}
                                 aria-hidden="true"
                                 />
@@ -228,7 +231,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                                     'pointer-events-none absolute -inset-px rounded-lg'
                                 )}
                                 aria-hidden="true"
-                            /> */}
+                            />
                         </>
                         )}
                     </RadioGroup.Option>
@@ -237,20 +240,53 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             </RadioGroup>
 
             {selectedPriceTier.ramadhanCampaign == true && (
-                <>
-                    <VerticalSpacer size={SpacerSize.Small} />
+                <div>
+                    <VerticalSpacer size={SpacerSize.Medium} />
+                    <BaseHeader>Ramadhan Donation Details</BaseHeader>
+                    <Label required={false} label={"How many people would you like to sponsor"} htmlFor={"nothing"} />
                     <TextInput
-                        label="On who's behalf?"
-                        placeholder="Your Marhum"
-                        type="text"
-                        name="amount"
-                        id="amount"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
-                            setOnBehalfOf(e.target.value)
+                        placeholder={numberSponsoring == 1 ? "1 person" : `${numberSponsoring} people`}
+                        type="number"
+                        name="numberSponsoring"
+                        value={numberSponsoring}
+                        id="numberSponsoring"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            let numPeople = parseInt(e.target.value)
+                            if (numPeople < 1) {
+                                numPeople = 1
+                            }
+
+                            setGlobalDonation({
+                                ...globalDonation,
+                                amountDonatedInCents: selectedPriceTier.amountInCents * numPeople,
+                                amountChargedInCents: parseInt(String(selectedPriceTier.amountInCents * 1.029 * numPeople))
+                            })
+                            setNumberSponsoring(numPeople)
                         }}
                         required={true}
                     />
-                </>
+
+                    <VerticalSpacer size={SpacerSize.Medium} />
+                    <Label required={true} label={"On who's behalf?"} htmlFor={"nothing2"} />
+                    {
+                        Array.from({ length: numberSponsoring }, (_, index) => (
+                            <TextInput
+                                key={index}
+                                placeholder={`Person ${index + 1}`}
+                                type="text"
+                                name={`onBehalfOf${index}`}
+                                id={`onBehalfOf${index}`}
+                                value={onBehalfOf[index] || ''}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const updatedOnBehalfOf = [...onBehalfOf];
+                                    updatedOnBehalfOf[index] = e.target.value;
+                                    setOnBehalfOf(updatedOnBehalfOf);
+                                }}
+                                required={true}
+                            />
+                        ))
+                    }
+                </div>
             )}
             
             {selectedPriceTier.ramadhanCampaign == false && (
