@@ -1,7 +1,7 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
 import { Country, Donation } from "@prisma/client"
-import { callKinshipAPI, classNames, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
+import { callKinshipAPI, centsToDollars, classNames, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, Label, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
 import { countries, states_and_provinces } from "../../../lib/utils/constants"
@@ -22,10 +22,10 @@ type PriceTier = {
 }
 
 const pricingTiers: PriceTier[] = [
-  { title: 'Quran Recitation ($35)', ramadhanCampaign: true, amountInCents: 3500 },
-  { title: 'Salat (1 Year, $205)', ramadhanCampaign: true, amountInCents: 20500 },
-  { title: 'Qadha Roza (1 Year, $180)', ramadhanCampaign: true, amountInCents: 18000 },
-  { title: 'Custom Amount', ramadhanCampaign: false, amountInCents: 0 },
+  { title: 'Quran Recitation', ramadhanCampaign: true, amountInCents: 3500 },
+  { title: 'Salat (1 Year)', ramadhanCampaign: true, amountInCents: 20500 },
+  { title: 'Qadha Roza (1 Year)', ramadhanCampaign: true, amountInCents: 18000 },
+  { title: 'Choose How Much To Donate', ramadhanCampaign: false, amountInCents: 0 },
 ]
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
@@ -77,7 +77,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             try {
 
                 if (selectedPriceTier.ramadhanCampaign == true) {
-                    if (!onBehalfOf) {
+                    if (onBehalfOf.length == 0) {
                         setError({
                             title: "Please list someone to recite on behalf of",
                             message: "Please specify who to recite the Salat, Quran, or Qadha Roza for"
@@ -85,7 +85,9 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                         setLoading(false)
                         return
                     } else {
-                        globalDonation.adheringLabels.push(`ON_BEHALF_OF_${onBehalfOf}`)
+                        for (const sponsored of onBehalfOf) {
+                            globalDonation.adheringLabels.push(`ON_BEHALF_OF_${sponsored}`)
+                        }
                     }
                 } 
 
@@ -167,7 +169,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
     }
 
     const [selectedPriceTier, setSelectedPriceTier] = useState(pricingTiers[3])
-    const [onBehalfOf, setOnBehalfOf] = useState<string>()
+    const [onBehalfOf, setOnBehalfOf] = useState<string[]>([])
+    const [numberSponsoring, setNumberSponsoring] = useState<number>(1)
 
     return (
         <div>
@@ -178,8 +181,8 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 setSelectedPriceTier(priceTier)
                 setGlobalDonation({
                     ...globalDonation,
-                    amountDonatedInCents: priceTier.amountInCents,
-                    amountChargedInCents: priceTier.amountInCents == 0 ? 0 : parseInt(String(priceTier.amountInCents * 1.029))
+                    amountDonatedInCents: priceTier.amountInCents * numberSponsoring,
+                    amountChargedInCents: priceTier.amountInCents == 0 ? 0 : parseInt(String(priceTier.amountInCents * 1.029 * numberSponsoring))
                 })
             }}>
                 <div className="mt-4  grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
@@ -196,21 +199,26 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     >
                         {({ checked, active }) => (
                         <>
-                            <span className="flex flex-1">
-                            <span className="flex flex-col">
+                            
+                            <span className="flex flex-col w-full">
                                 {(pricingTier.ramadhanCampaign === true) && (
-                                    <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
-                                        <svg className="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
-                                        <circle cx={3} cy={3} r={3} />
-                                        </svg>
-                                        Ramadhan
-                                    </span>
+                                    <div className="flex items-center">
+                                        <span className="mr-2 text-2xl font-bold tracking-tight text-gray-900">${pricingTier.amountInCents/100}</span>
+                                        <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
+                                            <svg className="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
+                                            <circle cx={3} cy={3} r={3} />
+                                            </svg>
+                                            Ramadhan
+                                        </span>
+                                    </div>
                                 )}
-                                
-                                <RadioGroup.Label as="span" className="block mt-2 text-sm font-medium text-gray-900">
-                                {pricingTier.title}
-                                </RadioGroup.Label>
-                            </span>
+                                {(pricingTier.ramadhanCampaign == false) && (<span className="mr-2 text-2xl font-bold tracking-tight text-gray-900">Custom</span>)}
+                                <span className="flex flex-col">
+                                    
+                                    <RadioGroup.Label as="span" className="block mt-2 text-sm font-medium text-gray-900">
+                                    {pricingTier.title}
+                                    </RadioGroup.Label>
+                                </span>
                             </span>
                             <CheckCircleIcon
                                 className={classNames(!checked ? 'invisible' : '', 'h-5 w-5 text-blue-600')}
@@ -231,24 +239,57 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 </div>
             </RadioGroup>
 
-            {selectedPriceTier.title != "Custom Amount" && (
-                <>
-                    <VerticalSpacer size={SpacerSize.Small} />
+            {selectedPriceTier.ramadhanCampaign == true && (
+                <div>
+                    <VerticalSpacer size={SpacerSize.Medium} />
+                    <BaseHeader>Ramadhan Donation Details</BaseHeader>
+                    <Label required={false} label={"How many people would you like to sponsor"} htmlFor={"nothing"} />
                     <TextInput
-                        label="On who's behalf?"
-                        placeholder="Your Marhum"
-                        type="text"
-                        name="amount"
-                        id="amount"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
-                            setOnBehalfOf(e.target.value)
+                        placeholder={numberSponsoring == 1 ? "1 person" : `${numberSponsoring} people`}
+                        type="number"
+                        name="numberSponsoring"
+                        value={numberSponsoring}
+                        id="numberSponsoring"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            let numPeople = parseInt(e.target.value)
+                            if (numPeople < 1) {
+                                numPeople = 1
+                            }
+
+                            setGlobalDonation({
+                                ...globalDonation,
+                                amountDonatedInCents: selectedPriceTier.amountInCents * numPeople,
+                                amountChargedInCents: parseInt(String(selectedPriceTier.amountInCents * 1.029 * numPeople))
+                            })
+                            setNumberSponsoring(numPeople)
                         }}
                         required={true}
                     />
-                </>
+
+                    <VerticalSpacer size={SpacerSize.Medium} />
+                    <Label required={true} label={"On who's behalf?"} htmlFor={"nothing2"} />
+                    {
+                        Array.from({ length: numberSponsoring }, (_, index) => (
+                            <TextInput
+                                key={index}
+                                placeholder={`Person ${index + 1}`}
+                                type="text"
+                                name={`onBehalfOf${index}`}
+                                id={`onBehalfOf${index}`}
+                                value={onBehalfOf[index] || ''}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const updatedOnBehalfOf = [...onBehalfOf];
+                                    updatedOnBehalfOf[index] = e.target.value;
+                                    setOnBehalfOf(updatedOnBehalfOf);
+                                }}
+                                required={true}
+                            />
+                        ))
+                    }
+                </div>
             )}
             
-            {selectedPriceTier.title == "Custom Amount" && (
+            {selectedPriceTier.ramadhanCampaign == false && (
                 <>
                     <VerticalSpacer size={SpacerSize.Small} />
                     <TextInput
