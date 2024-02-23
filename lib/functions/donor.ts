@@ -2,7 +2,6 @@ import { Address } from "../classes/address";
 import { Donor } from "../classes/donor";
 import { fetchDonorFromDatabase, setupDonorInDatabase, updateDonorInDatabase } from "../utils/database";
 import { formatDonorFromDatabase } from "../utils/formatting";
-import { isValidCountryCode } from "../utils/helpers";
 import { validate as verifyUUID } from 'uuid';
 import { createStripeCustomer } from "../utils/stripe";
 import { CountryCode } from "@lib/classes/utils";
@@ -18,9 +17,6 @@ export async function createDonor(
     state: string,
     country: CountryCode
 ): Promise<Donor> {
-    if (!isValidCountryCode(country)) {
-        throw new Error("Invalid country code provided. Please use a valid ISO 3166-1 alpha-2 country code.")
-    }
     
     if (!verifyUUID(donorId)) {
         throw new Error("Invalid donor_id provided. Please provide a valid UUID v4.")
