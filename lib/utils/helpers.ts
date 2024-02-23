@@ -16,10 +16,6 @@ export function cn(...inputs: ClassValue[]) {
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string)
 
-export function isValidCountryCode(countryCode: string): boolean {
-    return countries.some(country => country.value === countryCode);
-}
-
 //const result: ApiResponse<Donation> = await callKinshipAPI3<Donation>('/api/donation', requestData);
 export async function callKinshipAPI<T>(
     url: string,
