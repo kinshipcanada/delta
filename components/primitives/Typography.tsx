@@ -27,7 +27,7 @@ export const AnyText: React.FC<TextProps> = ({
 
 export const BaseHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <h2 className="text-lg font-medium leading-6 text-slate-900">{ children }</h2>
+        <h2 className="text-base font-semibold leading-6 text-slate-900">{ children }</h2>
     )
 }
 

@@ -1,336 +1,344 @@
-import Link from 'next/link'
-import { MoonIcon, PlusCircleIcon, CheckCircleIcon } from 'lucide-react'
-import Head from 'next/head'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast';
+function Ramadhan2() {
+  return (
+    <p>
+      Ramadhan Poverty Relief Campaign
+      Africa/India - we will divide them up equally. Please write names of marhum in the notes section below:
 
-export default function Home() {
+      Quran Recitation - $35.00 - Recited by those in need
+      Salaat for 1 year - $205.00 - recited by sheiks
+      Qadha Roza for 1 year $180.00 - by those in need including sheikhs
+    </p>
+  )
+}
 
-  const [cart, setCart] = useState([]);
+import { CheckCircleIcon } from "@heroicons/react/20/solid"
+import Button from "../../components/primitives/Button"
+import Link from "next/link"
+import { ButtonSize, ButtonStyle } from "../../components/primitives/types"
 
-  const loadCart = async () => {
-    animateValue("familiesSupported", 0, 411, 2000);
-
-    const rawCart = localStorage.getItem("kinship_cart")
-    if (rawCart) {
-        setCart(JSON.parse(rawCart))
-    } else {
-        setCart([])
-    }
+const families = [
+  {
+    name: 'Family 1: Based in India',
+    amount_needed: 10000,
+    description: 'Will receive housing, a water pump, training and support to set up a small business (including a sewing machine for the wife) and school fees for their children for the year',
+    amount_raised: 100,
+    tax_receipt_eligible: true,
+    receives: [
+      'Housing',
+      'Water Pump',
+      'Sewing Machine',
+      'Tuition Fees'
+    ],
+    imageSrc: "/campaigns/vision/8.jpeg",
+    imageAlt: 'A family eating dinner together',
   }
-  useEffect(()=>{
-    loadCart()
-  },[])
+]
 
-  function animateValue(id, start, end, duration) {
-        if (start === end) return;
-        var range = end - start;
-        var current = start;
-        var increment = end > start? 1 : -1;
-        var stepTime = Math.abs(Math.floor(duration / range));
-        var obj = document.getElementById(id);
-        var timer = setInterval(function() {
-            current += increment;
-            obj.innerHTML = current;
-            if (current == end) {
-                clearInterval(timer);
-            }
-        }, stepTime);
-    }
+function FamilyCard({ family }) {
+    return (
+      <Link href = '/donate'><a href={'/donate'}>
+        <div
+          className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
+        >
+          <div className="sm:col-span-4 md:col-span-5 md:row-span-2 md:row-end-2">
+            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-50">
+            <img src={family.imageSrc} alt={family.imageAlt} className="object-cover object-center" />
+            </div>
+            </div>
+            <div className="mt-6 sm:col-span-7 sm:mt-0 md:row-end-1">
+            <h3 className="text-lg font-medium text-gray-900">
+            {family.name}
+            </h3>
+            <p className="mt-1 font-medium text-gray-900">Goal: ${(family.amount_needed).toFixed(2)} CAD</p>
+          <p className="mt-3 text-gray-500">{family.description}</p>
+        </div>
+        <div className="sm:col-span-12 md:col-span-7">
+        <dl className="grid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
+        <div>
+          <dt className="font-medium text-gray-900">Family will recieve</dt>
+          <dd className="mt-3 text-gray-500">
+            { family.receives.map((item) => (
+              <span className="flex items-center">
+                <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+                {item}
+              </span>
+            )) }
+          </dd>
+        </div>
+        </dl>
+        <p className="mt-6 font-medium text-gray-900 md:mt-5 flex items-center">
+        <CheckCircleIcon className="flex-shrink-0 w-4 h-4 text-green-500 mr-1" aria-hidden="true" />
+        Tax receipt eligible
+        </p>
+        </div>
+        </div>
+        </a>
+      </Link>
+    )
+}
 
-
-  const regions = [
-    {
-      "name": "India",
-      "description": "The recommended amount is $100, which will allow a family of 5 to have at least one meal per day for a month.",
-      "imageSource": "/regions/india.png",
-      "defaultAmount": 100.00
-    },
-
-    {
-      "name": "Africa",
-      "description": "The recommended amount is $100, which will allow a family of 5 to have at least one meal per day for a month.",
-      "imageSource": "/regions/africa.png",
-      "defaultAmount": 100.00
-    },
-
-    {
-      "name": "Iraq",
-      "description": "The recommended amount is $100, which will allow a family of 5 to have at least one meal per day for a month",
-      "imageSource": "/regions/iraq.png",
-      "defaultAmount": 100.00
-    },
-
-    {
-      "name": "Community Center",
-      "description": "A donation of $750 will allow a community center to provide meals for people to break their fasts during Ramadhan.",
-      "imageSource": "/campaigns/community-center.png",
-      "defaultAmount": 750.00
-    }
-
-  ]
+export default function Ramadhan() {
 
   return (
-    <div>
-      <Head>
-        <title>Kinship Canada · Ramadhan Campaign</title>
-      </Head>
-      <div className="relative mt-16">
-        <div className="absolute inset-x-0 bottom-0 h-1/2" />
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="relative shadow-xl brightness-50 blur-lg sm:rounded-2xl sm:overflow-hidden">
-            <div className="absolute inset-0">
-              <img
-                className="h-full w-full object-cover brightness-50"
-                src="/frontend/hunger.jpg"
-                alt="Hunger"
+    <div className="bg-white">
+      <main className="isolate">
+        {/* Hero section */}
+        <div className="relative isolate -z-10">
+          <svg
+            className="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern
+                id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84"
+                width={200}
+                height={200}
+                x="50%"
+                y={-1}
+                patternUnits="userSpaceOnUse"
+              >
+                <path d="M.5 200V.5H200" fill="none" />
+              </pattern>
+            </defs>
+            <svg x="50%" y={-1} className="overflow-visible fill-gray-50">
+              <path
+                d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
+                strokeWidth={0}
               />
-              <div className="absolute inset-0 bg-blue-100 mix-blend-multiply" />
-            </div>
-            <div className="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32 lg:px-8">
-                
-              <h1 className="text-center text-4xl font-extrabold sm:text-5xl lg:text-6xl">
-                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                    <MoonIcon className="w-4 h-4 mr-2" />
-                    Ramadhan Campaign
-                </span>
-                <span className="block text-white">Hunger is not about a lack of food.</span>
-                <span className="block text-white">It&apos;s a terrible injustice.</span>
-              </h1>
-              <p className="mt-6 max-w-lg mx-auto text-center text-xl text-white sm:max-w-3xl">
-                Donate today to help ensure that someone can keep one meal on the table. Donations will be sent on the 20th of Shabaan.
-              </p>
-            </div>
+            </svg>
+            <rect width="100%" height="100%" strokeWidth={0} fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)" />
+          </svg>
+          <div
+            className="absolute left-1/2 right-0 top-0 -z-10 -ml-24 transform-gpu overflow-hidden blur-3xl lg:ml-24 xl:ml-48"
+            aria-hidden="true"
+          >
+            <div
+              className="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
+              style={{
+                clipPath:
+                  'polygon(63.1% 29.5%, 100% 17.1%, 76.6% 3%, 48.4% 0%, 44.6% 4.7%, 54.5% 25.3%, 59.8% 49%, 55.2% 57.8%, 44.4% 57.2%, 27.8% 47.9%, 35.1% 81.5%, 0% 97.7%, 39.2% 100%, 35.2% 81.4%, 97.2% 52.8%, 63.1% 29.5%)',
+              }}
+            />
           </div>
-        </div>
-      </div>
-
-
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto py-24 sm:py-32 sm:px-2 lg:px-4">
-          <div className="max-w-2xl mx-auto px-4 lg:max-w-none">
-            <div className="flex sm:flex-row flex-col justify-between">
-                <div className='sm:max-w-2xl'>
-                    <h2 className="font-semibold text-gray-500">Where your donation goes</h2>
-                    <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">What&apos;s actually included?</p>
-                    <p className="mt-4 text-gray-500">Amounts shown per region will provide a months worth of basic rations, including oil, flour, rice, and sugar. You can donate either the suggested amount or a custom amount. All donations are tax receipt eligible.
-                    <br/>Please donate to a maximum of three causes at a time.
-                    </p>
+          <div className="overflow-hidden">
+            <div className="mx-auto max-w-7xl px-6 pb-32 pt-36 sm:pt-60 lg:px-8 lg:pt-32">
+              <div className="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center">
+                <div className="w-full max-w-xl lg:shrink-0 xl:max-w-2xl">
+                  <p className="text-base font-semibold leading-7 text-blue-600">Campaign</p>
+                  <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                    <span className="text-blue-600">Ramadhan</span>  &middot; Poverty Relief Campaign
+                  </h1>
+                  <p className="relative mt-6 text-lg leading-8 text-gray-600 sm:max-w-md lg:max-w-none">
+                    Kinship Canada&apos;s Ramadhan campaign aims to help those in need with your help by providing compensation for the recitation of the Holy Quran, observance of late fasts (Qadha Roza) and prayers on behalf of loved ones.
+                  </p>
+                  <div className="mt-8 space-y-2">
+                    <CheckDetail title="Qur'an Recitation ($35 CAD)" />
+                    <CheckDetail title="Salat For One Year Recited By Sheikhs ($205 CAD)" />
+                    <CheckDetail title="Qadha Roza For One Year ($180 CAD)" />
+                  </div>                      
+                  <div className="mt-8">
+                    <Button text="Make A Donation &rarr;" style={ButtonStyle.Primary} size={ButtonSize.Standard} href={"/donate"} />
+                    <div className="inline-block ml-2" />
+                  </div>
                 </div>
-                <div className='sm:w-1/3 bg-white shadow-xl border-blue-600 border-4 shadow-blue-600 rounded-lg mt-8'>
-                    
-                    <div className="p-10 flex flex-col text-center justify-center content-center">
-                        <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Families Supported So Far</dt>
-                        <dd  id = "familiesSupported" className="order-1 text-5xl font-extrabold text-blue-600">117</dd>
+                <div className="mt-14 flex justify-end gap-8 sm:-mt-44 sm:justify-start sm:pl-20 lg:mt-0 lg:pl-0">
+                  <div className="ml-auto w-44 flex-none space-y-8 pt-32 sm:ml-0 sm:pt-80 lg:order-last lg:pt-36 xl:order-none xl:pt-80">
+                    <div className="relative">
+                      <img
+                        src="/campaigns/vision/6.jpg"
+                        alt=""
+                        className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
                     </div>
-
+                  </div>
+                  <div className="mr-auto w-44 flex-none space-y-8 sm:mr-0 sm:pt-52 lg:pt-36">
+                    <div className="relative">
+                      <img
+                        src="/campaigns/vision/7.png.webp"
+                        alt=""
+                        className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                    </div>
+                    <div className="relative">
+                      <img
+                        src="/campaigns/vision/9.jpg"
+                        alt=""
+                        className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                    </div>
+                  </div>
+                  <div className="w-44 flex-none space-y-8 pt-32 sm:pt-0">
+                    <div className="relative">
+                      <img
+                        src="/campaigns/vision/10.jpg"
+                        alt=""
+                        className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                    </div>
+                    <div className="relative">
+                      <img
+                        src="/campaigns/vision/11.jpg"
+                        alt=""
+                        className="aspect-[2/3] w-full rounded-xl bg-gray-900/5 object-cover shadow-lg"
+                      />
+                      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10" />
+                    </div>
+                  </div>
                 </div>
-                
+              </div>
             </div>
-
-          
-            {regions.map((region)=>(
-              <RegionComponent key={region.name} region={region} cart={cart} setCart={setCart}/>
-            ))}
-
-            </div>
-
-
-          <div className = 'mt-8'>
           </div>
         </div>
-        
+
+        <Example />
+
+        {/* Logo cloud */}
+        <div className="relative isolate -z-10 mt-4 sm:mt-48">
+          <div className="absolute inset-x-0 top-1/2 -z-10 flex -translate-y-1/2 justify-center overflow-hidden [mask-image:radial-gradient(50%_45%_at_50%_55%,white,transparent)]">
+            <svg className="h-[40rem] w-[80rem] flex-none stroke-gray-200" aria-hidden="true">
+              <defs>
+                <pattern
+                  id="e9033f3e-f665-41a6-84ef-756f6778e6fe"
+                  width={200}
+                  height={200}
+                  x="50%"
+                  y="50%"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="translate(-100 0)"
+                >
+                  <path d="M.5 200V.5H200" fill="none" />
+                </pattern>
+              </defs>
+              <svg x="50%" y="50%" className="overflow-visible fill-gray-50">
+                <path d="M-300 0h201v201h-201Z M300 200h201v201h-201Z" strokeWidth={0} />
+              </svg>
+              <rect width="100%" height="100%" strokeWidth={0} fill="url(#e9033f3e-f665-41a6-84ef-756f6778e6fe)" />
+            </svg>
+          </div>
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <h2 className="text-center text-lg font-semibold leading-8 text-gray-900">
+              Backed By Partners On The Ground
+            </h2>
+            <div className="mx-auto mt-10 grid max-w-lg grid-cols-3 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-3 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+              <img
+                className="col-span-2 max-h-24 w-full object-contain lg:col-span-1"
+                src="/partner-logos/desk-and-chair.png"
+                alt="Transistor"
+                width={158}
+                height={48}
+              />
+              <img
+                className="col-span-2 max-h-24 w-full object-contain lg:col-span-1"
+                src="/logo-full-size.png"
+                alt="Reform"
+                width={158}
+                height={48}
+              />
+              <img
+                className="col-span-2 max-h-24 w-full object-contain lg:col-span-1"
+                src="/partner-logos/al-imam.png"
+                alt="Tuple"
+                width={158}
+                height={48}
+              />
+            </div>
+          </div>
+        </div>
+
+
+
+      </main>
+    </div>
+  )
+}
+
+export function CheckDetail({ title, description }) {
+  return (
+    <div className="flex items-start">
+      <div className="flex-shrink-0">
+        <CheckCircleIcon className="w-5 h-5 text-green-600" aria-hidden="true" />
+      </div>
+      <div className="ml-3">
+        <p className="text-base font-medium text-gray-900">{ title }</p>
+        <p className="mt-1 text-base text-gray-500">
+          { description }
+        </p>
       </div>
     </div>
   )
 }
 
-const RegionComponent = ({region, cart, setCart}) => {
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [amount, setAmount] = useState(region.defaultAmount)
 
+
+import { CheckIcon } from '@heroicons/react/20/solid'
+import { InlineLink } from "@components/primitives"
+
+const includedFeatures = [
+  'Private forum access',
+  'Member resources',
+  'Entry to annual conference',
+  'Official member t-shirt',
+]
+
+export function Example() {
   return (
-    <div key={region.name} className="space-y-16 pt-10 mt-10 border-t border-gray-200 sm:pt-16 sm:mt-16">
-      <div
-        className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-8 lg:items-center"
-      >
-        <div className="mt-6 lg:mt-0 lg:col-span-5 xl:col-span-4">
-          <img src ={region.imageSource} className="w-20 mb-3" />
-          <p className="mt-1 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-              {region.name}
-          </p>  
-          <p className="mt-4 text-md text-gray-500">{region.description}</p>
+    <div className="bg-white py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl sm:text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">What you can donate to</h2>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            The following are the causes you can donate to this year with Kinship. To make a donation, <InlineLink href="/donate" text="click here" />.
+          </p>
         </div>
-        <div className="flex-auto lg:col-span-7 xl:col-span-8 mt-4 sm:mt-0">
-
-          <div className="bg-white overflow-hidden shadow border rounded-lg divide-y divide-gray-200">
-          <div className="px-4 py-5 sm:px-6 text-semibold font-medium">
-              Make a donation in {region.name}
+        <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+          <div className="p-8 sm:p-10 lg:flex-auto">
+            <h3 className="text-2xl font-bold tracking-tight text-gray-900">Lifetime membership</h3>
+            <p className="mt-6 text-base leading-7 text-gray-600">
+              Lorem ipsum dolor sit amet consect etur adipisicing elit. Itaque amet indis perferendis blanditiis
+              repellendus etur quidem assumenda.
+            </p>
+            <div className="mt-10 flex items-center gap-x-4">
+              <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">What’s included</h4>
+              <div className="h-px flex-auto bg-gray-100" />
+            </div>
+            <ul
+              role="list"
+              className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6"
+            >
+              {includedFeatures.map((feature) => (
+                <li key={feature} className="flex gap-x-3">
+                  <CheckIcon className="h-6 w-5 flex-none text-indigo-600" aria-hidden="true" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="px-4 py-5 sm:p-6">
-
-              <Form cart={cart} setCart={setCart} region = {region} success={success} setSuccess={setSuccess} loading={loading} setLoading={setLoading} amount={amount} setAmount={setAmount}/>
-
-          </div>
-          </div>
-
-        </div>
-      </div>
-  </div>
-  )
-}
-
-const Form = ({cart, setCart, region, success, setSuccess, loading, setLoading, amount, setAmount}) => {
-
-  const addToCart = (amount, causeId, causeName, eligibleVal, recurringVal, regionVal, intervalVal) => {
-
-		let amountToAdd = amount;
-		let causeToAddID = causeId;
-		let causeToAddName = causeName;
-		let eligible = eligibleVal; 
-		let recurring = recurringVal;
-		let region = regionVal;
-		let interval = intervalVal
-
-		let newItem = {
-			id: causeToAddID,
-			name: causeToAddName,
-			amount: parseFloat(amountToAdd).toFixed(2),
-			eligible: eligible,
-			recurring: recurring,
-			region: region,
-			interval: intervalVal,
-		}
-
-		let state = checkForItem(cart, causeToAddID, recurring)
-
-		if (state == false) {
-			cart.push(newItem);
-		} else {
-			for (var i = 0; i < cart.length; i++) {
-				if (cart[i]['id'] === newItem['id']) {
-				cart[i]['amount'] = (parseFloat(cart[i]['amount']) + parseFloat(amountToAdd));
-				}
-			}
-		}
-
-		setCart(cart)
-		localStorage.setItem('kinship_cart', JSON.stringify(cart));
-
-	}
-
-  const checkForItem = (a, obj, rec) => {
-		for (var i = 0; i < a.length; i++) {
-		if (a[i]['id'] === obj) {
-			if (a[i]['recurring'] == rec) {
-				return true;
-			}
-		}
-		}
-		return false;
-	}
-
-
-  return (
-    <div className="">
-      {
-        success ?
-
-
-          <div className="rounded-md bg-green-50 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-green-800">Thank you! Your donation has been added to cart, please go to cart to checkout.</p>
-              </div>
-              <div className="ml-auto pl-3">
-                <div className="-mx-1.5 -my-1.5">
-                  <Link href = "/cart">
-                    <button
-                      type="button"
-                      className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      Go To Cart &rarr;
-                    </button>
-                  </Link>
-                </div>
+          <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
+            <div className="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+              <div className="mx-auto max-w-xs px-8">
+                <p className="text-base font-semibold text-gray-600">Pay once, own it forever</p>
+                <p className="mt-6 flex items-baseline justify-center gap-x-2">
+                  <span className="text-5xl font-bold tracking-tight text-gray-900">$349</span>
+                  <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">USD</span>
+                </p>
+                <a
+                  href="#"
+                  className="mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Get access
+                </a>
+                <p className="mt-6 text-xs leading-5 text-gray-600">
+                  Invoices and receipts available for easy company reimbursement
+                </p>
               </div>
             </div>
           </div>
-
-
-        :
-
-        <>
-        <div className='flex flex-col'>
-          <label htmlFor={region.name} className="block text-sm font-medium text-gray-700">
-              Choose an amount to donate (recommended: $100)
-          </label>
-          <div className="mt-2 relative rounded-md shadow-sm w-full">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500 sm:text-sm">$</span>
-              </div>
-              <input
-                type="text"
-                name={region.name}
-                id={region.name}
-                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                defaultValue={amount}
-                onChange={setAmount(amount)}
-                aria-describedby="price-currency"
-              />
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <span className="text-gray-500 sm:text-sm" id="price-currency">
-                  CAD
-              </span>
-              </div>
-          </div>
-          <button
-              type="button"
-              onClick={()=>{
-                setLoading(true)
-                let amount = document.getElementById(region.name).value
-                let causeToAddID = `ramadhanCampaign${region.name}`;
-                let causeToAddName = `Ramadhan Campaign - ${region.name}`;
-                let eligible = true;
-                let recurring = false;
-                let interval = 'one-time';
-
-                try {
-                  addToCart(amount, causeToAddID, causeToAddName, eligible, recurring, region.name, interval)
-                  toast.success(`Donation to ${region.name} added to cart!`, { position: 'top-right' });
-                  setLoading(false)
-                  setSuccess(true)
-                } catch (error) {
-                  toast.error(`Error adding donation to cart!`, { position: 'top-right' });
-                  console.error(error)
-                  setLoading(false)
-                }
-              }}
-              className="mt-3 flex justify-center text-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                  {
-                    loading ?
-
-                    <>
-                      Adding to cart...
-                    </>
-
-                    :
-
-                    <>
-                      <PlusCircleIcon className="w-6 h-6 mr-2" />
-                      Add Donation To Cart
-                    </>
-                    
-                  }
-              </button>
-          </div>
-          </>
-      }
+        </div>
+      </div>
     </div>
   )
 }
