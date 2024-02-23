@@ -76,14 +76,20 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
             // Validate that there is a valid amount being donated
             try {
 
-                if (selectedPriceTier.ramadhanCampaign == true && !onBehalfOf) {
-                    setError({
-                        title: "Please list someone to recite on behalf of",
-                        message: "Please specify who to recite the Salat, Quran, or Qadha Roza for"
-                    })
-                    setLoading(false)
-                    return
-                }
+                if (selectedPriceTier.ramadhanCampaign == true) {
+                    if (!onBehalfOf) {
+                        setError({
+                            title: "Please list someone to recite on behalf of",
+                            message: "Please specify who to recite the Salat, Quran, or Qadha Roza for"
+                        })
+                        setLoading(false)
+                        return
+                    } else {
+                        globalDonation.adheringLabels.push(`ON_BEHALF_OF_${onBehalfOf}`)
+                    }
+                } 
+
+
                 if (!isFloatOrInteger(globalDonation.amountDonatedInCents)) {
                     throw new Error("Enter a valid amount to donate")
                 }
