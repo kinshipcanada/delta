@@ -1,7 +1,7 @@
 import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
 import { Country, Donation } from "@prisma/client"
-import { callKinshipAPI, classNames, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
+import { callKinshipAPI, centsToDollars, classNames, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
 import { Alert, BaseHeader, Button, CheckboxInput, Label, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
 import { countries, states_and_provinces } from "../../../lib/utils/constants"
@@ -22,10 +22,10 @@ type PriceTier = {
 }
 
 const pricingTiers: PriceTier[] = [
-  { title: 'Quran Recitation ($35)', ramadhanCampaign: true, amountInCents: 3500 },
-  { title: 'Salat (1 Year, $205)', ramadhanCampaign: true, amountInCents: 20500 },
-  { title: 'Qadha Roza (1 Year, $180)', ramadhanCampaign: true, amountInCents: 18000 },
-  { title: 'Custom Amount', ramadhanCampaign: false, amountInCents: 0 },
+  { title: 'Quran Recitation', ramadhanCampaign: true, amountInCents: 3500 },
+  { title: 'Salat (1 Year)', ramadhanCampaign: true, amountInCents: 20500 },
+  { title: 'Qadha Roza (1 Year)', ramadhanCampaign: true, amountInCents: 18000 },
+  { title: 'Choose How Much To Donate', ramadhanCampaign: false, amountInCents: 0 },
 ]
 
 const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation: (value: Donation) => void, setStep: (value: DonationStep) => void, setStripeClientSecret: (value: string) => void }> = ({ globalDonation, setGlobalDonation, setStep, setStripeClientSecret }) => {
@@ -196,23 +196,28 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     >
                         {({ checked, active }) => (
                         <>
-                            <span className="flex flex-1">
-                            <span className="flex flex-col">
+                            
+                            <span className="flex flex-col w-full">
                                 {(pricingTier.ramadhanCampaign === true) && (
-                                    <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
-                                        <svg className="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
-                                        <circle cx={3} cy={3} r={3} />
-                                        </svg>
-                                        Ramadhan
-                                    </span>
+                                    <div className="flex items-center">
+                                        <span className="mr-2 text-2xl font-bold tracking-tight text-gray-900">${pricingTier.amountInCents/100}</span>
+                                        <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
+                                            <svg className="h-1.5 w-1.5 fill-green-500" viewBox="0 0 6 6" aria-hidden="true">
+                                            <circle cx={3} cy={3} r={3} />
+                                            </svg>
+                                            Ramadhan
+                                        </span>
+                                    </div>
                                 )}
-                                
-                                <RadioGroup.Label as="span" className="block mt-2 text-sm font-medium text-gray-900">
-                                {pricingTier.title}
-                                </RadioGroup.Label>
+                                {(pricingTier.ramadhanCampaign == false) && (<span className="mr-2 text-2xl font-bold tracking-tight text-gray-900">Custom</span>)}
+                                <span className="flex flex-col">
+                                    
+                                    <RadioGroup.Label as="span" className="block mt-2 text-sm font-medium text-gray-900">
+                                    {pricingTier.title}
+                                    </RadioGroup.Label>
+                                </span>
                             </span>
-                            </span>
-                            <CheckCircleIcon
+                            {/* <CheckCircleIcon
                                 className={classNames(!checked ? 'invisible' : '', 'h-5 w-5 text-blue-600')}
                                 aria-hidden="true"
                                 />
@@ -223,7 +228,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                                     'pointer-events-none absolute -inset-px rounded-lg'
                                 )}
                                 aria-hidden="true"
-                            />
+                            /> */}
                         </>
                         )}
                     </RadioGroup.Option>
@@ -231,7 +236,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 </div>
             </RadioGroup>
 
-            {selectedPriceTier.title != "Custom Amount" && (
+            {selectedPriceTier.ramadhanCampaign == true && (
                 <>
                     <VerticalSpacer size={SpacerSize.Small} />
                     <TextInput
@@ -248,7 +253,7 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                 </>
             )}
             
-            {selectedPriceTier.title == "Custom Amount" && (
+            {selectedPriceTier.ramadhanCampaign == false && (
                 <>
                     <VerticalSpacer size={SpacerSize.Small} />
                     <TextInput
