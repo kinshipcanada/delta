@@ -126,14 +126,3 @@ export async function fetchAllDonationsForDonor(donorEmail: string): Promise<Don
     const donationsFromDatabase = await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { donor_contact_email: donorEmail }, false);
     return donationsFromDatabase.map((donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]) => formatDonationFromDatabase(donation));
 }
-
-export async function adminFetchDonationsBySpecs(
-    start_date?: Date,
-    end_date?: Date,
-    payment_method?: Date,
-    page?: Date,
-    offset?: Date
-) {
-    const donationsFromDatabase = await parameterizedDatabaseQuery(DatabaseTable.DONATIONS, { donor_contact_email: "hobbleabbas@gmail.com" }, false);
-    return donationsFromDatabase.map((donation: DatabaseTypings["public"]["Tables"]["donations"]["Row"]) => formatDonationFromDatabase(donation));
-}

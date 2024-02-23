@@ -1,6 +1,7 @@
 import PlacesAutocomplete, { geocodeByAddress } from "react-places-autocomplete";
 import React, { useState } from "react";
 import Script from "next/script";
+import { CursorArrowIcon } from "@radix-ui/react-icons";
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
@@ -23,7 +24,7 @@ export type GoogleFormattedAddress = {
   postalCode?: string;
 };
 
-export default function Address({ address, setAddress }: { address: string, setAddress: (value: string) => void}) {
+export default function Address({ addressString, setAddressString, formattedAddress, setFormattedAddress }: { addressString: string, setAddressString: (value: string) => void, formattedAddress: GoogleFormattedAddress | undefined, setFormattedAddress: (value: GoogleFormattedAddress) => void }) {
     const [error, setError] = useState<string>()
 
     function formatAddress(addressComponents: AddressComponent[]): GoogleFormattedAddress {
@@ -53,7 +54,6 @@ export default function Address({ address, setAddress }: { address: string, setA
     }
       
     const handleSelect = async (address: any) => {
-        setAddress(address);
         const results = await geocodeByAddress(address);
         if (results.length === 0) {
             setError("No results found for this address")
@@ -64,15 +64,17 @@ export default function Address({ address, setAddress }: { address: string, setA
             setError("Address is not a street address")
             return;
         }
-        console.log(results)
+
+        setAddressString(results[0].formatted_address)
+        setFormattedAddress(formatAddress(results[0].address_components))
     };
 
     return (
         <div>
           <Script type="text/javascript" src={source} strategy="beforeInteractive" />
           <PlacesAutocomplete
-              value={address}
-              onChange={setAddress}
+              value={addressString}
+              onChange={setAddressString}
               onSelect={handleSelect}
               searchOptions={{
               types: [],
@@ -84,7 +86,7 @@ export default function Address({ address, setAddress }: { address: string, setA
                   <input
                   {...getInputProps({
                     placeholder: "Search Places ...",
-                    className: "location-search-input",
+                    className: "location-search-input flex-grow mr-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md",
                   })}
                   />
                   <div className="autocomplete-dropdown-container">
@@ -95,11 +97,15 @@ export default function Address({ address, setAddress }: { address: string, setA
                         : { backgroundColor: "#ffffff", cursor: "pointer" };
                         return (
                         <div {...getSuggestionItemProps(suggestion, { style })}>
-                            {suggestion.description}
+                            <span className="flex space-x-4 cursor-select">
+                            {suggestion.description} 
+                            <CursorArrowIcon className="w-4 h-4" />
+                            </span>
                         </div>
                         );
                     })}
                   </div>
+                  {formattedAddress && <p>Selected Address: {formattedAddress.streetNumber} {formattedAddress.route} {formattedAddress.locality} {formattedAddress.administrativeAreaLevel1} {formattedAddress.country} ({formattedAddress.postalCode})</p>}
               </div>
               )}
           </PlacesAutocomplete>

@@ -2,7 +2,7 @@ import { useState, FC, useEffect } from "react"
 import { DonationStep } from "./helpers/types"
 import { Country, Donation } from "@prisma/client"
 import { callKinshipAPI, dollarsToCents, isFloatOrInteger, validateEmail } from "../../../lib/utils/helpers"
-import { Alert, BaseHeader, Button, CheckboxInput, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
+import { Alert, BaseHeader, Button, CheckboxInput, Label, SelectionInput, TextInput, VerticalSpacer } from "../../primitives"
 import { ButtonSize, ButtonStyle, EventColors, InputCustomizations, SpacerSize } from "../../primitives/types"
 import { countries, states_and_provinces } from "../../../lib/utils/constants"
 import { LockClosedIcon } from "@heroicons/react/24/solid"
@@ -293,27 +293,32 @@ const DonationInformationStep: FC<{ globalDonation: Donation, setGlobalDonation:
                     required={true} 
                 />
 
-                <SelectionInput
-                    label="Country"
-                    name="country" 
-                    id="country" 
-                    options={countries}
-                    value={globalDonation.donorAddressCountry}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{ 
-                        const countrySelected = e.target.value
-                        const validCountries = Object.values(Country)
-                        if (validCountries.includes(countrySelected.toUpperCase() as any)) {
+                <div>
+                    <Label label={"Country"} htmlFor={"country"} required={true} />
+                    <select
+                        id={"country"}
+                        name={"country"}
+                        onChange={(e: any)=>{ 
+
+                            const countrySelected = e.target.value
+                            const validCountries = countries
                             setGlobalDonation({
                                 ...globalDonation,
-                                donorAddressCountry: countrySelected.toUpperCase() as Country
+                                donorAddressCountry: countrySelected as Country
                             })
-                        } else {
-                            alert(`Unsupported country: ${countrySelected}`)
-                        }
-                        
-                    }}
-                    required={true}
-                />
+                            
+                        }}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        defaultValue={"CA"}
+                    >
+                        {Object.entries(countries).map(([countryCode, countryName]) => (
+                            <option key={countryCode} value={countryCode}>
+                                {countryName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                
             </div>
 
             <VerticalSpacer size={SpacerSize.Large} />

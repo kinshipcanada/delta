@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { toast } from "react-hot-toast"
 import { useAuth } from '../../components/prebuilts/Authentication'
 import { DonorEngine, NoIdDonorProfile } from '@lib/methods/donors'
-import { Donor } from '@prisma/client'
+import { Country, Donor } from '@prisma/client'
+import { countries, states_and_provinces } from '@lib/utils/constants'
+import { Label, SelectionInput, TextInput } from '@components/primitives'
 
 export default function Register() {
 
@@ -19,7 +21,16 @@ export default function Register() {
 	const [password, setPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState("")
 	const [error, setError] = useState<string | undefined>(undefined)
-	
+
+
+	const [firstName, setFirstName] = useState<string>()
+	const [lastName, setLastName] = useState<string>()
+	const [address, setAddress] = useState<string>()
+	const [city, setCity] = useState<string>()
+	const [province, setProvince] = useState<string>('Ontario')
+	const [country, setCountry] = useState<Country>("CA")
+	const [postalCode, setPostalCode] = useState<string>()
+
 	const register = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 
@@ -38,21 +49,28 @@ export default function Register() {
 			}
 
 			if (!data.user) {
-				alert("Supabase user is undefined")
+				setError("Internal error. Please try again later")
+				setLoading(false)
 				return
 			}
 
+			if (!firstName || !lastName || !address || !city || !postalCode) {
+				setError("Please fill out the whole form")
+				setLoading(false)
+				return
+			} 
+
 			const donorProfile: Donor = {
 				id: data.user.id,
-				donorFirstName: "",
+				donorFirstName: firstName,
 				donorMiddleName: null,
-				donorLastName: "",
+				donorLastName: lastName,
 				donorEmail: email,
-				donorAddressLineAddress: "43 Matson Drive",
-				donorAddressCity: "Bolton",
-				donorAddressState: 'ON',
-				donorAddressCountry: 'CA',
-				donorAddressPostalCode: 'L7E0B1',
+				donorAddressLineAddress: address,
+				donorAddressCity: city,
+				donorAddressState: province,
+				donorAddressCountry: country,
+				donorAddressPostalCode: postalCode,
 				stripeCustomerIds: []
 			}
 
@@ -113,6 +131,7 @@ export default function Register() {
 				return
 			}
 
+			setError(undefined)
 			setStep("personalInfo")
 		} catch (error) {
 			toast.error(`Error: ${error instanceof Error ? error.message : "Sorry, something went wrong creating your account"}`, { position: "top-right" })
@@ -214,6 +233,7 @@ export default function Register() {
 									type="text"
 									autoComplete="firstName"
 									required
+									onChange={(e)=>{setFirstName(e.target.value)}}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 								/>
 								</div>
@@ -229,6 +249,7 @@ export default function Register() {
 									type="text"
 									autoComplete="lastName"
 									required
+									onChange={(e)=>{setLastName(e.target.value)}}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 								/>
 								</div>
@@ -244,6 +265,7 @@ export default function Register() {
 									type="text"
 									autoComplete="address"
 									required
+									onChange={(e)=>{setAddress(e.target.value)}}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 								/>
 								</div>
@@ -259,39 +281,57 @@ export default function Register() {
 									type="text"
 									autoComplete="city"
 									required
+									onChange={(e)=>{setCity(e.target.value)}}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 								/>
 								</div>
 							</div>
 
-							<div>
-								<label htmlFor="state" className="block text-sm font-medium text-gray-700">
-									State or Province
-									<span className='text-red-500'>*</span>
-								</label>
-								<div className="mt-1">
-								<input
+							{states_and_provinces[country] === null || states_and_provinces[country] === undefined ? (
+								<TextInput
+									placeholder="State or Province"
 									type="text"
-									autoComplete="state"
-									required
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+									label="State or Province"
+									name="state_or_province"
+									id="state_or_province"
+									value={province}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										setProvince(e.target.value)
+									}}
+									required={true}
 								/>
-								</div>
-							</div>
+							) : (
+								<SelectionInput
+									label="State or Province"
+									name="state_or_province"
+									id="state_or_province"
+									value={province}
+									options={states_and_provinces[country]}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										setProvince(e.target.value)
+									}}
+									required={true}
+								/>
+							)}
 
 							<div>
-								<label htmlFor="country" className="block text-sm font-medium text-gray-700">
-									Country
-									<span className='text-red-500'>*</span>
-								</label>
-								<div className="mt-1">
-								<input
-									type="text"
-									autoComplete="country"
-									required
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-								/>
-								</div>
+								<Label label={"Country"} htmlFor={"country"} required={true} />
+								<select
+									id={"country"}
+									name={"country"}
+									onChange={(e: any)=>{ 
+										const countrySelected = e.target.value
+										setCountry(countrySelected as Country)
+									}}
+									className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+									defaultValue={"CA"}
+								>
+									{Object.entries(countries).map(([countryCode, countryName]) => (
+										<option key={countryCode} value={countryCode}>
+											{countryName}
+										</option>
+									))}
+								</select>
 							</div>
 
 							<div>
@@ -304,6 +344,7 @@ export default function Register() {
 									type="text"
 									autoComplete="postalCode"
 									required
+									onChange={(e)=>{setPostalCode(e.target.value)}}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 								/>
 								</div>

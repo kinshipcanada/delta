@@ -8,6 +8,11 @@ module.exports = {
         permanent: true,
       },
       {
+        source: '/app',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
         source: '/login',
         destination: '/auth/login',
         permanent: true,

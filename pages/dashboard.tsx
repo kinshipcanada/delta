@@ -1,16 +1,17 @@
 import { useAuth } from "@components/prebuilts/Authentication"
-import { callKinshipAPI } from "@lib/utils/helpers"
+import { callKinshipAPI, supabase } from "@lib/utils/helpers"
 import { Donation } from "@prisma/client"
 import { useEffect, useState } from "react"
 import { Tab } from '@headlessui/react'
 import { Fragment } from 'react'
 import toast from "react-hot-toast"
-import { UserIcon, Files } from "lucide-react"
-import { DonationPanel, PrismaDonationPanel } from "@components/prebuilts/app/DonationPanel"
+import { UserIcon, Files, LogOut } from "lucide-react"
+import { PrismaDonationPanel } from "@components/prebuilts/app/DonationPanel"
+import { useRouter } from "next/router"
 
 export default function Dashboard() {
 
-    const { donor } = useAuth()
+    const { donor, authReloadStatus, triggerAuthReload } = useAuth()
     const [donations, setDonations] = useState<Donation[]>([])
     const [loadingDonations, setLoadingDonations] = useState(true)
 
@@ -18,7 +19,7 @@ export default function Dashboard() {
         if (!donor) { return }
 
         const donations = await callKinshipAPI<Donation[]>("/api/v2/donor/fetch_donations", {
-            email: donor.donorEmail,
+            donorEmail: donor.donorEmail,
         })
 
         if (!donations.data) {
@@ -36,6 +37,15 @@ export default function Dashboard() {
         fetchDonations()
     }, [donor])
 
+    const router = useRouter()
+
+
+    const signOut = async () => {
+        const { error } = await supabase.auth.signOut()
+        triggerAuthReload(!authReloadStatus)
+        router.push('/')
+    }
+
     return (
         <div >
             {loadingDonations && <p>Loading...</p>}
@@ -47,7 +57,7 @@ export default function Dashboard() {
                                 {({ selected }) => (
                                     <button
                                         className={
-                                            selected ? 'p-1.5 bg-gray-100 text-blue-600 font-semibold text-sm rounded-lg' : 'p-1.5 text-black font-semibold text-sm'
+                                            selected ? 'outline-none p-1.5 bg-gray-100 text-blue-600 font-semibold text-sm rounded-lg' : 'p-1.5 text-black font-semibold text-sm'
                                         }
                                     >
                                         <span className="flex items-center">
@@ -61,7 +71,7 @@ export default function Dashboard() {
                             {({ selected }) => (
                                     <button
                                         className={
-                                            selected ? 'p-1.5 bg-gray-100 text-blue-600 font-semibold text-sm rounded-lg' : 'p-1.5 text-slate-600 font-semibold text-sm'
+                                            selected ? 'outline-none p-1.5 bg-gray-100 text-blue-600 font-semibold text-sm rounded-lg' : 'p-1.5 text-slate-600 font-semibold text-sm'
                                         }
                                     >
                                         <span className="flex items-center">
@@ -71,6 +81,15 @@ export default function Dashboard() {
                                     </button>
                                 )}
                             </Tab>
+                            <button
+                                onClick={()=>{signOut()}}
+                                className='p-1.5 text-slate-600 font-semibold text-sm'
+                            >
+                                <span className="flex items-center">
+                                    <LogOut className="w-4 h-4 mr-2" />
+                                    Log Out
+                                </span>
+                            </button>
                         </Tab.List>
                         <Tab.Panels className={"my-4"}>
                             <Tab.Panel className={"space-y-4"}>

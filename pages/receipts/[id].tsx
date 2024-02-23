@@ -17,7 +17,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       where: {
         OR: [
           { id: id },
-          { legacyIdV1: id }
+          { legacyIdV1: id },
+          { legacyIdV0: id }
         ]
       }
     })

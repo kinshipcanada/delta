@@ -11,6 +11,7 @@ export default async function handler(
 ) {
     try {
         const payload = req.body as FetchDonorProfileProps
+        console.log(`Fetching donor with props: ${payload.id}, ${payload.email}`)
         const donorEngine = new DonorEngine()
         const donor = await donorEngine.fetchDonorProfile(payload)
         return res.status(200).send({ data: donor })

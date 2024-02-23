@@ -130,6 +130,9 @@ export class DonorEngine {
         return await this.prismaClient.donation.findMany({
             where: {
                 donorEmail
+            },
+            orderBy: {
+                donatedAt: 'desc'
             }
         })
     } 
