@@ -1,6 +1,6 @@
 import { useAuth } from "@components/prebuilts/Authentication"
 import { callKinshipAPI, centsToDollars, classNames, dollarsToCents, parseFrontendDate } from "@lib/utils/helpers"
-import { Donation, PaymentMethodType } from "@prisma/client"
+import { Country, Donation, PaymentMethodType } from "@prisma/client"
 import { useEffect, useState } from "react"
 import { Tab } from '@headlessui/react'
 import { Fragment } from 'react'
@@ -96,7 +96,7 @@ export default function Admin() {
                                 <ResendDonations />
                             </Tab.Panel>
                             <Tab.Panel>
-                                Coming Soon...
+                                <UploadProof />
                             </Tab.Panel>
                             <Tab.Panel>
                                 <UploadDonations />
@@ -109,17 +109,116 @@ export default function Admin() {
     )
 }
 
+const UploadProof = () => {
+
+    const partners = ["Al Ayn", "Desk and Chair Foundation"]
+    const causes = ["Education", "Poverty Relief", "Vision Kinship"]
+
+    return (
+        <div>
+            <BaseHeader>Upload Proof Of Donation</BaseHeader>
+            <VerticalSpacer size={SpacerSize.Medium} />
+            <div className="space-y-4">
+                <TextInput
+                    label="Amount Sent"
+                    placeholder="0"
+                    type="text"
+                    inputCustomization={InputCustomizations.Dollars}
+                    name="amount"
+                    id="amount"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { 
+                    }}
+                    required={true}
+                />
+                <div>
+                    <Label label={"Where did the funds go"} htmlFor={"country"} required={true} />
+                    <select
+                        id={"country"}
+                        name={"country"}
+                        onChange={(e: any)=>{ 
+
+                            const countrySelected = e.target.value
+                            const validCountries = countries
+                        }}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        defaultValue={"CA"}
+                    >
+                        {Object.entries(countries).map(([countryCode, countryName]) => (
+                            <option key={countryCode} value={countryCode}>
+                                {countryName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <Label label={"Which partner delivered the funds"} htmlFor={"partner"} required={true} />
+                    <select
+                        id={"partner"}
+                        name={"partner"}
+                        onChange={(e: any)=>{ 
+
+                            const countrySelected = e.target.value
+                            const validCountries = countries
+                        }}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        defaultValue={"CA"}
+                    >
+                        {partners.map((partner)=>(
+                            <option key={partner} value={partner}>
+                                {partner}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <Label label={"What cause did it go to"} htmlFor={"cause"} required={true} />
+                    <select
+                        id={"cause"}
+                        name={"cause"}
+                        onChange={(e: any)=>{ 
+
+                            const countrySelected = e.target.value
+                            const validCountries = countries
+                        }}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        defaultValue={"CA"}
+                    >
+                         {causes.map((cause)=>(
+                            <option key={cause} value={cause}>
+                                {cause}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                
+                <div>
+                    <Label label={"Upload proof documents"} htmlFor={"country"} required={true} />
+                    <input type="file" />
+                </div>
+            </div>
+
+            <div className="flex justify-end">
+                <Button text="Upload Proof" style={ButtonStyle.Primary} />
+            </div>
+        </div>
+    )
+}
+
 import { v4 as uuidv4 } from 'uuid'
+import { countries } from "@lib/utils/constants"
 
 const UploadDonations = () => {
 
-    const [error, setError] = useState<string>("")
+    const [error, setError] = useState<string>()
+    const [message, setMessage] = useState<string>()
     const [uploading, setUploading] = useState<boolean>(false)
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [amount, setAmount] = useState(0);
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('ETRANSFER');
     const [date, setDate] = useState<Date>();
     const [address, setAddress] = useState<string>('')
     const [formattedAddress, setFormattedAddress] = useState<GoogleFormattedAddress>()
@@ -130,11 +229,20 @@ const UploadDonations = () => {
     const [isSadaqah, setIsSadaqah] = useState<boolean>(false)
     const [isRamadhan, setIsRamadhan] = useState<boolean>(false)
     
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        setUploading(true)
+        setError(undefined)
+        setMessage(undefined)
 
+        console.log("uploading...")
         if (!date) {
             setError("Please add a valid date")
+            setUploading(false)
+            return
+        }
+
+        if (!formattedAddress) {
+            setError("Please select an address")
             setUploading(false)
             return
         }
@@ -161,34 +269,34 @@ const UploadDonations = () => {
                 "MANUALLY_CREATED",
             ],
             allocatedToCauses: 0,
-            unallocatedToCauses: 0,
-            allocationBreakdown: null,
+            unallocatedToCauses: amount,
+            allocationBreakdown: { v3Causes: [] },
             causeName: null,
             causeRegion: "ANYWHERE",
-            transactionStatus: "PENDING",
-            amountDonatedInCents: 0,
+            transactionStatus: "SUCCEEDED",
+            amountDonatedInCents: amount,
             amountRefunded: 0,
-            amountChargedInCents: 0,
+            amountChargedInCents: amount,
             feesChargedInCents: 0,
             feesDonatedInCents: 0,
             currency: "CAD",
             donorId: null,
-            donorFirstName: "",
+            donorFirstName: firstName,
             donorMiddleName: null,
-            donorLastName: "",
-            donorEmail: "",
-            donorAddressLineAddress: "",
-            donorAddressCity: "",
-            donorAddressState: "",
-            donorAddressCountry: "CA",
-            donorAddressPostalCode: "",
-            billingAddressPostalCode: "",
+            donorLastName: lastName,
+            donorEmail: email,
+            donorAddressLineAddress: `${formattedAddress.streetNumber} ${formattedAddress.route}`,
+            donorAddressCity: formattedAddress.locality!,
+            donorAddressState: formattedAddress.administrativeAreaLevel1!,
+            donorAddressCountry: formattedAddress.country! == "Canada" ? "CA" : "AD",
+            donorAddressPostalCode: formattedAddress.postalCode!,
+            billingAddressPostalCode: formattedAddress.postalCode!,
             stripeCustomerId: null,
             stripePaymentIntentId: null,
             stripePaymentMethodId: null,
             stripeChargeId: null,
             stripeBalanceTxnId: null,
-            paymentMethodType: "CARD",
+            paymentMethodType: paymentMethod,
             pmCardFunding: null,
             pmCardBrand: null,
             pmCardLast4: null,
@@ -197,8 +305,33 @@ const UploadDonations = () => {
             legacyIdV0: null,
             legacyIdV1: null
         }
-        // Handle form submission logic here
-        console.log({ firstName, lastName, email, amount, paymentMethod, date });
+
+        console.log("Built donation, calling api")
+
+        const response = await callKinshipAPI<string>('/api/v2/donations/manual', {
+            donation
+        })
+        
+        if (response.error) {
+            setError(response.error)
+            setUploading(false)
+        } else {
+            setMessage(`Successfully generated and sent to ${email}`)
+            setFirstName("")
+            setLastName("")
+            setEmail("")
+            setAmount(0)
+            setPaymentMethod('ETRANSFER')
+            setDate(undefined)
+            setAddress('')
+            setFormattedAddress(undefined)
+            setIsImam(false)
+            setIsKhums(false)
+            setIsSadaqah(false)
+            setIsSadat(false)
+            setIsRamadhan(false)
+            setUploading(false)
+        }
     };
 
     return (
@@ -265,19 +398,19 @@ const UploadDonations = () => {
                 <Label label={"Address"} htmlFor={"address"} required={true} />
                 <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
                 <Label label={"Payment Method"} htmlFor={"paymentMethod"} required={true} />
-                <select>
-                    <option value={"CASH"}>Cash</option>
+                <select onChange={(e)=>{setPaymentMethod(e.target.value as PaymentMethodType)}}>
                     <option value={"ETRANSFER"}>eTransfer</option>
+                    <option value={"CASH"}>Cash</option>
                 </select>
                 <div className="">
-                <CheckboxInput
+                {/* <CheckboxInput
                 label="Is this donation for the Ramadhan Campaign?"
                 checked={isRamadhan}
                 required={false}
                 onChange={(e) => { 
                     setIsRamadhan(e.target.checked)
                 }}
-            />
+            /> */}
 
             <VerticalSpacer size={SpacerSize.Small} />
 
@@ -325,9 +458,12 @@ const UploadDonations = () => {
             )}
                 </div>
                 <div className="flex justify-end">
-                    <Button text={uploading ? "Uploading..." : "Upload"} style={ButtonStyle.Primary} />
+                    <Button onClick={handleSubmit} text={uploading ? "Uploading..." : "Upload"} style={ButtonStyle.Primary} />
                 </div>
             </div>
+
+            {message && <p className="text-green-600 font-semibold">{message}</p>}
+            {error && <p className="text-red-600 font-semibold">{message}</p>}
         </div>
     )
 }

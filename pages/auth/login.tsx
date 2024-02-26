@@ -215,7 +215,7 @@ export const ResetModal: FC<{ open: boolean, setOpen: (value: boolean) => void, 
 							onClick={async () => {
 								setLoading(true)
 								const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-									redirectTo: `${window.location.origin}/auth/reset`,
+									redirectTo: `${process.env.NEXT_PUBLIC_DOMAIN}/auth/reset`,
 								})
 	
 								if (error) {
