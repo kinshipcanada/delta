@@ -71,7 +71,7 @@ export default function Admin() {
                                     >
                                         <span className="flex items-center">
                                             <Files className="w-4 h-4 mr-2" />
-                                            Upload Proof
+                                            Upload Proof - Disabled
                                         </span>
                                     </button>
                                 )}
