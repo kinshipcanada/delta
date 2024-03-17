@@ -568,6 +568,9 @@ const ResendDonations = () => {
                                                 <th className="">Issued To</th>
                                                 <th className="">Date</th>
                                                 <th className="">Payment Method</th>
+                                                <th className="">Stripe ID</th>
+
+                                                <th className=""></th>
                                                 <th className=""></th>
                                             </tr>
                                         </thead>
@@ -579,8 +582,10 @@ const ResendDonations = () => {
                                                     <td>{donation.donorFirstName} {donation.donorMiddleName ? donation.donorMiddleName : ""} {donation.donorLastName}</td>
                                                     <td>{parseFrontendDate(donation.donatedAt)}</td>
                                                     <td>{donation.paymentMethodType == "CARD" ? `${donation.paymentMethodType} (${donation.pmCardLast4})` : donation.paymentMethodType}</td>
+                                                    <td className="font-semibold">{donation.stripePaymentIntentId ? donation.stripePaymentIntentId : "None"}</td>
+                                                   
                                                     <td>
-                                                        <Button size={ButtonSize.Small} style={ButtonStyle.Secondary} text="Resend Donation" />
+                                                        <Button href={`https://www.kinshipcanada.com/receipts/${donation.id}`} size={ButtonSize.Small} style={ButtonStyle.Primary} text="View Receipt" />
                                                     </td>
                                                 </tr>
                                             )
@@ -611,7 +616,6 @@ const ResendDonations = () => {
                         </Dialog>
                     </div>
                 }
-                
             </div>
         </div>
     )
