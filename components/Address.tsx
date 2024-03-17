@@ -54,23 +54,22 @@ export default function Address({ addressString, setAddressString, formattedAddr
     }
       
     const handleSelect = async (address: any) => {
-        const results = await geocodeByAddress(address);
-        if (results.length === 0) {
-            setError("No results found for this address")
-            return;
-        }
-
-        if (!results[0].types.includes("street_address")) {
-            setError("Address is not a street address")
-            return;
-        }
-
-        setAddressString(results[0].formatted_address)
-        setFormattedAddress(formatAddress(results[0].address_components))
+      console.log('selecting')
+      console.log(address)
+      const results = await geocodeByAddress(address);
+      console.log("found results")
+      console.log(results[0])
+      if (results.length === 0) {
+          setError("No results found for this address")
+          return;
+      }
+      setAddressString(results[0].formatted_address)
+      setFormattedAddress(formatAddress(results[0].address_components))
     };
 
     return (
         <div>
+          {error && `Error: ${error}`}
           <Script type="text/javascript" src={source} strategy="beforeInteractive" />
           <PlacesAutocomplete
               value={addressString}
