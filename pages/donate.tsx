@@ -10,7 +10,6 @@ import PaymentInfoStep from "../components/prebuilts/donations/PaymentInfoStep";
 import WireTransferInstructions from "../components/prebuilts/donations/WireTransferInstructions";
 import Confirmation from "../components/prebuilts/donations/confirmation/Confirmation";
 import DonationErrorMessage from "../components/prebuilts/donations/helpers/ErrorMessage";
-import { states_and_provinces } from "../lib/utils/constants";
 import { Stripe } from "@stripe/stripe-js";
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);

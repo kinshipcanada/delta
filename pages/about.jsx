@@ -1,8 +1,9 @@
+"use client"
 import {
     BoltIcon, CheckIcon, GlobeAltIcon, LinkIcon, ScaleIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import * as Sentry from "@sentry/nextjs"
+
 
 // Highlighted principles. These get mapped automatically.
 const principles = [
@@ -105,7 +106,7 @@ export default function About() {
                 </div>
                 <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
                     <div className="relative z-10">
-                    <p className="text-lg text-gray-500">
+                    <div className="text-lg text-gray-500">
                         Kinship prides itself on a few things that we do differently to help make as much impact as possible. We believe that every penny of your donation should go to the people you donated to - 
                         as such:
                         <br />
@@ -116,7 +117,7 @@ export default function About() {
                         </ol>
                         <br />
                         We also believe that giving charity should be a pleasant and easy experience. We are proud to offer a dashboard from which you can download your tax receipts, receive proof of donation, and more.
-                    </p>
+                    </div>
                     <div className="mt-10 flex text-base max-w-prose mx-auto lg:max-w-none">
                         <Link href = '/donate'>
                             <button
@@ -218,28 +219,6 @@ export default function About() {
                     </div>
                 </div>
                 </div>
-
-                <button onClick={async () => {
-                    const transaction = Sentry.startTransaction({
-                    name: "Example Frontend Transaction",
-                    });
-
-                    Sentry.configureScope((scope) => {
-                    scope.setSpan(transaction);
-                    });
-
-                    try {
-                        const res = await fetch("/api/sentry-example-api");
-                        if (!res.ok) {
-                            throw new Error("Sentry Example Frontend Error");
-                        }
-                        } finally {
-                        transaction.finish();
-                    }
-                }}>
-                    test
-                </button>
-            
         </div>
     )
 }
