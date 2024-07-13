@@ -5,7 +5,7 @@ import { Country, Donation, DonationRegion } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { HeartHandshake, Home, MailIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Address, { GoogleFormattedAddress } from "@components/Address"
 import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/20/solid"
 import { v4 as uuidv4 } from 'uuid'
@@ -102,7 +102,7 @@ export default function Donate() {
     } else if (view === 'confirmation'){
         return <ConfirmationForm donation={donation} confirmationType={confirmationType} />
     } else {
-        <p>Something went wrong. Please try again later</p>
+        <div>Something went wrong. Please try again later</div>
     }
 }
 
@@ -115,7 +115,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
     const elements = useElements()
 
     if (donation == undefined) {
-        return <p>Something went wrong. Please try again later</p>
+        return <div>Something went wrong. Please try again later</div>
     }
 
     const paymentElementOptions: StripePaymentElementOptions = {
@@ -390,6 +390,15 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
         
     }
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowAddress(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const [showAddress, setShowAddress] = useState(false);
+
     return (
         <div className="flex justify-center">
             <div className="space-y-6 w-full max-w-2xl py-8">
@@ -407,7 +416,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <p className={HEADER_CLASS}>Select Your Causes</p>
                     <div className="flex items-center grid grid-cols-2 gap-4">
                     {causes.map((cause)=> (
-                        <div>
+                        <div key={cause.title}>
                             <input 
                                 type="checkbox"
                                 id={cause.title} 
@@ -433,7 +442,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <div className="text-center space-y-2">
                         <p className={HEADER_CLASS}>Choose How Much To Donate</p>
                         {selectedCauses.map((cause) => (
-                            <AmountSelection cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
+                            <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
                         ))}
                     </div>
                 )}
@@ -477,7 +486,11 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             <Label label="Address" required={true} htmlFor={"address"} />
                             {/* <p className="block text-sm font-medium text-blue-600 underline cursor-pointer">Enter Address Manually</p> */}
                         </div>
-                        <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+
+
+                        {showAddress && (
+                            <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+                        )}
                     </div>
                 </div>
 

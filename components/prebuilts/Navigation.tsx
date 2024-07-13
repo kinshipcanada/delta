@@ -37,11 +37,9 @@ export default function Navigation() {
                       src="/logo.png"
                       alt=""
                       />
-                      {/* <Link href = '/developers'> */}
-                          <span className="hidden sm:block flex-shrink-0 ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 border hover:bg-blue-200 border-blue-600 transition-200">
-                              Kinship Canada
-                          </span>
-                      {/* </Link> */}
+                      <span className="hidden sm:block flex-shrink-0 ml-3 font-bold text-xl">
+                          Kinship Canada
+                      </span>
                   </a>
                 </div>
 
