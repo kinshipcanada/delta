@@ -477,7 +477,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             <Label label="Address" required={true} htmlFor={"address"} />
                             {/* <p className="block text-sm font-medium text-blue-600 underline cursor-pointer">Enter Address Manually</p> */}
                         </div>
-                        <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+                        {/* <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} /> */}
                     </div>
                 </div>
 
