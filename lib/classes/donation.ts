@@ -17,6 +17,8 @@ import { Currencies, CurrenciesSchema, DonationIdentifiers, DonationIdentifiersS
  */
 
 
+export type DonationWithCauses = ""
+
 export const TRANSACTION_STATUSES = ["processing", "payment_failed", "succeeded"] as const
 export const TransactionStatusSchema = z.enum(TRANSACTION_STATUSES)
 export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number]

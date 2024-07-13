@@ -84,26 +84,28 @@ export default function Address({ addressString, setAddressString, formattedAddr
               <div>
                   <input
                   {...getInputProps({
-                    placeholder: "Search Places ...",
-                    className: "location-search-input flex-grow mr-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md",
+                    placeholder: "Start typing to search addresses...",
+                    className: "location-search-input focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full",
                   })}
                   />
-                  <div className="autocomplete-dropdown-container">
-                    {loading && <div>Loading...</div>}
-                    {suggestions.map((suggestion) => {
-                        const style = suggestion.active
-                        ? { backgroundColor: "#fafafa", cursor: "pointer" }
-                        : { backgroundColor: "#ffffff", cursor: "pointer" };
-                        return (
-                        <div {...getSuggestionItemProps(suggestion, { style })}>
-                            <span className="flex space-x-4 cursor-select">
-                            {suggestion.description} 
-                            <CursorArrowIcon className="w-4 h-4" />
-                            </span>
-                        </div>
-                        );
-                    })}
-                  </div>
+                  {(loading || suggestions.length > 0) && (
+                    <div className="autocomplete-dropdown-container border rounded-lg p-2 space-y-1">
+                      {loading && <div>Loading...</div>}
+                      {suggestions.map((suggestion) => {
+                          const style = suggestion.active
+                          ? { backgroundColor: "#fafafa", cursor: "pointer" }
+                          : { backgroundColor: "#ffffff", cursor: "pointer" };
+                          return (
+                          <div {...getSuggestionItemProps(suggestion, { style })} className="py-2">
+                              <span className="flex space-x-4 cursor-select">
+                              {suggestion.description} 
+                              <CursorArrowIcon className="w-4 h-4" />
+                              </span>
+                          </div>
+                          );
+                      })}
+                    </div>
+                  )}
                   {formattedAddress && <p>Selected Address: {formattedAddress.streetNumber} {formattedAddress.route} {formattedAddress.locality} {formattedAddress.administrativeAreaLevel1} {formattedAddress.country} ({formattedAddress.postalCode})</p>}
               </div>
               )}

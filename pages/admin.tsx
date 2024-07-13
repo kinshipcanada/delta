@@ -403,14 +403,6 @@ const UploadDonations = () => {
                     <option value={"CASH"}>Cash</option>
                 </select>
                 <div className="">
-                {/* <CheckboxInput
-                label="Is this donation for the Ramadhan Campaign?"
-                checked={isRamadhan}
-                required={false}
-                onChange={(e) => { 
-                    setIsRamadhan(e.target.checked)
-                }}
-            /> */}
 
             <VerticalSpacer size={SpacerSize.Small} />
 

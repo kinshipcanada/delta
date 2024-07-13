@@ -11,57 +11,57 @@ datasource db {
 }
 
 model Donor {
-  id        String   @id @default(uuid())
-  donorFirstName            String
-  donorMiddleName String?
-  donorLastName             String
-  donorEmail                String
+  id                      String     @id @default(uuid())
+  donorFirstName          String
+  donorMiddleName         String?
+  donorLastName           String
+  donorEmail              String
   donorAddressLineAddress String
-  donorAddressCity         String
-  donorAddressState        String
-  donorAddressCountry      Country @default(CA)
+  donorAddressCity        String
+  donorAddressState       String
+  donorAddressCountry     Country    @default(CA)
   donorAddressPostalCode  String
-  stripeCustomerIds String[]
-  donations Donation[]
+  stripeCustomerIds       String[]
+  donations               Donation[]
 }
 
 model Donation {
-  id        String   @id @default(uuid())
+  id       String   @id @default(uuid())
   loggedAt DateTime @default(now())
 
   // Donation details
-  status               DonationStatus @default(PROCESSING)
-  donatedAt            DateTime
-  adheringLabels       String[]
+  status         DonationStatus @default(PROCESSING)
+  donatedAt      DateTime
+  adheringLabels String[]
 
-  allocatedToCauses Int
+  allocatedToCauses   Int
   unallocatedToCauses Int
   // { v2Causes: { name: string, amount: Int, region: DonationRegion }[] }
   allocationBreakdown Json?
 
-  causeName     String?
-  causeRegion   DonationRegion
+  causeName   String?
+  causeRegion DonationRegion?
 
   // Payment details
   transactionStatus    TransactionStatus @default(SUCCEEDED)
   amountDonatedInCents Int
-  amountRefunded Int
+  amountRefunded       Int
   amountChargedInCents Int
   feesChargedInCents   Int
-  feesDonatedInCents    Int
-  currency             Currency @default(CAD)
+  feesDonatedInCents   Int
+  currency             Currency          @default(CAD)
 
   // Donor details
-  donorId String?
-  donor   Donor? @relation(fields: [donorId], references: [id])
-  donorFirstName            String
-  donorMiddleName String?
-  donorLastName             String
-  donorEmail                String
+  donorId                 String?
+  donor                   Donor?  @relation(fields: [donorId], references: [id])
+  donorFirstName          String
+  donorMiddleName         String?
+  donorLastName           String
+  donorEmail              String
   donorAddressLineAddress String
-  donorAddressCity         String
-  donorAddressState        String
-  donorAddressCountry      Country @default(CA)
+  donorAddressCity        String
+  donorAddressState       String
+  donorAddressCountry     Country @default(CA)
   donorAddressPostalCode  String
 
   // Billing details
@@ -76,15 +76,26 @@ model Donation {
 
   // Payment method details
   paymentMethodType PaymentMethodType
-  pmCardFunding    String? // debit or credit
-  pmCardBrand      String?
-  pmCardLast4      String?
-  pmCardExpMonth   Int?
-  pmCardExpYear    Int?
+  pmCardFunding     String? // debit or credit
+  pmCardBrand       String?
+  pmCardLast4       String?
+  pmCardExpMonth    Int?
+  pmCardExpYear     Int?
 
   // legacy support
   legacyIdV0 String?
   legacyIdV1 String?
+
+  causes Cause[]
+}
+
+model Cause {
+  id                 String         @id @default(uuid())
+  donation           Donation       @relation(fields: [donationId], references: [id])
+  title              String
+  region             DonationRegion
+  amountDonatedCents Int
+  donationId         String
 }
 
 model ProofDetailsMap {
