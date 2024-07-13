@@ -11,7 +11,6 @@ import { Donor } from '@prisma/client';
 import { Donation } from '@prisma/client';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
-import { DonorApiResponse } from '@lib/classes/api';
 import { Cause } from '@lib/classes/causes';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
@@ -106,7 +105,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
           children
           }
-        <Footer />
+        {/* <Footer /> */}
       </main>
     </AuthProvider>
   )
@@ -159,18 +158,6 @@ export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }
                   </dd>
                 </div>
               )}
-
-              {/**
-               * {globalDonation && (globalDonation.adheringLabels > 1) && (
-                <div className="flex items-center justify-between">
-                  <dt>Special Requests</dt>
-                  {/* <dd>
-                  FIX BEFORE DEPLOY
-                    <span className='flex items-center'>
-                      <InformationCircleIcon className='w-5 h-5 text-slate-600 mr-1' />
-                      {generateDonationCausesString(globalDonation.adheringLabels)}
-                    </span>
-                  </dd> */}
 
               <div className="flex items-center justify-between">
                 <dt>Credit Card Processing Fees</dt>
