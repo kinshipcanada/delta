@@ -481,6 +481,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
                         />
                     </div>
+<<<<<<< HEAD
                     <div className="w-full space-y-1">
                         <div className="flex justify-between">
                             <Label label="Address" required={true} htmlFor={"address"} />
@@ -492,6 +493,9 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
                         )}
                     </div>
+=======
+                    
+>>>>>>> b27e25d (remove addr input)
                 </div>
 
                 {sumCauses(selectedCauses) > 0 && (
