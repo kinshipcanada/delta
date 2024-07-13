@@ -6,9 +6,9 @@ import {
   HomeModernIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline'
-import { AnyText, Button, ButtonSize, ButtonStyle, TextSize, TextWeight } from "../components/primitives";
+import { Button, ButtonSize, ButtonStyle } from "../components/primitives";
 import * as React from "react";
-import { Text } from '@radix-ui/themes';
+import Link from 'next/link';
 
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
@@ -38,76 +38,30 @@ export function Hero() {
   
   return (
       <div className="relative bg-white overflow-hidden">
-      <div className="hidden sm:block sm:absolute sm:inset-0" aria-hidden="true">
-        <svg
-          className="absolute bottom-0 right-0 transform translate-x-1/2 mb-48 text-gray-700 lg:top-0 lg:mb-0 xl:transform-none xl:translate-x-0"
-          width={364}
-          height={384}
-          viewBox="0 0 364 384"
-          fill="none"
-        >
-          <defs>
-            <pattern
-              id="eab71dd9-9d7a-47bd-8044-256344ee00d0"
-              x={0}
-              y={0}
-              width={20}
-              height={20}
-              patternUnits="userSpaceOnUse"
-            >
-              <rect x={0} y={0} width={4} height={4} fill="currentColor" />
-            </pattern>
-          </defs>
-          <rect width={364} height={384} fill="url(#eab71dd9-9d7a-47bd-8044-256344ee00d0)" />
-        </svg>
-      </div>
       <div className="relative">
         <main className="">
           <div className="mx-auto max-w-7xl">
-            <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-              <div className="px-4 sm:px-6 sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
-                <div>
-                      
-                  <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:text-5xl xl:text-6xl">
-                    <span className="md:block">Charity in its purest essence</span>
-                  </h1>
-                  <p className="mt-3 text-base text-gray-800 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                    All proceeds go directly to those who need it, with 0 admin fees. Manage your tax receipts, get proof of donation, and more.
-                  </p>
-                  <div className='m-4' />
-                  <div className='flex'>
-                    <Button 
-                      text = "Make A Donation &rarr;"
-                      href = "/donate"
-                      style={ButtonStyle.Primary}
-                      size={ButtonSize.Standard}
-                    />
-                    <div className='m-1' />
-                    <Button 
-                      text = "About Kinship"
-                      href = "/about"
-                      style={ButtonStyle.Secondary}
-                      size={ButtonSize.Standard}
-                    />
+              <div className="">
+                <div className='py-24 flex justify-between w-full'>
+                  <div className='flex flex-col'>
+                    <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:text-5xl xl:text-6xl">
+                      <span className="md:block">Charity in its purest essence</span>
+                    </h1>
+                    <p className="mt-3 text-base text-gray-800 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                      All proceeds go directly to those who need it, with 0 admin fees. 
+                    </p>
+                    <p className="mt-3 text-base text-gray-800 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+                      Manage your tax receipts, get proof of donation, and more.
+                    </p>
+                  </div>
+                  <div className='flex items-center'>
+                    <Link href="/donate">
+                      <button href="/donate" className="inline-flex items-center justify-center px-8 py-4 text-2xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                        Donate Now
+                      </button>
+                    </Link>
                   </div>
                 </div>
-              </div>
-              <div className=" lg:mt-0 col-span-6 lg:col-span-6">
-                <Globe
-                  //@ts-ignore
-                  ref={globeRef}
-                  width={800}
-                  height={780}
-                  backgroundColor={"rgba(0,0,0,0)"}
-                  globeImageUrl={imageUrl}
-                  arcColor={"white"}
-                  arcsData={arcsData}
-                  arcDashGap={0.6}
-                  arcDashLength={0.3}
-                  arcDashAnimateTime={4000 + 500}
-                  rendererConfig={{ preserveDrawingBuffer: true }}
-              />
-              </div>
             </div>
           </div>
         </main>

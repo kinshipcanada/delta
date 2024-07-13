@@ -102,7 +102,7 @@ export default function Donate() {
     } else if (view === 'confirmation'){
         return <ConfirmationForm donation={donation} confirmationType={confirmationType} />
     } else {
-        <p>Something went wrong. Please try again later</p>
+        <div>Something went wrong. Please try again later</div>
     }
 }
 
@@ -115,7 +115,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
     const elements = useElements()
 
     if (donation == undefined) {
-        return <p>Something went wrong. Please try again later</p>
+        return <div>Something went wrong. Please try again later</div>
     }
 
     const paymentElementOptions: StripePaymentElementOptions = {
@@ -407,7 +407,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <p className={HEADER_CLASS}>Select Your Causes</p>
                     <div className="flex items-center grid grid-cols-2 gap-4">
                     {causes.map((cause)=> (
-                        <div>
+                        <div key={cause.title}>
                             <input 
                                 type="checkbox"
                                 id={cause.title} 
@@ -433,7 +433,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <div className="text-center space-y-2">
                         <p className={HEADER_CLASS}>Choose How Much To Donate</p>
                         {selectedCauses.map((cause) => (
-                            <AmountSelection cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
+                            <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
                         ))}
                     </div>
                 )}
