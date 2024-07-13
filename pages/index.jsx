@@ -40,9 +40,8 @@ export function Hero() {
       <div className="relative bg-white overflow-hidden">
       <div className="relative">
         <main className="">
-          <div className="mx-auto max-w-7xl">
-              <div className="">
-                <div className='py-24 flex justify-between w-full'>
+          <div className="mx-auto max-w-7xl px-8">
+                <div className='py-24 flex justify-between w-full flex-col md:flex-row space-y-8'>
                   <div className='flex flex-col'>
                     <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-gray-800 sm:mt-5 sm:leading-none lg:text-5xl xl:text-6xl">
                       <span className="md:block">Charity in its purest essence</span>
@@ -61,7 +60,6 @@ export function Hero() {
                       </a>
                     </Link>
                   </div>
-                </div>
             </div>
           </div>
         </main>

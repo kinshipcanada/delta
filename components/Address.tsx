@@ -1,5 +1,5 @@
 import PlacesAutocomplete, { geocodeByAddress } from "react-places-autocomplete";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Script from "next/script";
 import { CursorArrowIcon } from "@radix-ui/react-icons";
 
@@ -52,7 +52,14 @@ export default function Address({ addressString, setAddressString, formattedAddr
       
         return formattedAddress;
     }
-      
+    const [scriptLoaded, setScriptLoaded] = useState(false)
+
+    useEffect(() => {
+        if (window.google && window.google.maps) {
+            setScriptLoaded(true)
+        }
+    }, [])
+
     const handleSelect = async (address: any) => {
       console.log('selecting')
       console.log(address)
@@ -66,6 +73,20 @@ export default function Address({ addressString, setAddressString, formattedAddr
       setAddressString(results[0].formatted_address)
       setFormattedAddress(formatAddress(results[0].address_components))
     };
+
+    if (!scriptLoaded) {
+      return (
+          <div>
+              <Script 
+                  type="text/javascript" 
+                  src={source} 
+                  strategy="beforeInteractive" 
+                  onLoad={() => setScriptLoaded(true)}
+              />
+              <p>Loading address search...</p>
+          </div>
+      )
+  }
 
     return (
         <div>
