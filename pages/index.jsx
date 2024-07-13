@@ -56,9 +56,9 @@ export function Hero() {
                   </div>
                   <div className='flex items-center'>
                     <Link href="/donate">
-                      <button href="/donate" className="inline-flex items-center justify-center px-8 py-4 text-2xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                      <a href="/donate" className="inline-flex items-center justify-center px-8 py-4 text-2xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                         Donate Now
-                      </button>
+                      </a>
                     </Link>
                   </div>
                 </div>

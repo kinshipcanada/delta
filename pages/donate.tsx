@@ -5,7 +5,7 @@ import { Country, Donation, DonationRegion } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { HeartHandshake, Home, MailIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Address, { GoogleFormattedAddress } from "@components/Address"
 import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/20/solid"
 import { v4 as uuidv4 } from 'uuid'
@@ -390,6 +390,15 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
         
     }
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowAddress(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const [showAddress, setShowAddress] = useState(false);
+
     return (
         <div className="flex justify-center">
             <div className="space-y-6 w-full max-w-2xl py-8">
@@ -477,7 +486,11 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             <Label label="Address" required={true} htmlFor={"address"} />
                             {/* <p className="block text-sm font-medium text-blue-600 underline cursor-pointer">Enter Address Manually</p> */}
                         </div>
-                        {/* <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} /> */}
+
+
+                        {showAddress && (
+                            <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+                        )}
                     </div>
                 </div>
 
