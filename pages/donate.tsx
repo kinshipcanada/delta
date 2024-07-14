@@ -181,7 +181,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center px-4 sm:px-0">
             <div className="space-y-6 w-full max-w-2xl px-4 py-8">
                 <button onClick={()=>{setView("donation")}}>&larr; Go Back</button>
                 <PaymentElement id="payment-element" options={paymentElementOptions} />
@@ -216,7 +216,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center px-4 sm:px-0">
             <div className="space-y-6 w-full max-w-2xl px-4 ">
             <div className="mx-auto max-w-3xl py-16 sm:px-6 sm:py-24 lg:px-8">
                 <div className="max-w-xl">
@@ -394,7 +394,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center px-4 sm:px-0">
             <div className="space-y-6 w-full max-w-2xl py-8">
                 <h1 className="flex w-full items-center justify-center space-x-4 mt-4 font-extrabold text-4xl text-center">
                     <img

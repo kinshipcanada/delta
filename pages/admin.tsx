@@ -41,6 +41,11 @@ export default function Admin() {
     //     fetchDonations()
     // }, [donor])
 
+    if (true) {
+        return (
+            <div>Admin Page Locked.</div>
+        )
+    }
     return (
         <div >
             {loadingDonations && <p>Loading...</p>}
