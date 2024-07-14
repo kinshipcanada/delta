@@ -105,7 +105,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
           children
           }
-        {/* <Footer /> */}
+        <Footer />
       </main>
     </AuthProvider>
   )
