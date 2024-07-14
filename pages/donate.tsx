@@ -1,11 +1,9 @@
 import { Button, ButtonSize, ButtonStyle, Label, SelectionInput } from "@components/primitives"
-import { HandRaisedIcon } from "@heroicons/react/24/outline"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
-import { Country, Donation, DonationRegion } from "@prisma/client"
+import { Donation, DonationRegion } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
-import { HeartHandshake, Home, MailIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Address, { GoogleFormattedAddress } from "@components/Address"
 import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/20/solid"
 import { v4 as uuidv4 } from 'uuid'
@@ -122,7 +120,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
     const paymentElementOptions: StripePaymentElementOptions = {
         defaultValues: {
             billingDetails: {
-                name: `${donation.donorFirstName} ${donation.donorMiddleName && donation.donorMiddleName} ${donation.donorLastName}`,
+                name: `${donation.donorFirstName} ${donation.donorLastName}`,
                 email: donation.donorEmail,
                 address: {
                   country: donation.donorAddressCountry,
@@ -200,7 +198,6 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
 
                 {stripeMessages && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <strong className="font-bold">Alert!</strong>
                         <span className="block sm:inline">{stripeMessages}</span>
                     </div>
                 )}
@@ -214,9 +211,10 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
 
     if (!donation) {
         return (
-            <div>Thank you so much! Your Donation Has Been Processed. A receipt will be sent shortly</div>
+            <div>Thank you so much! Your Donation Has Been Processed. A receipt will be sent shortly.</div>
         )
     }
+
     return (
         <div className="flex justify-center">
             <div className="space-y-6 w-full max-w-2xl px-4 ">
@@ -224,7 +222,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                 <div className="max-w-xl">
                     <h1 className="text-base font-medium text-blue-600">Donation Successful</h1>
                     <p className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Thank You!</p>
-                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.donorEmail}.</p>
+                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.donorEmail}. Please reach out to info@kinshipcanada.com with any questions.</p>
         
                     <dl className="mt-12 text-sm font-medium">
                     <dt className="text-gray-900">Donation ID</dt>
@@ -260,10 +258,10 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
         
                     <h3 className="sr-only">Summary</h3>
         
-                    <dl className="space-y-6 border-t border-gray-200 pt-10 text-sm">
+                    <dl className="space-y-6 border-t border-gray-200 pt-10 text-lg">
                         <div className="flex justify-between">
-                            <dt className="font-medium text-gray-900">Total Donated</dt>
-                            <dd className="text-gray-700">${centsToDollars(donation.amountChargedInCents)}</dd>
+                            <dt className="font-regular text-gray-900">Total Donated</dt>
+                            <dd className="text-gray-700 font-extrabold">${centsToDollars(donation.amountChargedInCents)}</dd>
                         </div>
                     </dl>
                     </div>
