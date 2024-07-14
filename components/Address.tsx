@@ -127,7 +127,7 @@ export default function Address({ addressString, setAddressString, formattedAddr
                       })}
                     </div>
                   )}
-                  {formattedAddress && <p>Selected Address: {formattedAddress.streetNumber} {formattedAddress.route} {formattedAddress.locality} {formattedAddress.administrativeAreaLevel1} {formattedAddress.country} ({formattedAddress.postalCode})</p>}
+                  {(formattedAddress && formattedAddress.streetNumber) && <p>Selected Address: {formattedAddress.streetNumber} {formattedAddress.route} {formattedAddress.locality} {formattedAddress.administrativeAreaLevel1} {formattedAddress.country} ({formattedAddress.postalCode})</p>}
               </div>
               )}
           </PlacesAutocomplete>

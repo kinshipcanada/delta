@@ -1,4 +1,4 @@
-import { Button, ButtonSize, ButtonStyle, Label } from "@components/primitives"
+import { Button, ButtonSize, ButtonStyle, Label, SelectionInput } from "@components/primitives"
 import { HandRaisedIcon } from "@heroicons/react/24/outline"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
 import { Country, Donation, DonationRegion } from "@prisma/client"
@@ -11,6 +11,7 @@ import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/20/solid"
 import { v4 as uuidv4 } from 'uuid'
 import { CreditCardIcon } from "@heroicons/react/24/solid"
 import { ConfirmationType } from "@lib/classes/utils"
+import { countries, states_and_provinces } from "@lib/utils/constants"
 
 const causes: CauseV2[] = [
     {
@@ -280,7 +281,9 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
     const [loading, setLoading] = useState<boolean>(false)
     
     const [selectedCauses, setSelectedCauses] = useState<CauseV2[]>([])
+
     const [address, setAddress] = useState<string>('')
+    const [manualAddressCollectionMode, setManualAddressCollectionMode] = useState<boolean>(false)
     const [formattedAddress, setFormattedAddress] = useState<GoogleFormattedAddress | undefined>(undefined)
 
     const [firstName, setFirstName] = useState<string>('')
@@ -325,7 +328,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
         }
 
         if (formattedAddress == undefined || formattedAddress?.streetNumber === undefined || formattedAddress?.route === undefined || formattedAddress?.locality === undefined || formattedAddress?.administrativeAreaLevel1 === undefined || formattedAddress?.country === undefined || formattedAddress?.postalCode === undefined) {
-            issues.push("Address is required")
+            issues.push("Address is required. Please start typing your address and select one from the dropdown menu")
         }
 
         for (const cause of selectedCauses) {
@@ -477,11 +480,17 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <div className="w-full space-y-1">
                         <div className="flex justify-between">
                             <Label label="Address" required={true} htmlFor={"address"} />
-                            {/* <p className="block text-sm font-medium text-blue-600 underline cursor-pointer">Enter Address Manually</p> */}
+                            <p className="block text-sm font-medium text-blue-600 underline cursor-pointer" onClick={()=>{ setManualAddressCollectionMode(!manualAddressCollectionMode)}}>{manualAddressCollectionMode ? "Enter Address Automatically" : "Enter Address Manually"}</p>
                         </div>
 
-
-                        <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+                        {manualAddressCollectionMode ? (
+                            <ManualAddressCollection 
+                                formattedAddress={formattedAddress}
+                                setFormattedAddress={setFormattedAddress}
+                            />
+                        ) : (
+                            <Address addressString={address} setAddressString={setAddress} formattedAddress={formattedAddress} setFormattedAddress={setFormattedAddress} />
+                        )}
                     </div>
                 </div>
 
@@ -501,6 +510,94 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
 
                 <div className="w-full flex justify-center">
                     <Button text={loading ? "Loading..." : "Proceed To Payment"} onClick={validateDonation} icon={<LockClosedIcon className="text-white w-4 h-4" />} style={ButtonStyle.Primary} size={ButtonSize.Large} />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function ManualAddressCollection(
+    { formattedAddress, setFormattedAddress }: 
+    { formattedAddress: GoogleFormattedAddress | undefined, setFormattedAddress: (address: GoogleFormattedAddress) => void }
+) {
+    return (
+        <div className="space-y-2">
+            <div className="w-full space-y-1">
+                <Label label="Street Number" required={true} htmlFor={"streetNumber"} />
+                <input 
+                    type="text" 
+                    id="streetNumber"
+                    placeholder="Street Number"
+                    onChange={(e) => setFormattedAddress({ ...formattedAddress, streetNumber: e.target.value })}
+                    className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
+                />
+            </div>
+            <div className="w-full space-y-1">
+                <Label label="Street Name" required={true} htmlFor={"streetName"} />
+                <input 
+                    type="text" 
+                    id="streetName"
+                    placeholder="Street Name"
+                    onChange={(e) => setFormattedAddress({ ...formattedAddress, route: e.target.value })}
+                    className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
+                />
+            </div>
+            <div className="w-full space-y-1">
+                <Label label="City" required={true} htmlFor={"city"} />
+                <input 
+                    type="text" 
+                    id="city"
+                    placeholder="City"
+                    onChange={(e) => setFormattedAddress({ ...formattedAddress, locality: e.target.value })}
+                    className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
+                />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                    {states_and_provinces[formattedAddress?.country ?? ''] === null || states_and_provinces[formattedAddress?.country ?? ''] === undefined ? (
+                        <div className="space-y-2">
+                            <Label label="Province" required={true} htmlFor={"province"} />
+                            <input 
+                                type="text" 
+                                id="province"
+                                placeholder="Province"
+                                onChange={(e) => setFormattedAddress({ ...formattedAddress, administrativeAreaLevel1: e.target.value })}
+                                className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
+                            />
+                        </div>
+                    ) : (
+                        <SelectionInput
+                            label="State or Province"
+                            name="state_or_province"
+                            id="state_or_province"
+                            value={formattedAddress?.administrativeAreaLevel1 ?? ''}
+                            options={states_and_provinces[formattedAddress?.country ?? 'CA']}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setFormattedAddress({ ...formattedAddress, administrativeAreaLevel1: e.target.value })
+                            }}
+                            required={true}
+                        />
+                    )}
+                </div>
+                
+                <div>
+                    <Label label={"Country"} htmlFor={"country"} required={true} />
+                    <select
+                        id={"country"}
+                        name={"country"}
+                        onChange={(e: any)=>{ 
+                            const countrySelected = e.target.value
+                            setFormattedAddress({ ...formattedAddress, country: countrySelected })
+                        }}
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
+                    >
+                        <option value="">Select a Country</option>
+                        {Object.entries(countries).map(([countryCode, countryName]) => (
+                            <option key={countryCode} value={countryCode}>
+                                {countryName}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
         </div>
