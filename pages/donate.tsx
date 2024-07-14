@@ -139,6 +139,8 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
             return;
         }
 
+        setLoading(true)
+
         const response = await stripe.confirmPayment({
             elements,
             confirmParams: {
@@ -393,7 +395,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
     return (
         <div className="flex justify-center">
             <div className="space-y-6 w-full max-w-2xl py-8">
-                <h1 className="flex w-full items-center justify-center space-x-4 mt-4 font-bold text-2xl text-center">
+                <h1 className="flex w-full items-center justify-center space-x-4 mt-4 font-extrabold text-4xl text-center">
                     <img
                         className="h-8 w-auto sm:h-10"
                         loading='eager'
@@ -463,7 +465,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                         </div>
                     </div>
                     <div className="w-full space-y-1">
-                        <Label label="Email" required={true} htmlFor={"email"} />
+                        <Label label="Email (Tax Receipt Will Be Sent Here)" required={true} htmlFor={"email"} />
                         <input 
                             type="email" 
                             id="email"
