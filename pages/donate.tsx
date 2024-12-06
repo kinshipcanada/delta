@@ -337,10 +337,18 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
 
         const sum = sumCauses(selectedCauses)
 
+        
         if (issues.length > 0) {
             alert(issues.join('\n'))
             return;
         } else {
+
+            const allocatedToCauses = selectedCauses
+                .filter(cause => cause.title !== "Where Most Needed")
+                .map((cause) => cause.amountCents ?? 0)
+                .reduce((acc, curr) => acc + curr, 0)
+            
+            console.log(selectedCauses)
             const donation: Donation = {
                 id: uuidv4(),
                 loggedAt: new Date(),
@@ -349,9 +357,11 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 adheringLabels: [
                     "V4_STRIPE_PAYMENT"
                 ],
-                allocatedToCauses: 0,
-                unallocatedToCauses: 0,
-                allocationBreakdown: { },
+                allocatedToCauses: allocatedToCauses,
+                unallocatedToCauses: sum - allocatedToCauses,
+                allocationBreakdown: {
+                    ...selectedCauses
+                },
                 causeName: null,
                 causeRegion: "ANYWHERE",
                 transactionStatus: "PENDING",
@@ -655,6 +665,7 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                                     value={customAmount ?? ''}
                                     min={0}
                                     className="w-full focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     onChange={(e) => {
                                         const value = Number(e.target.value);
                                         setCustomAmount(value);

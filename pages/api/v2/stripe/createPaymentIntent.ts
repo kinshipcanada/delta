@@ -10,7 +10,7 @@ const createDonationMetadata = (donation: Donation) => {
         donationId: donation.id,
         loggedAt: new Date().toDateString(),
         syncStatus: "unsynced",
-        allocationBreakdown: JSON.stringify({ v2Causes: [] }),
+        allocationBreakdown: JSON.stringify(donation.allocationBreakdown),
         status: DonationStatus.PROCESSING,
         adheringLabels: JSON.stringify(donation.adheringLabels),
         causeName: donation.causeName,
@@ -26,6 +26,9 @@ const createDonationMetadata = (donation: Donation) => {
         donorAddressState: donation.donorAddressState,
         donorAddressCountry: donation.donorAddressCountry,
         donorAddressPostalCode: donation.donorAddressPostalCode,
+        allocatedToCauses: donation.allocatedToCauses,
+        unallocatedToCauses: donation.unallocatedToCauses,
+
     }
 }
 

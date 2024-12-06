@@ -9,6 +9,7 @@ import {
 import { Button, ButtonSize, ButtonStyle } from "../components/primitives";
 import * as React from "react";
 import Link from 'next/link';
+import { BanknoteIcon, FileCheck2, SearchCheckIcon } from 'lucide-react';
 
 let Globe = () => null;
 if (typeof window !== "undefined") Globe = require("react-globe.gl").default;
@@ -70,21 +71,23 @@ export function Hero() {
 
 export function Incentives () {
 
+  const incentiveIconClass = 'w-12 h-12 text-blue-600'
+  
   const incentives = [
     {
       name: '100% of your donation goes to those who need it',
       description: "Kinship pays for any processing or bank fees out of pocket, unless you opt to contribute it.",
-      imageSrc: 'https://tailwindui.com/img/ecommerce/icons/icon-delivery-light.svg',
+      icon: <BanknoteIcon className={incentiveIconClass} />,
     },
     {
       name: 'Download tax receipts from your dashboard',
       description: 'You can access and download CRA-eligible tax receipts from your dashboard.',
-      imageSrc: 'https://tailwindui.com/img/ecommerce/icons/icon-chat-light.svg',
+      icon: <FileCheck2 className={incentiveIconClass} />,
     },
     {
       name: 'Receive proof of donation on your dashboard',
       description: "You will receive proof of all donations you make.",
-      imageSrc: 'https://tailwindui.com/img/ecommerce/icons/icon-fast-checkout-light.svg',
+      icon: <SearchCheckIcon className={incentiveIconClass} />,
     },
   ]
 
@@ -95,8 +98,8 @@ export function Incentives () {
           {incentives.map((incentive) => (
             <div key={incentive.name} className="text-center sm:flex sm:text-left lg:block lg:text-center">
               <div className="sm:flex-shrink-0">
-                <div className="flow-root">
-                  <img className="w-28 h-24 mx-auto" src={incentive.imageSrc} alt="" />
+                <div className="flex items-center justify-center">
+                  {incentive.icon}
                 </div>
               </div>
               <div className="mt-3 sm:mt-0 sm:ml-3 lg:mt-3 lg:ml-0">
