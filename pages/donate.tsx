@@ -62,6 +62,24 @@ const causes: CauseV2[] = [
         title: "Widows",
         choices: []
     },
+    {
+        region: DonationRegion.ANYWHERE,
+        title: "Ramadhan Campaign",
+        choices: [
+            {
+                amountCents: 50000,
+                description: "Feed one jamaat (community) for one night"
+            },
+            {
+                amountCents: 4200,
+                description: "One food ration package (grain, oil, sugar, lentils, small amount of meat, etc) for one family"
+            },
+            {
+                amountCents: 20000,
+                description: "Slaughter one animal to feed as many people as possible (Qurbani)"
+            },
+        ]
+    },
 ]
 
 
@@ -416,6 +434,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <div>Make A Donation</div>
                 </h1>
 
+                
                 <div className="w-full flex flex-col justify-start space-y-2 items-center">
                     <p className={HEADER_CLASS}>Select Your Causes</p>
                     <div className="flex items-center grid grid-cols-2 gap-4">
@@ -641,10 +660,10 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
     return (
         <div className="overflow-hidden rounded-lg bg-white shadow-sm border">
             <div className="px-4 py-5 sm:p-6 flex justify-between">
-                <p className={HEADER_CLASS}>{cause.title}</p>
-                <div className="flex flex-col space-y-3 justify-start">
+                <p className={HEADER_CLASS} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>{cause.title}</p>
+                <div className="flex flex-col space-y-3 justify-start items-start">
                     {cause.choices.map((choice) => (
-                        <span key={choice.description} className="space-x-4">
+                        <span key={choice.description} className="flex items-center space-x-4">
                             <input 
                                 type="radio"
                                 id={`${cause.title}-${choice.description}`}
@@ -653,7 +672,7 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                                 checked={selectedAmount === choice.amountCents}
                                 onChange={() => handleAmountChange(choice.amountCents)}
                             />
-                            <label htmlFor={`${cause.title}-${choice.description}`}>${centsToDollars(choice.amountCents)} {choice.description}</label>
+                            <label htmlFor={`${cause.title}-${choice.description}`}><span className="font-bold">${centsToDollars(choice.amountCents)}</span> {choice.description}</label>
                         </span>
                     ))}
                     {
@@ -677,7 +696,7 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                                 />
                             </div>
                         ) : (
-                            <span className="space-x-4 flex items-center">
+                            <span className="flex items-center space-x-4">
                                 <input 
                                     type="radio"
                                     id={`${cause.title}-custom`} 
