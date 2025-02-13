@@ -306,6 +306,8 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
     const [lastName, setLastName] = useState<string>('')
     const [email, setEmail] = useState<string>('')
 
+    const [inHonorOf, setInHonorOf] = useState<string>('')
+
     const getStripeClientSecret = async (donation: Donation) => {
         setLoading(true)
 
@@ -415,6 +417,10 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 legacyIdV1: null
             }
 
+            if (inHonorOf !== '') {
+                donation.adheringLabels.push("V4_IN_HONOR_OF_" + inHonorOf)
+            }
+
             await getStripeClientSecret(donation)
             setDonation(donation)
         }
@@ -467,6 +473,18 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                         {selectedCauses.map((cause) => (
                             <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
                         ))}
+
+                        <p className={HEADER_CLASS}>(Optional) Donate In Someones Honor</p>
+                        <p>Make this donation in someone else's honor. If you have selected prayers or recitations, this is whos name it will be recited for.</p>
+                        <input 
+                            type="text"
+                            value={inHonorOf ?? ''}
+                            className="w-full focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="Optional"
+                            onChange={(e) => {
+                                setInHonorOf(e.target.value);
+                            }}
+                        />
                     </div>
                 )}
 
