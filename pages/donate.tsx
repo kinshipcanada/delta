@@ -1,4 +1,5 @@
-import { Button, ButtonSize, ButtonStyle, Label, SelectionInput } from "@components/primitives"
+"use client"
+import { Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
 import { Donation, DonationRegion } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
@@ -10,6 +11,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { CreditCardIcon } from "@heroicons/react/24/solid"
 import { ConfirmationType } from "@lib/classes/utils"
 import { countries, states_and_provinces } from "@lib/utils/constants"
+import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typography"
+import Badge from "@components/ui/badge"
 
 const causes: CauseV2[] = [
     {
@@ -429,20 +432,27 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
 
     return (
         <div className="flex justify-center px-4 sm:px-0">
-            <div className="space-y-6 w-full max-w-2xl py-8">
-                <h1 className="flex w-full items-center justify-center space-x-4 mt-4 font-extrabold text-4xl text-center">
-                    <img
-                        className="h-8 w-auto sm:h-10"
-                        loading='eager'
-                        src="/logo.png"
-                        alt=""
-                    />
-                    <div>Make A Donation</div>
-                </h1>
+            <div className="space-y-12 w-full max-w-2xl py-8">
+                <div>
+                    <h1 className="flex w-full items-center justify-center space-x-4 mt-4">
+                        <img
+                            className="h-8 w-auto sm:h-10"
+                            loading='eager'
+                            src="/logo.png"
+                            alt=""
+                        />
+                        <TypographyH2>Make A Donation</TypographyH2>
+                    </h1>
 
+                    <TypographyP>If you would like to make an eTransfer donation, please etransfer <a href="mailto:info@kinshipcanada.com" className="text-blue-500 underline">info@kinshipcanada.com</a>, and email us with the amount and what causes you prefer to support.</TypographyP>
+
+                    <TypographyP>For very large donations kindly contact us at <a href="mailto:info@kinshipcanada.com" className="text-blue-500 underline">info@kinshipcanada.com</a> to arrange an ACH or wire transfer.</TypographyP>
+                </div>
                 
-                <div className="w-full flex flex-col justify-start space-y-2 items-center">
-                    <p className={HEADER_CLASS}>Select Your Causes</p>
+                <div className="w-full flex flex-col justify-start space-y-4">
+                    <TypographyH4>
+                        Step 1. Select Your Causes
+                    </TypographyH4>
                     <div className="flex items-center grid grid-cols-2 gap-4">
                     {causes.map((cause)=> (
                         <div key={cause.title}>
@@ -468,13 +478,24 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 </div>
 
                 {selectedCauses.length > 0 && (
-                    <div className="text-center space-y-2">
-                        <p className={HEADER_CLASS}>Choose How Much To Donate</p>
+                    <>
+                    <div className="space-y-2">
+                        <TypographyH4>
+                            Step 2. Choose How Much To Donate
+                        </TypographyH4>
                         {selectedCauses.map((cause) => (
                             <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
                         ))}
 
-                        <p className={HEADER_CLASS}>(Optional) Donate In Someones Honor</p>
+                        
+                    </div>
+                    <div className="space-y-2">
+                        <TypographyH4>
+                            <span className="inline-flex items-center rounded-full bg-green-200 px-2.5 py-0.5 text-sm font-medium text-green-800 mr-2">
+                                Optional
+                            </span>
+                            Donate In Someones Honor
+                        </TypographyH4>
                         <p>Make this donation in someone else's honor. If you have selected prayers or recitations, this is whos name it will be recited for.</p>
                         <input 
                             type="text"
@@ -486,6 +507,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             }}
                         />
                     </div>
+                    </>
                 )}
 
                 <div className="flex flex-col space-y-2 items-center">
