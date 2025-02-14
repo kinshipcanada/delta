@@ -12,7 +12,6 @@ import { CreditCardIcon } from "@heroicons/react/24/solid"
 import { ConfirmationType } from "@lib/classes/utils"
 import { countries, states_and_provinces } from "@lib/utils/constants"
 import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typography"
-import Badge from "@components/ui/badge"
 
 const causes: CauseV2[] = [
     {
@@ -451,7 +450,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 
                 <div className="w-full flex flex-col justify-start space-y-4">
                     <TypographyH4>
-                        Step 1. Select Your Causes
+                        Select Your Causes
                     </TypographyH4>
                     <div className="flex items-center grid grid-cols-2 gap-4">
                     {causes.map((cause)=> (
@@ -481,7 +480,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     <>
                     <div className="space-y-2">
                         <TypographyH4>
-                            Step 2. Choose How Much To Donate
+                            Choose How Much To Donate
                         </TypographyH4>
                         {selectedCauses.map((cause) => (
                             <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
@@ -510,8 +509,10 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     </>
                 )}
 
-                <div className="flex flex-col space-y-2 items-center">
-                    <p className={HEADER_CLASS}>Your Info</p>
+                <div className="flex flex-col space-y-2">
+                    <TypographyH4>
+                        Your Information
+                    </TypographyH4>
                     <div className="flex space-x-2 w-full">
                         <div className="w-1/2">
                             <Label label="First Name" required={true} htmlFor={"firstName"} />
