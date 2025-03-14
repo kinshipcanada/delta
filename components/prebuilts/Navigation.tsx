@@ -23,7 +23,6 @@ export default function Navigation() {
       { name: "Home", link: "/", current: router.asPath == "/" },
       { name: "Make A Donation", link: "/donate", current: router.asPath == "/donate" },
       { name: "About", link: "/about", current: router.asPath == "/about" },
-      { name: "Threads Of Opportunity Campaign", link: "https://give-can.keela.co/preview/4eGCSa84iHMfiB5Eg", current: false }
     ]
 
     return (
