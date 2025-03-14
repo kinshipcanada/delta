@@ -33,7 +33,7 @@ export default function Donate2() {
                             <span className="ml-4 cursor-pointer flex whitespace-nowrap">
                                 <Button
                                     text = {option.buttonName}
-                                    href = "/donate"
+                                    href = {option.link}
                                     style={ButtonStyle.Primary}
                                     size={ButtonSize.Standard}
                                 />
