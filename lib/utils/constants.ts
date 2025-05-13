@@ -1,5 +1,4 @@
 import { Cause } from "@lib/classes/causes";
-import { CountryCode } from "@lib/classes/utils";
 import { Country } from "@prisma/client";
 
 export type SelectOption = {

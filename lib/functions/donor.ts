@@ -1,7 +1,6 @@
 import { Address } from "../classes/address";
 import { Donor } from "../classes/donor";
-import { fetchDonorFromDatabase, setupDonorInDatabase, updateDonorInDatabase } from "../utils/database";
-import { formatDonorFromDatabase } from "../utils/formatting";
+import { setupDonorInDatabase, updateDonorInDatabase } from "../utils/database";
 import { validate as verifyUUID } from 'uuid';
 import { createStripeCustomer } from "../utils/stripe";
 import { CountryCode } from "@lib/classes/utils";
@@ -57,14 +56,6 @@ export async function createDonor(
     }
 
     return donor
-}
-
-export async function fetchDonor(donorId?: string, donorEmail?: string): Promise<Donor> {
-    if (donorId == null && donorEmail == null) {
-        throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
-    }
-
-    return formatDonorFromDatabase(await fetchDonorFromDatabase(donorId, donorEmail))
 }
 
 /**

@@ -1,6 +1,4 @@
 import { SelectOption } from "@lib/utils/constants";
-import { Donation } from "../../lib/classes/donation";
-import { Donor } from "../../lib/classes/donor";
 
 export const enum ButtonStyle {
     Primary,
@@ -80,10 +78,6 @@ export interface SpacerProps {
     size: SpacerSize
 }
 
-export interface AppPageProps {
-    donor: Donor,
-    donations: Donation[],
-}
 
 export interface Tab {
     name: string;

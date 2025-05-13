@@ -14,6 +14,7 @@ const requestSchema = z.object({
   causes: z.array(CausesSchema)
 })
 
+// TODO: this is not used anywhere, we should remove it
 export type ApiAdminProofUploadRequestSchema = z.infer<typeof requestSchema>
 
 /**

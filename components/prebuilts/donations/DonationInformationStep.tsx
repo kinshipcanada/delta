@@ -9,8 +9,6 @@ import { LockClosedIcon } from "@heroicons/react/24/solid"
 import { useAuth } from "../Authentication"
 import { ObjectIdApiResponse } from "@lib/classes/api"
 import { Cause } from "@lib/classes/causes"
-import { CountryCode } from "@lib/classes/utils"
-import { v4 as uuidv4 } from 'uuid'
 
 import { RadioGroup } from '@headlessui/react'
 import { CheckCircleIcon } from '@heroicons/react/20/solid'

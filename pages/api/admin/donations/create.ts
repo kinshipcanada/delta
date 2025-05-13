@@ -9,6 +9,7 @@ const requestSchema = z.object({
     donation: DonationSchema
 })
 
+// TODO: this is not used anywhere, we should remove it
 export type ApiAdminDonationsCreateRequestSchema = z.infer<typeof requestSchema>
 
 /**

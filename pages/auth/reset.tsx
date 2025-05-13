@@ -27,6 +27,7 @@ export default function Reset() {
                 setError("Sorry, something went wrong. Please try again later")
             });
         
+		// TODO: bug here I think, we shouldn't be pushing to the dashboard here, we should be pushing to the login page only as seen above
         router.push('/dashboard')
         setLoading(false)
     };

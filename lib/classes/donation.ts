@@ -63,13 +63,6 @@ export const DonationDetailsSchema = z.object({
   date_logged: z.string().pipe( z.coerce.date() ),
 })
 
-export interface Donation2 {
-  identifiers: DonationIdentifiers,
-  donor: Donor
-  transaction_details: TransactionDetails
-  donation_details: DonationDetails
-}
-
 export interface Donation {
   identifiers: DonationIdentifiers;
   donor: Donor;

@@ -110,20 +110,6 @@ export async function fetchProofFromDatabase(donation_identifiers: DonationIdent
     .select('proof.*');
 }
 
-export function fetchDonorFromDatabase(donorId?: string, donorEmail?: string): Promise<any> {
-  if (donorId == null && donorEmail == null) {
-    throw new Error('No valid identifiers provided. You must provide at least one of the following: donor_id, donor_email.')
-  }
-
-  const database = _createDatabase()
-
-  try {
-    return donorId ? database('donors').where('id', donorId).first() : database('donors').where('email', donorEmail).first()
-  } catch (error) {
-    throw error
-  } 
-}
-
 export function updateDonorInDatabase(
   donorId: string, 
   firstName: string, 

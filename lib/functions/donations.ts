@@ -66,16 +66,17 @@ export const createDonation2 = async (identifiers: DonationIdentifiers): Promise
     await uploadNewDonationToDatabase(donation)
     return donation
 }
-export async function createDonation(identifiers: DonationIdentifiers): Promise<Donation> {
-    const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
-    await uploadDonationToDatabase(donation);
-    await sendNotification(
-        UserNotificationType.DONATION_MADE,
-        donation,
-    )
 
-    return donation
-}
+// export async function createDonation(identifiers: DonationIdentifiers): Promise<Donation> {
+//     const donation = await formatDonationFromRawStripeData(await fetchFullDonationFromStripe(identifiers));
+//     await uploadDonationToDatabase(donation);
+//     await sendNotification(
+//         UserNotificationType.DONATION_MADE,
+//         donation,
+//     )
+
+//     return donation
+// }
 
 export async function createManualDonation(donation: Donation): Promise<Donation> {
     const donationId = uuidv4();
