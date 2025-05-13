@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as Sentry from "@sentry/nextjs";
+import captureException from '@lib/instrumentation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             payment_method: paymentMethod
         });
     } catch (error) {
-        Sentry.captureException(error)
+        captureException(error)
         res.status(500).json({ status: 500 });
     }
 }

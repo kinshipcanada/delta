@@ -1,10 +1,9 @@
 import Stripe from 'stripe';
 import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
-import { z } from "zod";
-import * as Sentry from "@sentry/nextjs";
 import { Donation, DonationStatus } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
+import captureException from '@lib/instrumentation';
 
 const createDonationMetadata = (donation: Donation) => {
     return {
@@ -99,7 +98,7 @@ export default async function handler(
         res.status(200).send(response);
     } catch (error) {
         console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
-        Sentry.captureException(error)
+        captureException(error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);
     }
