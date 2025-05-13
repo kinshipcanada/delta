@@ -21,7 +21,6 @@ export {
     type BadgeProps,
     SpacerSize,
     type SpacerProps,
-    type AppPageProps,
     type Tab,
     type TabsProps,
     type TableProps,
