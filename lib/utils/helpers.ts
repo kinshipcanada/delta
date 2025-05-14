@@ -9,6 +9,7 @@ import { NextApiResponse } from "next";
 import { ZodError, ZodObject, ZodType, z } from "zod";
 import { ApiResponse } from "@lib/classes/api";
 import { Cause } from "@lib/classes/causes";
+import posthog from 'posthog-js';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
