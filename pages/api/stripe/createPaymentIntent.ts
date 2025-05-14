@@ -3,7 +3,7 @@ import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
 import { Donation, DonationStatus } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
-import captureException from '@lib/instrumentation';
+import { captureServerException } from '@lib/posthog-server';
 
 const createDonationMetadata = (donation: Donation) => {
     return {
@@ -32,17 +32,15 @@ const createDonationMetadata = (donation: Donation) => {
 }
 
 /**
- * @description Fetches a donors profile
+ * @description Creates a payment intent in Stripe for a donation
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-
     const donation: Donation = req.body.donation
 
     try {
-
         const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
             apiVersion: "2023-08-16"
         })
@@ -72,7 +70,7 @@ export default async function handler(
 
         const paymentIntent = await stripeClient.paymentIntents.create({
             amount: donation.amountChargedInCents,
-            // Causes is added here for backwards compatability
+            // Causes is added here for backwards compatibility
             metadata: createDonationMetadata(donation),
             customer: stripeCustomerId,
             currency: 'cad',
@@ -97,9 +95,19 @@ export default async function handler(
         }
         res.status(200).send(response);
     } catch (error) {
-        console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
-        captureException(error)
-        const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
+        // Type guard to make TypeScript happy
+        const err = error instanceof Error 
+            ? error 
+            : new Error(typeof error === 'string' ? error : 'Unknown error');
+            
+        console.error(`Error creating Stripe Payment Intent for donation: ${err.message}`);
+        
+        // Use the imported captureServerException function
+        captureServerException(err, 'stripe_payment_intent');
+        
+        const response: ObjectIdApiResponse = { 
+            error: "Sorry, something went wrong on our end" 
+        };
         res.status(500).json(response);
     }
 }
