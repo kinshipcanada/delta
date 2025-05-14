@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import * as Sentry from "@sentry/nextjs";
-import { DonorEngine, FetchDonorProfileProps } from "@lib/methods/donors";
+import { DonorEngine } from "@lib/methods/donors";
+import { posthogLogger } from '@lib/posthog-server';
 
 /**
  * @description Fetch donations for a given donor email
@@ -15,7 +15,7 @@ export default async function handler(
         const donations = await donorEngine.fetchDonationsForDonor(payload)
         return res.status(200).send({ data: donations })
     } catch (error) {
-        Sentry.captureException(error)
+        posthogLogger(error)
         console.error(error)
         return res.status(500).send({
             error: "Sorry, something went wrong fetching your donations",

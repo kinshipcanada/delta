@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { extractStripePaymentIntentFromClientSecret } from '../../../../lib/utils/helpers';
-import * as Sentry from "@sentry/nextjs";
+import { posthogLogger } from '@lib/posthog-server';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -11,7 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const { clientSecret } = req.body;
 
-        // Extract payment intent id from client secret
         const paymentIntentId = extractStripePaymentIntentFromClientSecret(clientSecret);
 
         await stripe.paymentIntents.update(
@@ -30,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: 200
         });
     } catch (error) {
-        Sentry.captureException(error)
+        posthogLogger(error)
         res.status(500).json({ status: 500 });
     }
 }

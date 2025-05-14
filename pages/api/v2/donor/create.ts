@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import * as Sentry from "@sentry/nextjs";
 import { DonorEngine } from "@lib/methods/donors";
 import { Donor } from "@prisma/client";
+import { posthogLogger } from '@lib/posthog-server';
 
 /**
  * @description Creates a new donor profile
@@ -16,7 +16,7 @@ export default async function handler(
         const profile = await donorEngine.createDonorProfile(payload)
         return res.status(200).send({ data: profile })
     } catch (error) {
-        Sentry.captureException(error)
+        posthogLogger(error)
         console.error(`Error calling api/v2/donor/create: ${error}`)
         return res.status(500).send({
             error: "Sorry, something went wrong creating your donor profile",
