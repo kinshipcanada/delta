@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { DonationEngine } from "@lib/methods/donations";
 import { Donation } from "@prisma/client";
 import { NotificationEngine } from "@lib/methods/notifications";
-import { captureServerException } from '@lib/posthog-server';
+import { posthogLogger } from '@lib/posthog-server';
 
 /**`
  * @description Allows admin to create a new donation manually
@@ -22,7 +22,7 @@ export default async function handler(
         return res.status(200).send({ data: donation })
     } catch (error) {
         console.error(error)
-        captureServerException(error)
+        posthogLogger(error)
         return res.status(500).send({
             error: "Sorry, something went wrong creating this donation",
         })

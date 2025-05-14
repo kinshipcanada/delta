@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { DonorEngine } from "@lib/methods/donors";
-import { captureServerException } from '@lib/posthog-server';
+import { posthogLogger } from '@lib/posthog-server';
 
 /**
  * @description Creates a new donor profile
@@ -15,7 +15,7 @@ export default async function handler(
         const donorExists = await donorEngine.checkIfDonorExists(payload)
         return res.status(200).send({ data: donorExists })
     } catch (error) {
-        captureServerException(error)
+        posthogLogger(error)
         console.error(`Error calling api/v2/donor/create: ${error}`)
         return res.status(500).send({
             error: "Sorry, something went wrong checking this donor profile",

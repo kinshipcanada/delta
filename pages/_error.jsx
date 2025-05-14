@@ -19,9 +19,9 @@ CustomErrorComponent.getInitialProps = async (contextData) => {
     });
   } else {
     try {
-      const { captureServerException } = require('../lib/posthog-server');
+      const { posthogLogger } = require('../lib/posthog-server');
       const errorToCapture = err || new Error(`Server error - status ${statusCode}`);
-      captureServerException(errorToCapture, 'next_error_page');
+      posthogLogger(errorToCapture, 'next_error_page');
     } catch (e) {
       console.error('Failed to log server-side error to PostHog:', e);
     }

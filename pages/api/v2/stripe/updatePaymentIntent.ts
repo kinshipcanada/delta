@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { extractStripePaymentIntentFromClientSecret } from '../../../../lib/utils/helpers';
-import { captureServerException } from '@lib/posthog-server';
+import { posthogLogger } from '@lib/posthog-server';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             status: 200
         });
     } catch (error) {
-        captureServerException(error)
+        posthogLogger(error)
         res.status(500).json({ status: 500 });
     }
 }

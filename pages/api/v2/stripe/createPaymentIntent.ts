@@ -3,7 +3,7 @@ import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
 import { Donation, DonationStatus } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
-import { captureServerException } from '@lib/posthog-server';
+import { posthogLogger } from '@lib/posthog-server';
 
 const createDonationMetadata = (donation: Donation) => {
     return {
@@ -99,7 +99,7 @@ export default async function handler(
         res.status(200).send(response);
     } catch (error) {
         console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
-        captureServerException(error)
+        posthogLogger(error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);
     }
