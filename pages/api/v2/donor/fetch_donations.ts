@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { DonorEngine } from "@lib/methods/donors";
-import captureException from '@lib/instrumentation';
+import { captureServerException } from '@lib/posthog-server';
 
 /**
  * @description Fetch donations for a given donor email
@@ -15,7 +15,7 @@ export default async function handler(
         const donations = await donorEngine.fetchDonationsForDonor(payload)
         return res.status(200).send({ data: donations })
     } catch (error) {
-        captureException(error)
+        captureServerException(error)
         console.error(error)
         return res.status(500).send({
             error: "Sorry, something went wrong fetching your donations",

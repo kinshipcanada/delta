@@ -8,7 +8,6 @@ import { Theme } from '@radix-ui/themes';
 import posthog from "posthog-js";
 import { PostHogProvider } from 'posthog-js/react';
 
-// Initialize PostHog only on client side
 if (typeof window !== 'undefined') {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
@@ -19,7 +18,6 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// Error boundary as a class component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   constructor(props: {children: React.ReactNode}) {
     super(props);
@@ -31,7 +29,6 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log the error to PostHog
     if (typeof window !== 'undefined') {
       posthog.captureException(error, {
         componentStack: errorInfo.componentStack,

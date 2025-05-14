@@ -12,7 +12,6 @@ CustomErrorComponent.getInitialProps = async (contextData) => {
   if (typeof window !== 'undefined') {
     const errorToCapture = err || new Error(`_error.js - status ${statusCode}`);
     
-    // Use captureException for client-side errors
     posthog.captureException(errorToCapture, {
       statusCode: statusCode,
       url: window.location.href,
@@ -22,7 +21,7 @@ CustomErrorComponent.getInitialProps = async (contextData) => {
     try {
       const { captureServerException } = require('../lib/posthog-server');
       const errorToCapture = err || new Error(`Server error - status ${statusCode}`);
-      captureServerException(errorToCapture);
+      captureServerException(errorToCapture, 'next_error_page');
     } catch (e) {
       console.error('Failed to log server-side error to PostHog:', e);
     }

@@ -95,14 +95,12 @@ export default async function handler(
         }
         res.status(200).send(response);
     } catch (error) {
-        // Type guard to make TypeScript happy
         const err = error instanceof Error 
             ? error 
             : new Error(typeof error === 'string' ? error : 'Unknown error');
             
         console.error(`Error creating Stripe Payment Intent for donation: ${err.message}`);
         
-        // Use the imported captureServerException function
         captureServerException(err, 'stripe_payment_intent');
         
         const response: ObjectIdApiResponse = { 

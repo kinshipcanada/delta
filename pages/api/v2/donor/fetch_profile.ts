@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { DonorEngine, FetchDonorProfileProps } from "@lib/methods/donors";
-import captureException from '@lib/instrumentation';
+import { captureServerException } from '@lib/posthog-server';
 
 /**
  * @description Fetch a donors profile
@@ -16,7 +16,7 @@ export default async function handler(
         const donor = await donorEngine.fetchDonorProfile(payload)
         return res.status(200).send({ data: donor })
     } catch (error) {
-        captureException(error)
+        captureServerException(error)
         console.error(error)
         return res.status(500).send({
             error: "Sorry, something went wrong fetching your donor profile",
