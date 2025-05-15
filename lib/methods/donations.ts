@@ -3,6 +3,7 @@ import { Country, Currency, Donation, DonationRegion, DonationStatus, PaymentMet
 import { JsonObject } from "@prisma/client/runtime/library";
 import Stripe from "stripe"
 
+// TODO: remove this class after authentication is removed
 interface BuildDonationFromStripeProps {
     stripePaymentIntentId?: string
     stripeChargeId?: string
@@ -95,15 +96,16 @@ export class DonationEngine {
                     "causeRegion": donation.causeRegion,
                     "amountDonatedInCents": donation.amountDonatedInCents,
                     "feesDonatedInCents": donation.feesDonatedInCents,
-                    "donorFirstName": donation.donorFirstName,
-                    "donorMiddleName": donation.donorMiddleName,
-                    "donorLastName": donation.donorLastName,
-                    "donorEmail": donation.donorEmail,
-                    "donorAddressLineAddress": donation.donorAddressLineAddress,
-                    "donorAddressCity": donation.donorAddressCity,
-                    "donorAddressState": donation.donorAddressState,
-                    "donorAddressCountry": donation.donorAddressCountry,
-                    "donorAddressPostalCode": donation.donorAddressPostalCode,
+                    // TODO: revert to prev after authentication is removed
+                    // "donorFirstName": donation.donorFirstName,
+                    // "donorMiddleName": donation.donorMiddleName,
+                    // "donorLastName": donation.donorLastName,
+                    // "donorEmail": donation.donorEmail,
+                    // "donorAddressLineAddress": donation.donorAddressLineAddress,
+                    // "donorAddressCity": donation.donorAddressCity,
+                    // "donorAddressState": donation.donorAddressState,
+                    // "donorAddressCountry": donation.donorAddressCountry,
+                    // "donorAddressPostalCode": donation.donorAddressPostalCode,
                     "legacyIdV0": donation.legacyIdV0,
                     "legacyIdV1": donation.legacyIdV1,
                     "syncStatus": "synced"
@@ -272,15 +274,16 @@ export class DonationEngine {
             feesChargedInCents: balanceTransactionObject ? balanceTransactionObject.fee : -1,
             feesDonatedInCents: Number(feesDonatedInCents),
             currency: chargeObject.currency.toUpperCase() as Currency,
-            donorFirstName: donorFirstName,
-            donorMiddleName: donorMiddleName,
-            donorLastName: donorLastName,
-            donorEmail: donorEmail,
-            donorAddressLineAddress: donorAddressLineAddress,
-            donorAddressCity: donorAddressCity,
-            donorAddressState: donorAddressState,
-            donorAddressCountry: donorAddressCountry as Country,
-            donorAddressPostalCode: donorAddressPostalCode,
+            // TODO: revert to prev after authentication is removed
+            // donorFirstName: donorFirstName,
+            // donorMiddleName: donorMiddleName,
+            // donorLastName: donorLastName,
+            // donorEmail: donorEmail,
+            // donorAddressLineAddress: donorAddressLineAddress,
+            // donorAddressCity: donorAddressCity,
+            // donorAddressState: donorAddressState,
+            // donorAddressCountry: donorAddressCountry as Country,
+            // donorAddressPostalCode: donorAddressPostalCode,
             billingAddressPostalCode: "",
             stripeCustomerId: customerObject.id,
             stripePaymentIntentId: paymentIntentObject.id,

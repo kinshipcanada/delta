@@ -9,10 +9,9 @@ import { HorizontalSpacer } from "../../primitives/Spacer";
 import { ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../primitives/types";
 import { BoldText, Text } from "../../primitives/Typography";
 import { JustifyEnd } from "../../primitives/Utils";
-import { Donation as PrismaDonation } from "@prisma/client";
+import { Donation as PrismaDonation, Donor } from "@prisma/client";
 
-
-export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation }> = ({ donation }) => {
+export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: Donor }> = ({ donation, donor }) => {
     return (
         <PanelWithFooter
             footer={
@@ -28,7 +27,7 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation }> = ({ do
                         Donor
                     </BoldText>
                     <Text>
-                        { donation.donorFirstName } {donation.donorMiddleName ? donation.donorMiddleName : ""} { donation.donorLastName }
+                        {donor ? `${donor.donorFirstName} ${donor.donorMiddleName ?? ""} ${donor.donorLastName}` : ""}
                     </Text>
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
@@ -39,7 +38,12 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation }> = ({ do
                     <Text>
                         ${ centsToDollars(donation.amountChargedInCents) }
                         <HorizontalSpacer size={SpacerSize.Small} />
-                        <Badge text={donation.donorAddressCountry == "CA" ? "Tax Receipt" : "Donation Receipt"} style={Style.Outlined} color={donation.donorAddressCountry == "CA" ? EventColors.Success : EventColors.Neutral } />
+                        <Badge 
+                            text={donor?.donorAddressCountry === "CA" ? "Tax Receipt" : "Donation Receipt"} 
+                            style={Style.Outlined} 
+                            color={donor?.donorAddressCountry === "CA" ? EventColors.Success : EventColors.Neutral} 
+                        />
+
                     </Text>
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
@@ -77,7 +81,6 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation }> = ({ do
                     </Text>
                 </div>
             </dl>                
-
         </PanelWithFooter>
     )
 }

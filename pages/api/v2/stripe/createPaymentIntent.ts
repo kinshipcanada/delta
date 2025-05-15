@@ -5,6 +5,7 @@ import { Donation, DonationStatus } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
 import { posthogLogger } from '@lib/posthog-server';
 
+// TODO: update after authentication is removed
 const createDonationMetadata = (donation: Donation) => {
     return {
         donationId: donation.id,
@@ -17,15 +18,25 @@ const createDonationMetadata = (donation: Donation) => {
         causeRegion: donation.causeRegion,
         amountDonatedInCents: donation.amountDonatedInCents,
         feesDonatedInCents: donation.feesDonatedInCents,
-        donorFirstName: donation.donorFirstName,
-        donorMiddleName: donation.donorMiddleName,
-        donorLastName: donation.donorLastName,
-        donorEmail: donation.donorEmail,
-        donorAddressLineAddress: donation.donorAddressLineAddress,
-        donorAddressCity: donation.donorAddressCity,
-        donorAddressState: donation.donorAddressState,
-        donorAddressCountry: donation.donorAddressCountry,
-        donorAddressPostalCode: donation.donorAddressPostalCode,
+        // TODO: remove after authentication is removed
+        // donorFirstName: donation.donorFirstName,
+        // donorMiddleName: donation.donorMiddleName,
+        // donorLastName: donation.donorLastName,
+        // donorEmail: donation.donorEmail,
+        // donorAddressLineAddress: donation.donorAddressLineAddress,
+        // donorAddressCity: donation.donorAddressCity,
+        // donorAddressState: donation.donorAddressState,
+        // donorAddressCountry: donation.donorAddressCountry,
+        // donorAddressPostalCode: donation.donorAddressPostalCode,
+        donorFirstName: "firstName",
+        donorMiddleName: "middleName",
+        donorLastName: "lastName",
+        donorEmail: "email",
+        donorAddressLineAddress: "address",
+        donorAddressCity: "city",
+        donorAddressState: "state",
+        donorAddressCountry: "country",
+        donorAddressPostalCode: "postalCode",
         allocatedToCauses: donation.allocatedToCauses,
         unallocatedToCauses: donation.unallocatedToCauses,
 
@@ -58,15 +69,25 @@ export default async function handler(
             // We have to do this, because we can't attach a billing address or customer objects directly to Stripe payment intents, just the id as a string
             const donorEngine = new DonorEngine()
             stripeCustomerId = await donorEngine.createStripeProfile({
-                donorFirstName: donation.donorFirstName,
-                donorMiddleName: donation.donorMiddleName,
-                donorLastName: donation.donorLastName,
-                donorEmail: donation.donorEmail,
-                donorAddressLineAddress: donation.donorAddressLineAddress,
-                donorAddressCity: donation.donorAddressCity,
-                donorAddressState: donation.donorAddressState,
-                donorAddressCountry: donation.donorAddressCountry,
-                donorAddressPostalCode: donation.donorAddressPostalCode,
+                // donorFirstName: donation.donorFirstName,
+                // donorMiddleName: donation.donorMiddleName,
+                // donorLastName: donation.donorLastName,
+                // donorEmail: donation.donorEmail,
+                // donorAddressLineAddress: donation.donorAddressLineAddress,
+                // donorAddressCity: donation.donorAddressCity,
+                // donorAddressState: donation.donorAddressState,
+                // donorAddressCountry: donation.donorAddressCountry,
+                // donorAddressPostalCode: donation.donorAddressPostalCode,
+                // TODO: remove after authentication is removed
+                donorFirstName: "firstName",
+                donorMiddleName: "middleName",
+                donorLastName: "lastName",
+                donorEmail: "email",
+                donorAddressLineAddress: "address",
+                donorAddressCity: "city",
+                donorAddressState: "state",
+                donorAddressCountry: "CA",
+                donorAddressPostalCode: "M4A 0J5",
                 stripeCustomerIds: []
             })
         }
@@ -77,7 +98,9 @@ export default async function handler(
             metadata: createDonationMetadata(donation),
             customer: stripeCustomerId,
             currency: 'cad',
-            receipt_email: donation.donorEmail,
+            // TODO: remove after authentication is removed
+            // receipt_email: donation.donorEmail,
+            receipt_email: "email",
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {

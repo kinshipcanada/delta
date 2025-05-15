@@ -54,15 +54,6 @@ model Donation {
   // Donor details
   donorId                 String?
   donor                   Donor?  @relation(fields: [donorId], references: [id])
-  donorFirstName          String
-  donorMiddleName         String?
-  donorLastName           String
-  donorEmail              String
-  donorAddressLineAddress String
-  donorAddressCity        String
-  donorAddressState       String
-  donorAddressCountry     Country @default(CA)
-  donorAddressPostalCode  String
 
   // Billing details
   billingAddressPostalCode String

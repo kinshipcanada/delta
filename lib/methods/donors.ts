@@ -129,11 +129,13 @@ export class DonorEngine {
     async fetchDonationsForDonor(donorEmail: string): Promise<Donation[]> {
         return await this.prismaClient.donation.findMany({
             where: {
-                donorEmail
+                donor: {
+                    donorEmail
+                }
             },
             orderBy: {
                 donatedAt: 'desc'
             }
-        })
+        });
     } 
 }

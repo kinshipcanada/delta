@@ -5,6 +5,8 @@ import { ServerClient } from 'postmark'
 import { DonationEngine } from "./donations";
 import { centsToDollars, parseFrontendDate } from "@lib/utils/helpers";
 
+// TODO: remove this class after authentication is removed
+
 export class NotificationEngine {
     readonly postmarkClient: ServerClient;
     readonly fromEmail: string
@@ -39,12 +41,29 @@ export class NotificationEngine {
 
     public async emailDonationReceipt(donation: Donation) {
         const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`
+        // const emailBody = `
+        //     Dear ${donation.donorFirstName},
+
+        //     Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)} ${donation.currency}.
+
+        //     You can access your ${donation.donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+
+        //     Thank you very much,
+        //     The Team At Kinship Canada
+
+        //     Invoice ID: ${donation.id}
+        //     Date Donated: ${parseFrontendDate(donation.donatedAt)}
+        //     Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
+        //     Receipt Issued To: ${donation.donorFirstName} ${donation.donorMiddleName ? donation.donorMiddleName : ""} ${donation.donorLastName}
+        //     Donor Address: ${donation.donorAddressLineAddress}, ${donation.donorAddressCity}, ${donation.donorAddressState}, ${donation.donorAddressCountry} (${donation.donorAddressPostalCode})
+        // `
+
         const emailBody = `
-            Dear ${donation.donorFirstName},
+            Dear firstName,
 
             Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)} ${donation.currency}.
 
-            You can access your ${donation.donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+            You can access your receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
 
             Thank you very much,
             The Team At Kinship Canada
@@ -52,10 +71,10 @@ export class NotificationEngine {
             Invoice ID: ${donation.id}
             Date Donated: ${parseFrontendDate(donation.donatedAt)}
             Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
-            Receipt Issued To: ${donation.donorFirstName} ${donation.donorMiddleName ? donation.donorMiddleName : ""} ${donation.donorLastName}
-            Donor Address: ${donation.donorAddressLineAddress}, ${donation.donorAddressCity}, ${donation.donorAddressState}, ${donation.donorAddressCountry} (${donation.donorAddressPostalCode})
+            Receipt Issued To: firstName lastName
+            Donor Address: 123 Main St, Toronto, ON, CA (M5A 1A1)
         `
 
-        return await this.sendEmail(donation.donorEmail, subjectLine, emailBody)
+        return await this.sendEmail("test@test.com", subjectLine, emailBody)
     }
 }

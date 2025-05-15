@@ -1,6 +1,6 @@
 import { useAuth } from "@components/prebuilts/Authentication"
 import { callKinshipAPI, supabase } from "@lib/utils/helpers"
-import { Donation } from "@prisma/client"
+import { Donation, Donor } from "@prisma/client"
 import { useEffect, useState } from "react"
 import { Tab } from '@headlessui/react'
 import { Fragment } from 'react'
@@ -19,7 +19,7 @@ export default function Dashboard() {
         if (!donor) { return }
 
         const donations = await callKinshipAPI<Donation[]>("/api/v2/donor/fetch_donations", {
-            donorEmail: donor.donorEmail,
+            donorEmail: donor.donorEmail
         })
 
         if (!donations.data) {
@@ -94,7 +94,11 @@ export default function Dashboard() {
                         <Tab.Panels className={"my-4"}>
                             <Tab.Panel className={"space-y-4"}>
                                 {donations.map((donation)=>(
-                                    <PrismaDonationPanel donation={donation} />
+                                    <PrismaDonationPanel 
+                                        key={donation.id}
+                                        donation={donation} 
+                                        donor={donor} 
+                                    />
                                 ))}
                             </Tab.Panel>
                             <Tab.Panel>

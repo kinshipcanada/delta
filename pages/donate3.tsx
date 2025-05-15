@@ -13,6 +13,9 @@ import { ConfirmationType } from "@lib/classes/utils"
 import { countries, states_and_provinces } from "@lib/utils/constants"
 import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typography"
 
+// TODO: redo this page once authentication is removed to reflect 
+// the fields from the donation models
+
 const causes: CauseV2[] = [
     {
         region: DonationRegion.ANYWHERE,
@@ -139,17 +142,29 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
 
     const paymentElementOptions: StripePaymentElementOptions = {
         defaultValues: {
+            // TODO: revert to prev after authentication is removed
             billingDetails: {
-                name: `${donation.donorFirstName} ${donation.donorLastName}`,
-                email: donation.donorEmail,
+                name: `firstName lastName`,
+                email: `email@email.com`,
                 address: {
-                  country: donation.donorAddressCountry,
-                  postal_code: donation.donorAddressPostalCode,
-                  state: donation.donorAddressState,
-                  city: donation.donorAddressCity,
-                  line1: donation.donorAddressLineAddress
+                  country: `CA`,
+                  postal_code: `M5A 0J5`,
+                  state: `ON`,
+                  city: `Toronto`,
+                  line1: `123 Main St`
                 }
             }
+            // billingDetails: {
+            //     name: `${donation.donorFirstName} ${donation.donorLastName}`,
+            //     email: donation.donorEmail,
+            //     address: {
+            //       country: donation.donorAddressCountry,
+            //       postal_code: donation.donorAddressPostalCode,
+            //       state: donation.donorAddressState,
+            //       city: donation.donorAddressCity,
+            //       line1: donation.donorAddressLineAddress
+            //     }
+            // }
         }
     }
 
@@ -242,7 +257,10 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                 <div className="max-w-xl">
                     <h1 className="text-base font-medium text-blue-600">Donation Successful</h1>
                     <p className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Thank You!</p>
-                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.donorEmail}. Please reach out to info@kinshipcanada.com with any questions.</p>
+                    
+                    {/* TODO: revert to prev after authentication is removed */}
+                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to email@email.com. Please reach out to info@kinshipcanada.com with any questions.</p>
+                    {/* <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.donorEmail}. Please reach out to info@kinshipcanada.com with any questions.</p> */}
         
                     <dl className="mt-12 text-sm font-medium">
                     <dt className="text-gray-900">Donation ID</dt>
@@ -258,9 +276,13 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                         <dt className="font-medium text-gray-900">Address Details</dt>
                         <dd className="mt-2 text-gray-700">
                             <address className="not-italic">
-                                <span className="block">{donation.donorAddressLineAddress}</span>
+                                {/* TODO: revert to prev after authentication is removed */}
+                                <span className="block">123 Main St</span>
+                                <span className="block">Toronto ON M5A 0J5</span>
+                                <span className="block">Canada</span>
+                                {/* <span className="block">{donation.donorAddressLineAddress}</span>
                                 <span className="block">{donation.donorAddressCity} {donation.donorAddressState}</span>
-                                <span className="block">{donation.donorAddressCountry}, {donation.donorAddressPostalCode}</span>
+                                <span className="block">{donation.donorAddressCountry}, {donation.donorAddressPostalCode}</span> */}
                             </address>
                         </dd>
                         </div>
@@ -268,8 +290,11 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                         <dt className="font-medium text-gray-900">Donor Details</dt>
                         <dd className="mt-2 text-gray-700">
                             <address className="not-italic">
-                            <span className="block">{donation.donorFirstName} {donation.donorLastName}</span>
-                            <span className="block">{donation.donorEmail}</span>
+                                {/* TODO: revert to prev after authentication is removed */}
+                                <span className="block">firstName lastName</span>
+                                <span className="block">email@email.com</span>
+                                {/* <span className="block">{donation.donorFirstName} {donation.donorLastName}</span>
+                                <span className="block">{donation.donorEmail}</span> */}
                             </address>
                         </dd>
                         </div>
@@ -394,15 +419,16 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 feesDonatedInCents: 0,
                 currency: "CAD",
                 donorId: null,
-                donorFirstName: firstName,
-                donorMiddleName: null,
-                donorLastName: lastName,
-                donorEmail: email,
-                donorAddressLineAddress: `${formattedAddress!.streetNumber} ${formattedAddress!.route}`,
-                donorAddressCity: formattedAddress!.locality!,
-                donorAddressState: formattedAddress!.administrativeAreaLevel1!,
-                donorAddressCountry: formattedAddress!.country! == "Canada" ? "CA" : "AD",
-                donorAddressPostalCode: formattedAddress!.postalCode!,
+                // TODO: revert to prev after authentication is removed
+                // donorFirstName: firstName,
+                // donorMiddleName: null,
+                // donorLastName: lastName,
+                // donorEmail: email,
+                // donorAddressLineAddress: `${formattedAddress!.streetNumber} ${formattedAddress!.route}`,
+                // donorAddressCity: formattedAddress!.locality!,
+                // donorAddressState: formattedAddress!.administrativeAreaLevel1!,
+                // donorAddressCountry: formattedAddress!.country! == "Canada" ? "CA" : "AD",
+                // donorAddressPostalCode: formattedAddress!.postalCode!,
                 billingAddressPostalCode: formattedAddress!.postalCode!,
                 stripeCustomerId: null,
                 stripePaymentIntentId: null,
