@@ -14,8 +14,6 @@ const createDonationMetadata = (donation: Donation) => {
         allocationBreakdown: JSON.stringify(donation.allocationBreakdown),
         status: DonationStatus.PROCESSING,
         adheringLabels: JSON.stringify(donation.adheringLabels),
-        causeName: donation.causeName,
-        causeRegion: donation.causeRegion,
         amountDonatedInCents: donation.amountDonatedInCents,
         feesDonatedInCents: donation.feesDonatedInCents,
         // TODO: remove after authentication is removed

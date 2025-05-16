@@ -1,5 +1,5 @@
 import prisma from "@lib/prisma";
-import { Donation, Donor, PaymentMethodType, PrismaClient } from "@prisma/client";
+import { Donation, Donor, PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 
 export interface FetchDonorProfileProps {
@@ -10,7 +10,6 @@ export interface FetchDonorProfileProps {
 export interface AttachOrDetachPaymentMethodProps {
     id: string 
     paymentMethodId: string
-    paymentMethodType: PaymentMethodType
 }
 
 export type UpdatableDonorProfile = Pick<Donor, "donorFirstName" | "donorLastName" | "donorMiddleName" | "donorAddressLineAddress" | "donorAddressState" | "donorAddressCity" | "donorAddressCountry" | "donorAddressPostalCode">

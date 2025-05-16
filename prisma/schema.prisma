@@ -33,48 +33,33 @@ model Donation {
   date           DateTime @default(now())
   adheringLabels String[]
 
-  allocatedToCauses   Int
-  unallocatedToCauses Int
+  // come back to this
+  allocatedToCauses   Int?
+  unallocatedToCauses Int?
   // { v2Causes: { name: string, amount: Int, region: DonationRegion }[] }
   allocationBreakdown Json?
 
-  causeName   String?
-  causeRegion DonationRegion?
 
-  // Payment details
-  transactionStatus    TransactionStatus @default(SUCCEEDED)
+  // causeName   String? TODO: going to have to relate this field to the cause table
+  // causeRegion DonationRegion? TODO: going to have to relate this field to the cause table
+
   amountDonatedInCents Int
-  amountRefunded       Int
   amountChargedInCents Int
+
   feesChargedInCents   Int
   feesDonatedInCents   Int
-  currency             Currency          @default(CAD)
 
-  // Donor details
+  // Donor details TODO: remove once the auth is removed
   donorId                 String?
   donor                   Donor?  @relation(fields: [donorId], references: [id])
 
-  // Billing details
-  billingAddressPostalCode String
-
   // Stripe identifiers
   stripeCustomerId      String?
-  stripePaymentIntentId String? @unique
-  stripePaymentMethodId String?
-  stripeChargeId        String? @unique
-  stripeBalanceTxnId    String?
 
-  // Payment method details
-  paymentMethodType PaymentMethodType
-  pmCardFunding     String? // debit or credit
-  pmCardBrand       String?
-  pmCardLast4       String?
-  pmCardExpMonth    Int?
-  pmCardExpYear     Int?
+  stripeTransferId      String? // not sure how these fit in
+  stripeChargeId        String? // not sure how these fit in
 
-  // legacy support
-  legacyIdV0 String?
-  legacyIdV1 String?
+  version               Float?
 
   causes Cause[]
 }
@@ -129,17 +114,6 @@ enum DonationRegion {
   // I'm guessing Africe and Tanzania is the same thing
   AFRICA
   CANADA
-}
-
-enum TransactionStatus {
-  PENDING
-  FAILED
-  SUCCEEDED
-}
-
-enum Currency {
-  CAD
-  USD
 }
 
 enum Country {

@@ -16,11 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // Fetch the receipt from the primary source
     const donation = await prisma.donation.findFirst({
       where: {
-        OR: [
-          { id: id },
-          { legacyIdV1: id },
-          { legacyIdV0: id }
-        ]
+        id: id
       }
     })
 

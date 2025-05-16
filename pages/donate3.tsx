@@ -194,8 +194,6 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
         } else {
             setDonation({
                 ...donation,
-                stripePaymentIntentId: response.paymentIntent.id,
-                stripePaymentMethodId: response.paymentIntent.payment_method!.toString()
             })
 
             if (response.paymentIntent.status == "succeeded") {
@@ -408,16 +406,14 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 allocationBreakdown: {
                     ...selectedCauses
                 },
-                causeName: null,
-                causeRegion: "ANYWHERE",
-                transactionStatus: "PENDING",
+                // causeName: null,
+                // causeRegion: "ANYWHERE",
+                // transactionStatus: "PENDING",
                 amountDonatedInCents: sum,
-                amountRefunded: 0,
                 amountChargedInCents: sum,
                 feesChargedInCents: 0,
                 feesDonatedInCents: 0,
-                currency: "CAD",
-                donorId: null,
+                donorId: null, // will get rid of after donor model is removed
                 // TODO: revert to prev after authentication is removed
                 // donorFirstName: firstName,
                 // donorMiddleName: null,
@@ -428,20 +424,10 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 // donorAddressState: formattedAddress!.administrativeAreaLevel1!,
                 // donorAddressCountry: formattedAddress!.country! == "Canada" ? "CA" : "AD",
                 // donorAddressPostalCode: formattedAddress!.postalCode!,
-                billingAddressPostalCode: formattedAddress!.postalCode!,
                 stripeCustomerId: null,
-                stripePaymentIntentId: null,
-                stripePaymentMethodId: null,
+                stripeTransferId: null,
                 stripeChargeId: null,
-                stripeBalanceTxnId: null,
-                paymentMethodType: "CARD",
-                pmCardFunding: null,
-                pmCardBrand: null,
-                pmCardLast4: null,
-                pmCardExpMonth: null,
-                pmCardExpYear: null,
-                legacyIdV0: null,
-                legacyIdV1: null
+                version: 2,
             }
 
             if (inHonorOf !== '') {
