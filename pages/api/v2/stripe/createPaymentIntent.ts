@@ -9,7 +9,7 @@ import { posthogLogger } from '@lib/posthog-server';
 const createDonationMetadata = (donation: Donation) => {
     return {
         donationId: donation.id,
-        loggedAt: new Date().toDateString(),
+        date: new Date().toDateString(),
         syncStatus: "unsynced",
         allocationBreakdown: JSON.stringify(donation.allocationBreakdown),
         status: DonationStatus.PROCESSING,

@@ -101,7 +101,7 @@ const Receipt: React.FC<Props> = (props) => {
                 <h1 className = 'text-xl font-bold leading-7 text-gray-900 sm:text-2xl sm:truncate mb-2'>Official Receipt For Income Tax Purposes</h1>
                 <p className="font-medium text-gray-700 mb-1">Kinship Canada is a registered charity</p>
                 <p className="font-medium text-gray-700">Registration Number 855070728 RR 0001</p>
-                <p className="font-medium text-gray-700">Date Of Donation: {parseFrontendDate(receipt.donatedAt)}</p>
+                <p className="font-medium text-gray-700">Date Of Donation: {parseFrontendDate(receipt.date)}</p>
             </div>
             <div>
                 <p className="font-medium text-gray-700 mb-1">Signed By Vice President</p>

@@ -26,12 +26,11 @@ model Donor {
 }
 
 model Donation {
-  id       String   @id @default(uuid())
-  loggedAt DateTime @default(now())
+  id            String   @id @default(uuid())
 
   // Donation details
-  status         DonationStatus @default(PROCESSING)
-  donatedAt      DateTime
+  status         DonationStatus @default(PROCESSING) // keep this
+  date           DateTime @default(now())
   adheringLabels String[]
 
   allocatedToCauses   Int
@@ -81,12 +80,12 @@ model Donation {
 }
 
 model Cause {
-  id                 String         @id @default(uuid())
-  donation           Donation       @relation(fields: [donationId], references: [id])
-  title              String
-  region             DonationRegion
-  amountDonatedCents Int
-  donationId         String
+  id                    String         @id @default(uuid())
+  donation_id           Donation       @relation(fields: [donationId], references: [id])
+  title                 String
+  region                DonationRegion?
+  amountDonatedCents    Int
+  donationId            String
 }
 
 model ProofDetailsMap {
@@ -113,6 +112,7 @@ model Proof {
   donations                String[]
 }
 
+// keep
 enum DonationStatus {
   PROCESSING
   DELIVERED_TO_PARTNERS
@@ -121,9 +121,12 @@ enum DonationStatus {
 }
 
 enum DonationRegion {
+  // doesn't show up in the new enum from
+  // consolidate but is used in donate3
   ANYWHERE
   IRAQ
   INDIA
+  // I'm guessing Africe and Tanzania is the same thing
   AFRICA
   CANADA
 }

@@ -69,7 +69,7 @@ export class NotificationEngine {
             The Team At Kinship Canada
 
             Invoice ID: ${donation.id}
-            Date Donated: ${parseFrontendDate(donation.donatedAt)}
+            Date Donated: ${parseFrontendDate(donation.date)}
             Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
             Receipt Issued To: firstName lastName
             Donor Address: 123 Main St, Toronto, ON, CA (M5A 1A1)

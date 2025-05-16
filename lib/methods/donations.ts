@@ -3,7 +3,7 @@ import { Country, Currency, Donation, DonationRegion, DonationStatus, PaymentMet
 import { JsonObject } from "@prisma/client/runtime/library";
 import Stripe from "stripe"
 
-// TODO: remove this class after authentication is removed
+// TODO: update after authentication is removed
 interface BuildDonationFromStripeProps {
     stripePaymentIntentId?: string
     stripeChargeId?: string
@@ -87,7 +87,7 @@ export class DonationEngine {
                 const metadataParam: Stripe.MetadataParam = {
                     "donationId": donation.id,
                     "status": donation.status,
-                    "loggedAt": donation.loggedAt.toString(),
+                    "date": donation.date.toString(),
                     "adheringLabels": donation.adheringLabels.toString(),
                     "allocatedToCauses": donation.allocatedToCauses,
                     "allocationBreakdown": JSON.stringify(donation.allocationBreakdown),
@@ -219,7 +219,7 @@ export class DonationEngine {
 
         const {
             donationId,
-            loggedAt,
+            date,
             syncStatus,
             allocationBreakdown,
             status,
@@ -258,9 +258,8 @@ export class DonationEngine {
 
         const donation: Donation = {
             id: donationId,
-            loggedAt: syncStatus == "synced" ? new Date(loggedAt) : new Date(),
             status: status as DonationStatus,
-            donatedAt: new Date(chargeObject.created * 1000),
+            date: new Date(chargeObject.created * 1000),
             adheringLabels: adheringLabels.split(','),
             allocatedToCauses: Number(allocatedToCauses),
             unallocatedToCauses: Number(unallocatedToCauses),

@@ -398,9 +398,8 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
             console.log(selectedCauses)
             const donation: Donation = {
                 id: uuidv4(),
-                loggedAt: new Date(),
+                date: new Date(),
                 status: "PROCESSING",
-                donatedAt: new Date(),
                 adheringLabels: [
                     "V4_STRIPE_PAYMENT"
                 ],

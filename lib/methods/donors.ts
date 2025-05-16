@@ -134,7 +134,7 @@ export class DonorEngine {
                 }
             },
             orderBy: {
-                donatedAt: 'desc'
+                date: 'desc'
             }
         });
     } 

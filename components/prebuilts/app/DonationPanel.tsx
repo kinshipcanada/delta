@@ -77,7 +77,7 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: D
                         Date Of Donation
                     </BoldText>
                     <Text>
-                        { parseFrontendDate(donation.donatedAt) }
+                        { parseFrontendDate(donation.date) }
                     </Text>
                 </div>
             </dl>                
