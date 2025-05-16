@@ -34,14 +34,11 @@ model Donation {
   adheringLabels String[]
 
   // come back to this
-  allocatedToCauses   Int?
-  unallocatedToCauses Int?
+  allocatedToCauses   Int
+  unallocatedToCauses Int
   // { v2Causes: { name: string, amount: Int, region: DonationRegion }[] }
-  allocationBreakdown Json?
+  allocationBreakdown Json
 
-
-  // causeName   String? TODO: going to have to relate this field to the cause table
-  // causeRegion DonationRegion? TODO: going to have to relate this field to the cause table
 
   amountDonatedInCents Int
   amountChargedInCents Int
@@ -61,43 +58,20 @@ model Donation {
 
   version               Float?
 
-  causes Cause[]
+  causes Cause[] @relation("DonationCauses")
 }
 
 model Cause {
   id                    String         @id @default(uuid())
-  donation_id           Donation       @relation(fields: [donationId], references: [id])
-  title                 String
+  donation_id           String         @unique
+  donation              Donation       @relation("DonationCauses", fields: [donation_id], references: [id])
   region                DonationRegion?
   amountDonatedCents    Int
-  donationId            String
+  inHonorOf             String?
+  cause                 String
+  subCause              String?
 }
 
-model ProofDetailsMap {
-  // Amount distributed for this specific donation. 
-  // The parent proof has the total amount in this distribution
-  id                       String @id @default(uuid())
-  amountDistributedInCents Int
-  parentProofId            String
-}
-
-enum PaymentMethodType {
-  CARD
-  ACSS_DEBIT
-  ETRANSFER
-  CASH
-}
-
-model Proof {
-  id                       String   @id @default(uuid())
-  amountDistributedInCents Int
-  messageToDonor           String
-  regionDistributed        String
-  adheringLabels           String[]
-  donations                String[]
-}
-
-// keep
 enum DonationStatus {
   PROCESSING
   DELIVERED_TO_PARTNERS
@@ -106,13 +80,10 @@ enum DonationStatus {
 }
 
 enum DonationRegion {
-  // doesn't show up in the new enum from
-  // consolidate but is used in donate3
-  ANYWHERE
+  ANYWHERE // not sure if we want to keep this
   IRAQ
   INDIA
-  // I'm guessing Africe and Tanzania is the same thing
-  AFRICA
+  TANZANIA
   CANADA
 }
 
