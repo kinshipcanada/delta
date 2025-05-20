@@ -145,7 +145,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
             // TODO: revert to prev after authentication is removed
             billingDetails: {
                 name: `firstName lastName`,
-                email: `email@email.com`,
+                email: `zaltaf@gmail.com`,
                 address: {
                   country: `CA`,
                   postal_code: `M5A 0J5`,

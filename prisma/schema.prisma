@@ -31,9 +31,9 @@ model Donation {
   // Donation details
   status         DonationStatus @default(PROCESSING) // keep this
   date           DateTime @default(now())
-  adheringLabels String[]
+  adheringLabels String[] // not sure if we're removing this
 
-  // come back to this
+  // This seems important enough to keep but not sure
   allocatedToCauses   Int
   unallocatedToCauses Int
   // { v2Causes: { name: string, amount: Int, region: DonationRegion }[] }

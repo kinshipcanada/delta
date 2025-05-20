@@ -29,7 +29,7 @@ const createDonationMetadata = (donation: Donation) => {
         donorFirstName: "firstName",
         donorMiddleName: "middleName",
         donorLastName: "lastName",
-        donorEmail: "email",
+        donorEmail: "zaltaf@gmail.com",
         donorAddressLineAddress: "address",
         donorAddressCity: "city",
         donorAddressState: "state",
@@ -80,7 +80,7 @@ export default async function handler(
                 donorFirstName: "firstName",
                 donorMiddleName: "middleName",
                 donorLastName: "lastName",
-                donorEmail: "email",
+                donorEmail: "zaltaf@gmail.com",
                 donorAddressLineAddress: "address",
                 donorAddressCity: "city",
                 donorAddressState: "state",
@@ -98,7 +98,7 @@ export default async function handler(
             currency: 'cad',
             // TODO: remove after authentication is removed
             // receipt_email: donation.donorEmail,
-            receipt_email: "email",
+            receipt_email: "zaltaf@gmail.com",
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {
@@ -120,7 +120,7 @@ export default async function handler(
         res.status(200).send(response);
     } catch (error) {
         console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
-        posthogLogger(error)
+        posthogLogger(error as Error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);
     }
