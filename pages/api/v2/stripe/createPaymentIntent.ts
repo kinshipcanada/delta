@@ -11,9 +11,7 @@ const createDonationMetadata = (donation: Donation) => {
         donationId: donation.id,
         date: new Date().toDateString(),
         syncStatus: "unsynced",
-        allocationBreakdown: JSON.stringify(donation.allocationBreakdown),
         status: DonationStatus.PROCESSING,
-        adheringLabels: JSON.stringify(donation.adheringLabels),
         amountDonatedInCents: donation.amountDonatedInCents,
         feesDonatedInCents: donation.feesDonatedInCents,
         // TODO: remove after authentication is removed
@@ -35,9 +33,6 @@ const createDonationMetadata = (donation: Donation) => {
         donorAddressState: "state",
         donorAddressCountry: "country",
         donorAddressPostalCode: "postalCode",
-        allocatedToCauses: donation.allocatedToCauses,
-        unallocatedToCauses: donation.unallocatedToCauses,
-
     }
 }
 

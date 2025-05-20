@@ -15,8 +15,12 @@ export default async function handler(
         const donorExists = await donorEngine.checkIfDonorExists(payload)
         return res.status(200).send({ data: donorExists })
     } catch (error) {
-        posthogLogger(error)
-        console.error(`Error calling api/v2/donor/create: ${error}`)
+        if (error instanceof Error) {
+            posthogLogger(error);
+        } else {
+            posthogLogger(new Error('An unknown error occurred'));
+        }
+        console.error(`Error calling api/v2/donor/check_if_exists: ${error}`);
         return res.status(500).send({
             error: "Sorry, something went wrong checking this donor profile",
         })

@@ -31,14 +31,6 @@ model Donation {
   // Donation details
   status         DonationStatus @default(PROCESSING) // keep this
   date           DateTime @default(now())
-  adheringLabels String[] // not sure if we're removing this
-
-  // This seems important enough to keep but not sure
-  allocatedToCauses   Int
-  unallocatedToCauses Int
-  // { v2Causes: { name: string, amount: Int, region: DonationRegion }[] }
-  allocationBreakdown Json
-
 
   amountDonatedInCents Int
   amountChargedInCents Int
@@ -53,7 +45,7 @@ model Donation {
   // Stripe identifiers
   stripeCustomerId      String?
 
-  stripeTransferId      String? // not sure how these fit in
+  stripeTransferId      String? // will create script for this later
   stripeChargeId        String? // not sure how these fit in
 
   version               Float?

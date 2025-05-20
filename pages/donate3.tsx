@@ -386,26 +386,12 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
         if (issues.length > 0) {
             alert(issues.join('\n'))
             return;
-        } else {
-
-            const allocatedToCauses = selectedCauses
-                .filter(cause => cause.title !== "Where Most Needed")
-                .map((cause) => cause.amountCents ?? 0)
-                .reduce((acc, curr) => acc + curr, 0)
-            
+        } else { 
             console.log(selectedCauses)
             const donation: Donation = {
                 id: uuidv4(),
                 date: new Date(),
                 status: "PROCESSING",
-                adheringLabels: [
-                    "V4_STRIPE_PAYMENT"
-                ],
-                allocatedToCauses: allocatedToCauses,
-                unallocatedToCauses: sum - allocatedToCauses,
-                allocationBreakdown: {
-                    ...selectedCauses
-                },
                 // causeName: null,
                 // causeRegion: "ANYWHERE",
                 // transactionStatus: "PENDING",
@@ -428,10 +414,6 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                 stripeTransferId: null,
                 stripeChargeId: null,
                 version: 2,
-            }
-
-            if (inHonorOf !== '') {
-                donation.adheringLabels.push("V4_IN_HONOR_OF_" + inHonorOf)
             }
 
             await getStripeClientSecret(donation)

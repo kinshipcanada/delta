@@ -17,7 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             payment_method: paymentMethod
         });
     } catch (error) {
-        posthogLogger(error)
+        if (error instanceof Error) {
+            posthogLogger(error);
+        } else {
+            posthogLogger(new Error('An unknown error occurred'));
+        }
         res.status(500).json({ status: 500 });
     }
 }

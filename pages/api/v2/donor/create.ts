@@ -16,7 +16,11 @@ export default async function handler(
         const profile = await donorEngine.createDonorProfile(payload)
         return res.status(200).send({ data: profile })
     } catch (error) {
-        posthogLogger(error)
+        if (error instanceof Error) {
+            posthogLogger(error);
+        } else {
+            posthogLogger(new Error('An unknown error occurred'));
+        }
         console.error(`Error calling api/v2/donor/create: ${error}`)
         return res.status(500).send({
             error: "Sorry, something went wrong creating your donor profile",

@@ -15,7 +15,11 @@ export default async function handler(
         const donations = await donorEngine.fetchDonationsForDonor(payload)
         return res.status(200).send({ data: donations })
     } catch (error) {
-        posthogLogger(error)
+        if (error instanceof Error) {
+            posthogLogger(error);
+        } else {
+            posthogLogger(new Error('An unknown error occurred'));
+        }
         console.error(error)
         return res.status(500).send({
             error: "Sorry, something went wrong fetching your donations",
