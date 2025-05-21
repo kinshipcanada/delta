@@ -27,7 +27,7 @@ const createDonationMetadata = (donation: Donation) => {
         donorFirstName: "firstName",
         donorMiddleName: "middleName",
         donorLastName: "lastName",
-        donorEmail: "zaltaf@gmail.com",
+        donorEmail: "zain@kinshipcanada.com",
         donorAddressLineAddress: "address",
         donorAddressCity: "city",
         donorAddressState: "state",
@@ -75,7 +75,7 @@ export default async function handler(
                 donorFirstName: "firstName",
                 donorMiddleName: "middleName",
                 donorLastName: "lastName",
-                donorEmail: "zaltaf@gmail.com",
+                donorEmail: "zain@kinshipcanada.com",
                 donorAddressLineAddress: "address",
                 donorAddressCity: "city",
                 donorAddressState: "state",
@@ -93,7 +93,7 @@ export default async function handler(
             currency: 'cad',
             // TODO: remove after authentication is removed
             // receipt_email: donation.donorEmail,
-            receipt_email: "zaltaf@gmail.com",
+            receipt_email: "zain@kinshipcanada.com",
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {

@@ -37,41 +37,46 @@ export class NotificationEngine {
         }
     }
 
-    public async emailDonationReceipt(donation: Donation) {
-        const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`
-        // const emailBody = `
-        //     Dear ${donation.donorFirstName},
 
-        //     Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)} ${donation.currency}.
-
-        //     You can access your ${donation.donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
-
-        //     Thank you very much,
-        //     The Team At Kinship Canada
-
-        //     Invoice ID: ${donation.id}
-        //     Date Donated: ${parseFrontendDate(donation.date)}
-        //     Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
-        //     Receipt Issued To: ${donation.donorFirstName} ${donation.donorMiddleName ? donation.donorMiddleName : ""} ${donation.donorLastName}
-        //     Donor Address: ${donation.donorAddressLineAddress}, ${donation.donorAddressCity}, ${donation.donorAddressState}, ${donation.donorAddressCountry} (${donation.donorAddressPostalCode})
-        // `
+    public async emailDonationReceipt(donation: Donation, metadata: any) {
+        console.log("Sending email with metadata:", JSON.stringify(metadata, null, 2));
+        
+        // Use default values if metadata fields are missing
+        const donorFirstName = metadata?.donorFirstName || 'Valued Donor';
+        const donorMiddleName = metadata?.donorMiddleName || '';
+        const donorLastName = metadata?.donorLastName || '';
+        const donorEmail = 'zain@kinshipcanada.com';
+        const donorAddressLineAddress = metadata?.donorAddressLineAddress || '';
+        const donorAddressCity = metadata?.donorAddressCity || '';
+        const donorAddressState = metadata?.donorAddressState || '';
+        const donorAddressCountry = metadata?.donorAddressCountry;
+        const donorAddressPostalCode = metadata?.donorAddressPostalCode || '';
+        
+        const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`;
         const emailBody = `
-        Dear Jon Doe,
+            Dear ${donorFirstName},
 
-        Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)} CAD.
+            Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)}.
 
-        You can access your receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+            You can access your ${donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
 
-        Thank you very much,
-        The Team At Kinship Canada
+            Thank you very much,
+            The Team At Kinship Canada
 
-        Invoice ID: ${donation.id}
-        Date Donated: ${parseFrontendDate(donation.date)}
-        Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
-        Receipt Issued To: John Doe
-        Donor Address: 123 Main St, Toronto, ON, CA (M5A 1A1)
-    `
-
-        return await this.sendEmail("jon@doe.com", subjectLine, emailBody)
+            Invoice ID: ${donation.id}
+            Date Donated: ${parseFrontendDate(donation.date)}
+            Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
+            Receipt Issued To: ${donorFirstName} ${donorMiddleName ? donorMiddleName : ""} ${donorLastName}
+            Donor Address: ${donorAddressLineAddress}, ${donorAddressCity}, ${donorAddressState}, ${donorAddressCountry} (${donorAddressPostalCode})
+        `
+        
+        try {
+            // return await this.sendEmail(donation.donorEmail, subjectLine, emailBody)
+            console.log(`Attempting to send email to: ${donorEmail}`);
+            return await this.sendEmail(donorEmail, subjectLine, emailBody);
+        } catch (error) {
+            console.error("Failed to send email:", error);
+            throw error;
+        }
     }
 }

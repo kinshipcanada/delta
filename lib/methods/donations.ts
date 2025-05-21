@@ -112,39 +112,6 @@ export class DonationEngine {
         }
     }
 
-    // private async syncDatabaseInstance(donationId?: string, donation?: Donation) {
-    //     if (!donationId && !donation) {
-    //         throw new Error("One of a donation id or donation must be provided to sync the database instance")
-    //     }
-
-    //     let donationObject: Donation;
-
-    //     if (donation) {
-    //         donationObject = donation
-    //     } else {
-    //         donationObject = await prisma.donation.findFirstOrThrow({
-    //             where: {
-    //                 id: donationId
-    //             }
-    //         })
-    //     }
-
-    //     const stripeObject = await this.fetchDonationFromStripe({
-    //         stripePaymentIntentId: donationObject.stripePaymentIntentId as string,
-    //         stripeChargeId: donationObject.stripeChargeId as string,
-    //     })
-
-    //     await prisma.donation.update({
-    //         where: {
-    //             id: donationObject.id
-    //         },
-    //         data: {
-    //             stripeBalanceTxnId: stripeObject.stripeBalanceTxnId,
-    //             transactionStatus: stripeObject.transactionStatus
-    //         }
-    //     })
-    // }
-
     private async fetchDonationFromStripe(props: BuildDonationFromStripeProps) {
         let paymentIntentObject: Stripe.PaymentIntent
         let chargeObject: Stripe.Charge
@@ -213,33 +180,14 @@ export class DonationEngine {
 
         const {
             donationId,
-            loggedAt,
-            syncStatus,
-            allocationBreakdown,
             status,
-            adheringLabels,
-            allocatedToCauses,
-            unallocatedToCauses,
-            causeName,
-            causeRegion,
             amountDonatedInCents,
             feesDonatedInCents,
-            donorFirstName,
-            donorMiddleName,
-            donorLastName,
-            donorEmail,
-            donorAddressLineAddress,
-            donorAddressCity,
-            donorAddressState,
-            donorAddressCountry,
-            donorAddressPostalCode,
         } = chargeObject.metadata
 
         if (!chargeObject.payment_method_details) {
             throw new Error("No payment method object attached to Stripe charge object")
         }
-
-        const cardPaymentMethodDetails: Stripe.Charge.PaymentMethodDetails.Card | undefined = chargeObject.payment_method_details.card
 
         const donation: Donation = {
             id: donationId,

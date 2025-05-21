@@ -12,10 +12,24 @@ export default async function handler(
   res: NextApiResponse,
 ) {
     try {
+        console.log("Webhook received:", JSON.stringify(req.body, null, 2));
+        
+        // Check if the webhook payload has the expected structure
+        if (!req.body.data?.object?.id) {
+            console.error("Invalid webhook payload structure:", req.body);
+            return res.status(400).send({
+                error: "Invalid webhook payload structure"
+            });
+        }
+        
         const donationEngine = new DonationEngine()
         const donation: Donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
         const notificationEngine = new NotificationEngine()
-        await notificationEngine.emailDonationReceipt(donation)
+        
+        // Use a default empty object if metadata is missing
+        const metadata = req.body.data.object.metadata || {};
+        await notificationEngine.emailDonationReceipt(donation, metadata)
+        
         return res.status(200).send({ data: donation })
     } catch (error) {
         console.error(error)
