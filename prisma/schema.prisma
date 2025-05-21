@@ -52,7 +52,6 @@ model Cause {
   id                    String         @id @default(uuid())
   donation_id           String         @unique
   donation              Donation       @relation("DonationCauses", fields: [donation_id], references: [id])
-  region                DonationRegion?
   amountDonatedCents    Int
   inHonorOf             String?
   cause                 String

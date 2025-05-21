@@ -1,7 +1,7 @@
 "use client"
 import { Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
-import { Donation, DonationRegion, DonationStatus, Donor } from "@prisma/client"
+import { Donation, DonationStatus, Donor } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { useState } from "react"
@@ -18,82 +18,54 @@ import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typograp
 
 const causes: CauseV2[] = [
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Where Most Needed",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Sehme Sadat",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Sehme Imam",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Vision Kinship",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Orphans",
         choices: [],
         subCause: undefined 
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Education",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Poverty Relief",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Medical Aid",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Housing",
         choices: [],
         subCause: undefined
     },
     {
-        region: DonationRegion.ANYWHERE,
         cause: "Widows",
         choices: [],
         subCause: undefined
-    },
-    {
-        region: DonationRegion.ANYWHERE,
-        cause: "Ramadhan Campaign",
-        choices: [
-            {
-                amountCents: 50000,
-                subCause: "Feed one jamaat (community) for one night"
-            },
-            {
-                amountCents: 4200,
-                subCause: "One food ration package (grain, oil, sugar, lentils, small amount of meat, etc) for one family"
-            },
-            {
-                amountCents: 20000,
-                subCause: "Slaughter one animal to feed as many people as possible (Qurbani)"
-            },
-        ],
     },
 ]
 
@@ -106,7 +78,6 @@ type DefaultCauseChoice = {
 type CauseV2 = {
     id?: string
     donation_id?: string
-    region: DonationRegion
     amountDonatedCents?: number
     inHonorOf?: string
     cause: string
@@ -398,7 +369,6 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
             const causeEntry: any = {
                 id: uuidv4(),
                 donation_id: donation.id,
-                region: cause.region,
                 amountDonatedCents: cause.amountDonatedCents || 0,
                 cause: cause.cause,
             };
@@ -521,9 +491,14 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                                 className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
                                 onChange={(e) => {
                                     if (e.target.checked) {
-                                        setSelectedCauses([...selectedCauses, cause])
+                                        if (selectedCauses.length < 3) {
+                                            setSelectedCauses([...selectedCauses, cause]);
+                                        } else {
+                                            alert("You can select a maximum of 3 causes.");
+                                            e.target.checked = false; // Prevent checking the box
+                                        }
                                     } else {
-                                        setSelectedCauses(selectedCauses.filter((selectedCause) => selectedCause.cause != cause.cause))
+                                        setSelectedCauses(selectedCauses.filter((selectedCause) => selectedCause.cause != cause.cause));
                                     }
                                 }}
                             />

@@ -159,7 +159,6 @@ export class DonationEngine {
         const donation: any = {
             id: donationId,
             status: status as DonationStatus,
-            // Remove date field to avoid database error
             date: new Date(chargeObject.created * 1000),
             amountDonatedInCents: Number(amountDonatedInCents),
             amountChargedInCents: chargeObject.amount_captured,
@@ -176,15 +175,35 @@ export class DonationEngine {
     }
 
     async saveCauseForDonation(donationId: string, causeData: any) {
-        return await prisma.cause.create({
-            data: {
-                id: causeData.id,
-                donation_id: donationId,
-                region: causeData.region,
-                amountDonatedCents: causeData.amountDonatedCents,
-                cause: causeData.cause,
-                subCause: causeData.subCause,
-            },
-        });
+        console.log(`[DonationEngine] Attempting to save cause for donation ID: ${donationId}. Cause Data: ${JSON.stringify(causeData)}`);
+
+        const dataToCreate: any = {
+            id: causeData.id,
+            donation_id: donationId,
+            amountDonatedCents: causeData.amountDonatedCents,
+            cause: causeData.cause,
+        };
+
+        if (causeData.subCause) {
+            dataToCreate.subCause = causeData.subCause;
+        }
+
+        if (causeData.inHonorOf) {
+            dataToCreate.inHonorOf = causeData.inHonorOf;
+        }
+
+        console.log(`[DonationEngine] Prepared data for cause insertion for donation ID ${donationId}:`, JSON.stringify(dataToCreate));
+
+        try {
+            const savedCause = await prisma.cause.create({
+                data: dataToCreate,
+            });
+            console.log(`[DonationEngine] Successfully saved cause to database. Donation ID: ${donationId}, Cause ID: ${savedCause.id}`);
+            return savedCause;
+        } catch (error) {
+            console.error(`[DonationEngine] Error inserting cause into database for donation ID ${donationId}:`, error);
+            console.error(`[DonationEngine] Failed cause data for donation ID ${donationId}:`, JSON.stringify(causeData));
+            throw error; // Re-throw to allow the caller (e.g., webhook handler) to manage the overall transaction
+        }
     }
 }
