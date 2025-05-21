@@ -14,14 +14,6 @@ export default async function handler(
     try {
         console.log("Webhook received:", JSON.stringify(req.body, null, 2));
         
-        // Check if the webhook payload has the expected structure
-        if (!req.body.data?.object?.id) {
-            console.error("Invalid webhook payload structure:", req.body);
-            return res.status(400).send({
-                error: "Invalid webhook payload structure"
-            });
-        }
-        
         const donationEngine = new DonationEngine()
         const donation: Donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
         const notificationEngine = new NotificationEngine()
@@ -34,12 +26,14 @@ export default async function handler(
     } catch (error) {
         console.error(error)
         if (error instanceof Error) {
-            posthogLogger(error)
+            console.error("Error stack:", error.stack);
+            posthogLogger(error);
         } else {
-            posthogLogger(new Error('An unknown error occurred'))
+            posthogLogger(new Error('An unknown error occurred'));
         }
+        
         return res.status(500).send({
             error: "Sorry, something went wrong creating this donation",
-        })
+        });
     }
 }

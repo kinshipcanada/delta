@@ -38,6 +38,7 @@ export class NotificationEngine {
     }
 
 
+    // TODO: fix the hardcoded fields
     public async emailDonationReceipt(donation: Donation, metadata: any) {
         console.log("Sending email with metadata:", JSON.stringify(metadata, null, 2));
         
@@ -45,11 +46,11 @@ export class NotificationEngine {
         const donorFirstName = metadata?.donorFirstName || 'Valued Donor';
         const donorMiddleName = metadata?.donorMiddleName || '';
         const donorLastName = metadata?.donorLastName || '';
-        const donorEmail = 'zain@kinshipcanada.com';
+        const donorEmail = 'zain@kinshipcanada.com'; // TODO: fix the hardcoded fields
         const donorAddressLineAddress = metadata?.donorAddressLineAddress || '';
         const donorAddressCity = metadata?.donorAddressCity || '';
         const donorAddressState = metadata?.donorAddressState || '';
-        const donorAddressCountry = metadata?.donorAddressCountry;
+        const donorAddressCountry = metadata?.donorAddressCountry || 'US'; // TODO: fix the hardcoded fields
         const donorAddressPostalCode = metadata?.donorAddressPostalCode || '';
         
         const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`;
@@ -58,7 +59,7 @@ export class NotificationEngine {
 
             Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)}.
 
-            You can access your ${donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+            You can access your ${donorAddressCountry == "CA" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
 
             Thank you very much,
             The Team At Kinship Canada
@@ -70,13 +71,7 @@ export class NotificationEngine {
             Donor Address: ${donorAddressLineAddress}, ${donorAddressCity}, ${donorAddressState}, ${donorAddressCountry} (${donorAddressPostalCode})
         `
         
-        try {
-            // return await this.sendEmail(donation.donorEmail, subjectLine, emailBody)
-            console.log(`Attempting to send email to: ${donorEmail}`);
-            return await this.sendEmail(donorEmail, subjectLine, emailBody);
-        } catch (error) {
-            console.error("Failed to send email:", error);
-            throw error;
-        }
+        console.log(`Sending email to: ${donorEmail}`);        
+        return await this.sendEmail(donorEmail, subjectLine, emailBody);
     }
 }

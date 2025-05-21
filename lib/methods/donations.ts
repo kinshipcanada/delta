@@ -28,19 +28,54 @@ export class DonationEngine {
     }
 
     public async createDonationByWebhook(stripeChargeId: string) {
-        const donation = await this.fetchDonationFromStripe({
-            stripeChargeId
-        })
+        console.log(`[DonationEngine] Creating donation from webhook for charge ID: ${stripeChargeId}`);
+        try {
+            const donation = await this.fetchDonationFromStripe({
+                stripeChargeId
+            });
+            console.log(`[DonationEngine] Successfully fetched donation data from Stripe: ${donation.id}`);
 
-        return await this.insertDonationObject(donation)
+            try {
+                const existingDonation = await prisma.donation.findUnique({
+                    where: { id: donation.id }
+                });
+                
+                if (existingDonation) {
+                    console.log(`[DonationEngine] Donation with ID ${donation.id} already exists, skipping insertion`);
+                    return existingDonation;
+                }
+                
+                const savedDonation = await this.insertDonationObject(donation);
+                console.log(`[DonationEngine] Successfully saved donation to database: ${savedDonation.id}`);
+                return savedDonation;
+            } catch (insertError) {
+                console.error(`[DonationEngine] Error inserting donation into database:`, insertError);
+                throw insertError;
+            }
+        } catch (fetchError) {
+            console.error(`[DonationEngine] Error fetching donation from Stripe:`, fetchError);
+            throw fetchError;
+        }
     }
 
     private async insertDonationObject(donation: Donation): Promise<Donation> {
-        return await prisma.donation.create({
-            data: {
-                ...donation,
-            }
-        })
+        console.log(`[DonationEngine] Inserting donation into database with ID: ${donation.id}`);
+        console.log(`[DonationEngine] Donation data:`, JSON.stringify({
+            id: donation.id,
+            status: donation.status,
+            amount: donation.amountChargedInCents
+        }));
+        
+        try {
+            return await prisma.donation.create({
+                data: {
+                    ...donation,
+                }
+            });
+        } catch (error) {
+            console.error(`[DonationEngine] Database error:`, error);
+            throw error;
+        }
     }
 
     public async createDonationManually(donation: Donation) {
@@ -68,49 +103,6 @@ export class DonationEngine {
         }
     }
 
-    // Syncing functions
-    private async syncStripeInstance(donationId: string, metadata?: Stripe.MetadataParam) {
-        const donation = await this.fetchDonation({ donationId })
-
-        if (!donation.stripeChargeId) {
-            throw new Error("Donation is missing a Stripe charge ID")
-        }
-
-        if (metadata) {
-            this.stripeClient.charges.update(donation.stripeChargeId, {
-                metadata
-            })
-        } else {
-            const metadataParam: Stripe.MetadataParam = {
-                "donationId": donation.id,
-                "status": donation.status,
-                "amountDonatedInCents": donation.amountDonatedInCents,
-                "feesDonatedInCents": donation.feesDonatedInCents,
-                // "donorFirstName": donation.donorFirstName,
-                // "donorMiddleName": donation.donorMiddleName,
-                // "donorLastName": donation.donorLastName,
-                // "donorEmail": donation.donorEmail,
-                // "donorAddressLineAddress": donation.donorAddressLineAddress,
-                // "donorAddressCity": donation.donorAddressCity,
-                // "donorAddressState": donation.donorAddressState,
-                // "donorAddressCountry": donation.donorAddressCountry,
-                // "donorAddressPostalCode": donation.donorAddressPostalCode,
-                "donorFirstName": "John",
-                "donorLastName": "Doe",
-                "donorEmail": "john@doe.com",
-                "donorAddressLineAddress": "123 Main St",
-                "donorAddressCity": "Toronto",
-                "donorAddressState": "ON",
-                "donorAddressCountry": "CA",
-                "donorAddressPostalCode": "M5A 1A1",
-                "syncStatus": "synced"
-            }
-            
-            this.stripeClient.charges.update(donation.stripeChargeId, {
-                metadata: metadataParam
-            })
-        }
-    }
 
     private async fetchDonationFromStripe(props: BuildDonationFromStripeProps) {
         let paymentIntentObject: Stripe.PaymentIntent
@@ -176,8 +168,6 @@ export class DonationEngine {
                 : chargeObject.balance_transaction
         }
 
-        const metadataObject = chargeObject.metadata
-
         const {
             donationId,
             status,
@@ -189,9 +179,10 @@ export class DonationEngine {
             throw new Error("No payment method object attached to Stripe charge object")
         }
 
-        const donation: Donation = {
+        const donation: any = {
             id: donationId,
             status: status as DonationStatus,
+            // Remove date field to avoid database error
             date: new Date(chargeObject.created * 1000),
             amountDonatedInCents: Number(amountDonatedInCents),
             amountChargedInCents: chargeObject.amount_captured,
@@ -199,11 +190,12 @@ export class DonationEngine {
             feesDonatedInCents: Number(feesDonatedInCents),
             stripeCustomerId: customerObject.id,
             stripeChargeId: chargeObject.id,
-            donorId: null,
+            donorId: null, // TODO: connect to Donor model
             stripeTransferId: null,
             version: null,
         }
 
-        return donation
+        console.log("[DonationEngine] Created donation object:", JSON.stringify(donation));
+        return donation as Donation
     }
 }
