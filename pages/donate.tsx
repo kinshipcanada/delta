@@ -1,5 +1,5 @@
 "use client"
-import { Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
+import { Alert, Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
 import { Donation, DonationRegion, DonationStatus, Donor } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
@@ -12,6 +12,10 @@ import { CreditCardIcon } from "@heroicons/react/24/solid"
 import { ConfirmationType } from "@lib/classes/utils"
 import { countries, states_and_provinces } from "@lib/utils/constants"
 import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typography"
+import { Checkbox } from "@radix-ui/react-checkbox"
+import { XMarkIcon } from "@heroicons/react/24/outline"
+import { FileWarningIcon } from "lucide-react"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 
 // TODO: redo this page once authentication is removed to reflect 
 // the fields from the donation models
@@ -76,24 +80,6 @@ const causes: CauseV2[] = [
         cause: "Widows",
         choices: [],
         subCause: undefined
-    },
-    {
-        region: DonationRegion.ANYWHERE,
-        cause: "Ramadhan Campaign",
-        choices: [
-            {
-                amountCents: 50000,
-                subCause: "Feed one jamaat (community) for one night"
-            },
-            {
-                amountCents: 4200,
-                subCause: "One food ration package (grain, oil, sugar, lentils, small amount of meat, etc) for one family"
-            },
-            {
-                amountCents: 20000,
-                subCause: "Slaughter one animal to feed as many people as possible (Qurbani)"
-            },
-        ],
     },
 ]
 
@@ -348,6 +334,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
 const HEADER_CLASS="text-lg font-bold leading-7 tracking-tight text-slate-800 sm:truncate sm:text-xl"
 
 function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, setDonorInfo }: { setDonation: (donation: Donation) => void, setStripeClientSecret: (clientSecret: string) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, donorInfo: any, setDonorInfo: (info: any) => void}) {
+    const devToolsEnabled = process.env.NEXT_PUBLIC_DEV_ENVIRONMENT && process.env.NEXT_PUBLIC_DEV_ENVIRONMENT == "true"
     const [loading, setLoading] = useState<boolean>(false)
     
     const [selectedCauses, setSelectedCauses] = useState<CauseV2[]>([])
@@ -490,6 +477,30 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
     return (
         <div className="flex justify-center px-4 sm:px-0">
             <div className="space-y-12 w-full max-w-2xl py-8">
+                {devToolsEnabled && 
+                    <div className="bg-blue-100 rounded p-4">
+                        DevTools 
+                        <div className="flex items-center">
+                            <input 
+                                type="checkbox"
+                                id="prefillCheckbox"
+                                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setFirstName("Testing")
+                                        setLastName("Sample")
+                                        setEmail("zain@kinshipcanada.com")
+                                    } else {
+                                        setFirstName('')
+                                        setLastName('')
+                                        setEmail('')
+                                    }
+                                }}
+                            />
+                            <label htmlFor="prefillCheckbox">Prefill sample donor info</label>
+                        </div>
+                    </div>
+                }
                 <div>
                     <h1 className="flex w-full items-center justify-center space-x-4 mt-4">
                         <img
@@ -533,6 +544,18 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                         </div>
 
                 </div>
+                
+                {selectedCauses.length > 3 && (
+                    <div className=" flex items-center justify-between gap-x-6 bg-red-600 px-6 py-2.5 sm:rounded-xl sm:py-3 sm:pl-4 sm:pr-3.5">
+                    <ExclamationTriangleIcon  className="w-5 h-5 text-white"/>
+                    <p className="text-sm/6 text-white font-semibold">
+                        Sorry! You can only add up to 3 causes at once. Please remove one
+                    </p>
+                    <button type="button" className="-m-1.5 flex-none p-1.5">
+                        <span className="sr-only">Dismiss</span>
+                    </button>
+                    </div>
+                )}
 
                 {selectedCauses.length > 0 && (
                     <>
@@ -578,6 +601,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                                 type="text" 
                                 id="firstName"
                                 placeholder="First"
+                                value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 className="w-full focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
                             />
@@ -588,6 +612,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                                 id="lastName"
                                 type="text" 
                                 placeholder="Last"
+                                value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 className="w-full focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
                             />
@@ -599,6 +624,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                             type="email" 
                             id="email"
                             placeholder="Email"
+                            value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md w-full"
                         />
