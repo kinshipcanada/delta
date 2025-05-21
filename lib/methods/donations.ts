@@ -27,6 +27,7 @@ export class DonationEngine {
         this.prismaClient = prisma
     }
 
+
     public async createDonationByWebhook(stripeChargeId: string) {
         console.log(`[DonationEngine] Creating donation from webhook for charge ID: ${stripeChargeId}`);
         try {
@@ -58,6 +59,7 @@ export class DonationEngine {
         }
     }
 
+
     private async insertDonationObject(donation: Donation): Promise<Donation> {
         console.log(`[DonationEngine] Inserting donation into database with ID: ${donation.id}`);
         console.log(`[DonationEngine] Donation data:`, JSON.stringify({
@@ -78,32 +80,7 @@ export class DonationEngine {
         }
     }
 
-    public async createDonationManually(donation: Donation) {
-        // to do: backend validation of manual donation creation
-        if (donation.amountDonatedInCents == 0) {
-            throw new Error("Amount donated must be greater than 0")
-        }
-
-        return await this.insertDonationObject(donation)
-    }
-
-    public async fetchDonation(props: FetchDonationProps): Promise<Donation> {
-        if (!(props.donationId || props.stripeChargeId || props.stripePaymentIntentId)) {
-            throw new Error("One of a donation id, stripe charge id, or stripe payment intent id must be provided to fetch a donation")
-        }
-
-        if (props.donationId) {
-            return await prisma.donation.findFirstOrThrow({
-                where: {
-                    id: props.donationId
-                }
-            })
-        } else {
-            return await this.fetchDonationFromStripe(props)
-        }
-    }
-
-
+    
     private async fetchDonationFromStripe(props: BuildDonationFromStripeProps) {
         let paymentIntentObject: Stripe.PaymentIntent
         let chargeObject: Stripe.Charge
