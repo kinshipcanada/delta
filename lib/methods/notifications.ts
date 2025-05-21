@@ -59,7 +59,7 @@ export class NotificationEngine {
 
             Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)}.
 
-            You can access your ${donorAddressCountry == "CA" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+            You can access your ${donorAddressCountry == "CA" || donorAddressCountry == "Canada" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
 
             Thank you very much,
             The Team At Kinship Canada

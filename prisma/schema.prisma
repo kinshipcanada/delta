@@ -50,7 +50,7 @@ model Donation {
 
 model Cause {
   id                    String         @id @default(uuid())
-  donation_id           String         @unique
+  donation_id           String
   donation              Donation       @relation("DonationCauses", fields: [donation_id], references: [id])
   amountDonatedCents    Int
   inHonorOf             String?

@@ -97,7 +97,6 @@ export default function Donate() {
     const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed);
     
-    // const [causes, setCauses] = useState<CauseV2[]>([]);
     
     const [donorInfo, setDonorInfo] = useState({
         firstName: '',
@@ -520,12 +519,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                                 className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
                                 onChange={(e) => {
                                     if (e.target.checked) {
-                                        if (selectedCauses.length < 3) {
-                                            setSelectedCauses([...selectedCauses, cause]);
-                                        } else {
-                                            alert("You can select a maximum of 3 causes.");
-                                            e.target.checked = false; // Prevent checking the box
-                                        }
+                                        setSelectedCauses([...selectedCauses, cause]);
                                     } else {
                                         setSelectedCauses(selectedCauses.filter((selectedCause) => selectedCause.cause != cause.cause));
                                     }
