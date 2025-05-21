@@ -1,7 +1,7 @@
 "use client"
 import { Alert, Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
-import { Donation, DonationStatus, Donor } from "@prisma/client"
+import { Donation, DonationRegion, DonationStatus, Donor } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { useState } from "react"
@@ -24,52 +24,62 @@ const causes: CauseV2[] = [
     {
         cause: "Where Most Needed",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Sehme Sadat",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Sehme Imam",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Vision Kinship",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Orphans",
         choices: [],
-        subCause: undefined 
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Education",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Poverty Relief",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Medical Aid",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Housing",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
     {
         cause: "Widows",
         choices: [],
-        subCause: undefined
+        subCause: undefined,
+        region: DonationRegion.ANYWHERE
     },
 ]
 
@@ -84,6 +94,7 @@ type CauseV2 = {
     donation_id?: string
     amountDonatedCents?: number
     inHonorOf?: string
+    region?: DonationRegion
     cause: string
     subCause?: string
     choices: DefaultCauseChoice[]
@@ -337,6 +348,38 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
 
     const [inHonorOf, setInHonorOf] = useState<string>('')
 
+    const prefillUSDonor = () => {
+        setFirstName("John");
+        setLastName("Doe");
+        setEmail("john.doe@example.com");
+        setFormattedAddress({
+            streetNumber: "1600",
+            route: "Amphitheatre Parkway",
+            locality: "Mountain View",
+            administrativeAreaLevel1: "CA", // California
+            country: "US",
+            postalCode: "94043"
+        });
+        setAddress("1600 Amphitheatre Parkway, Mountain View, CA 94043, USA");
+        setManualAddressCollectionMode(false);
+    };
+
+    const prefillCanadianDonor = () => {
+        setFirstName("Jane");
+        setLastName("Doe");
+        setEmail("jane.doe@example.ca");
+        setFormattedAddress({
+            streetNumber: "123",
+            route: "Main Street",
+            locality: "Toronto",
+            administrativeAreaLevel1: "ON", // Ontario
+            country: "CA",
+            postalCode: "M5A 1A1"
+        });
+        setAddress("123 Main Street, Toronto, ON M5A 1A1, Canada");
+        setManualAddressCollectionMode(false);
+    };
+
     const getStripeClientSecret = async (donation: Donation) => {
         setLoading(true)
 
@@ -376,6 +419,12 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
                 amountDonatedCents: cause.amountDonatedCents || 0,
                 cause: cause.cause,
             };
+
+            if (cause.region) {
+                causeEntry.region = cause.region;
+            } else {
+                causeEntry.region = DonationRegion.ANYWHERE;
+            }
 
             if (inHonorOf && inHonorOf.trim() !== "") {
                 causeEntry.inHonorOf = inHonorOf;
@@ -465,26 +514,11 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
         <div className="flex justify-center px-4 sm:px-0">
             <div className="space-y-12 w-full max-w-2xl py-8">
                 {devToolsEnabled && 
-                    <div className="bg-blue-100 rounded p-4">
-                        DevTools 
-                        <div className="flex items-center">
-                            <input 
-                                type="checkbox"
-                                id="prefillCheckbox"
-                                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setFirstName("Testing")
-                                        setLastName("Sample")
-                                        setEmail("zain@kinshipcanada.com")
-                                    } else {
-                                        setFirstName('')
-                                        setLastName('')
-                                        setEmail('')
-                                    }
-                                }}
-                            />
-                            <label htmlFor="prefillCheckbox">Prefill sample donor info</label>
+                    <div className="bg-blue-100 rounded p-4 space-y-2">
+                        <TypographyH4>DevTools</TypographyH4> 
+                        <div className="flex space-x-2">
+                             <Button text="Prefill US Donor" onClick={prefillUSDonor} style={ButtonStyle.Secondary} size={ButtonSize.Small} />
+                             <Button text="Prefill Canadian Donor" onClick={prefillCanadianDonor} style={ButtonStyle.Secondary} size={ButtonSize.Small} />
                         </div>
                     </div>
                 }

@@ -54,6 +54,7 @@ model Cause {
   donation              Donation       @relation("DonationCauses", fields: [donation_id], references: [id])
   amountDonatedCents    Int
   inHonorOf             String?
+  region                DonationRegion @default(ANYWHERE)
   cause                 String
   subCause              String?
 }

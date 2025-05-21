@@ -1,5 +1,5 @@
 import prisma from "@lib/prisma";
-import { Country, Donation, DonationStatus, PrismaClient } from "@prisma/client";
+import { Country, Donation, DonationRegion, DonationStatus, PrismaClient } from "@prisma/client";
 import { JsonObject } from "@prisma/client/runtime/library";
 import Stripe from "stripe"
 
@@ -183,6 +183,12 @@ export class DonationEngine {
             amountDonatedCents: causeData.amountDonatedCents,
             cause: causeData.cause,
         };
+
+        if (causeData.region) {
+            dataToCreate.region = causeData.region;
+        } else {
+            dataToCreate.region = DonationRegion.ANYWHERE;
+        }
 
         if (causeData.subCause) {
             dataToCreate.subCause = causeData.subCause;
