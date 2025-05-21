@@ -167,12 +167,24 @@ export class DonationEngine {
             feesDonatedInCents: Number(feesDonatedInCents),
             stripeCustomerId: customerObject.id,
             stripeChargeId: chargeObject.id,
-            donorId: null, // TODO: connect to Donor model
             stripeTransferId: null,
             version: null,
         }
 
         console.log("[DonationEngine] Created donation object:", JSON.stringify(donation));
         return donation as Donation
+    }
+
+    async saveCauseForDonation(donationId: string, causeData: any) {
+        return await prisma.cause.create({
+            data: {
+                id: causeData.id,
+                donation_id: donationId,
+                region: causeData.region,
+                amountDonatedCents: causeData.amountDonatedCents,
+                cause: causeData.cause,
+                subCause: causeData.subCause,
+            },
+        });
     }
 }

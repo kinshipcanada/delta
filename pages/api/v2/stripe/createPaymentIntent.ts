@@ -1,12 +1,12 @@
 import Stripe from 'stripe';
 import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
-import { Donation, DonationStatus } from '@prisma/client';
+import { Country, Donation, DonationStatus } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
 import { posthogLogger } from '@lib/posthog-server';
 
 // TODO: update after authentication is removed
-const createDonationMetadata = (donation: Donation) => {
+const createDonationMetadata = (donation: Donation, donorInfo: { [key: string]: string }, causesData: any[]) => {
     return {
         donationId: donation.id,
         date: new Date().toDateString(),
@@ -14,25 +14,16 @@ const createDonationMetadata = (donation: Donation) => {
         status: DonationStatus.PROCESSING,
         amountDonatedInCents: donation.amountDonatedInCents,
         feesDonatedInCents: donation.feesDonatedInCents,
-        // TODO: remove after authentication is removed
-        // donorFirstName: donation.donorFirstName,
-        // donorMiddleName: donation.donorMiddleName,
-        // donorLastName: donation.donorLastName,
-        // donorEmail: donation.donorEmail,
-        // donorAddressLineAddress: donation.donorAddressLineAddress,
-        // donorAddressCity: donation.donorAddressCity,
-        // donorAddressState: donation.donorAddressState,
-        // donorAddressCountry: donation.donorAddressCountry,
-        // donorAddressPostalCode: donation.donorAddressPostalCode,
-        donorFirstName: "firstName",
-        donorMiddleName: "middleName",
-        donorLastName: "lastName",
-        donorEmail: "zain@kinshipcanada.com",
-        donorAddressLineAddress: "address",
-        donorAddressCity: "city",
-        donorAddressState: "state",
-        donorAddressCountry: "country",
-        donorAddressPostalCode: "postalCode",
+        donorFirstName: donorInfo.firstName,
+        donorMiddleName: donorInfo.middleName,
+        donorLastName: donorInfo.lastName,
+        donorEmail: donorInfo.email,
+        donorAddressLineAddress: donorInfo.lineAddress,
+        donorAddressCity: donorInfo.city,
+        donorAddressState: donorInfo.state,
+        donorAddressCountry: donorInfo.country as Country,
+        donorAddressPostalCode: donorInfo.postalCode,
+        causes: JSON.stringify(causesData)
     }
 }
 
@@ -45,6 +36,8 @@ export default async function handler(
 ) {
 
     const donation: Donation = req.body.donation
+    const donorInfo: { [key: string]: string } = req.body.donorInfo
+    const causesData: any[] = req.body.causesData || [];
 
     try {
 
@@ -54,46 +47,26 @@ export default async function handler(
 
         let stripeCustomerId: string;
 
-        if (donation.stripeCustomerId) {
-            // Get the first stripe customer id to use for this donor
-            stripeCustomerId = donation.stripeCustomerId
-        } else {
-            // If there is no created customer_id, see if we can fetch one from stripe, otherwise create one.
-            // We have to do this, because we can't attach a billing address or customer objects directly to Stripe payment intents, just the id as a string
-            const donorEngine = new DonorEngine()
-            stripeCustomerId = await donorEngine.createStripeProfile({
-                // donorFirstName: donation.donorFirstName,
-                // donorMiddleName: donation.donorMiddleName,
-                // donorLastName: donation.donorLastName,
-                // donorEmail: donation.donorEmail,
-                // donorAddressLineAddress: donation.donorAddressLineAddress,
-                // donorAddressCity: donation.donorAddressCity,
-                // donorAddressState: donation.donorAddressState,
-                // donorAddressCountry: donation.donorAddressCountry,
-                // donorAddressPostalCode: donation.donorAddressPostalCode,
-                // TODO: remove after authentication is removed
-                donorFirstName: "firstName",
-                donorMiddleName: "middleName",
-                donorLastName: "lastName",
-                donorEmail: "zain@kinshipcanada.com",
-                donorAddressLineAddress: "address",
-                donorAddressCity: "city",
-                donorAddressState: "state",
-                donorAddressCountry: "CA",
-                donorAddressPostalCode: "M4A 0J5",
-                stripeCustomerIds: []
-            })
-        }
+        const donorEngine = new DonorEngine()
+        stripeCustomerId = await donorEngine.createStripeProfile({
+            donorFirstName: donorInfo.firstName,
+            donorMiddleName: donorInfo.middleName,
+            donorLastName: donorInfo.lastName,
+            donorEmail: donorInfo.email,
+            donorAddressLineAddress: donorInfo.lineAddress,
+            donorAddressCity: donorInfo.city,
+            donorAddressState: donorInfo.state,
+            donorAddressCountry: donorInfo.country as Country,
+            donorAddressPostalCode: donorInfo.postalCode,
+            stripeCustomerIds: []
+        })
 
         const paymentIntent = await stripeClient.paymentIntents.create({
             amount: donation.amountChargedInCents,
-            // Causes is added here for backwards compatability
-            metadata: createDonationMetadata(donation),
+            metadata: createDonationMetadata(donation, donorInfo, causesData),
             customer: stripeCustomerId,
             currency: 'cad',
-            // TODO: remove after authentication is removed
-            // receipt_email: donation.donorEmail,
-            receipt_email: "zain@kinshipcanada.com",
+            receipt_email: donorInfo.email,
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {

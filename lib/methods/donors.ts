@@ -125,16 +125,16 @@ export class DonorEngine {
         }
     }
 
-    async fetchDonationsForDonor(donorEmail: string): Promise<Donation[]> {
-        return await this.prismaClient.donation.findMany({
-            where: {
-                donor: {
-                    donorEmail
-                }
-            },
-            orderBy: {
-                date: 'desc'
-            }
-        });
-    } 
+    // async fetchDonationsForDonor(donorEmail: string): Promise<Donation[]> {
+    //     return await this.prismaClient.donation.findMany({
+    //         where: {
+    //             donor: {
+    //                 donorEmail
+    //             }
+    //         },
+    //         orderBy: {
+    //             date: 'desc'
+    //         }
+    //     });
+    // } 
 }

@@ -43,15 +43,15 @@ export class NotificationEngine {
         console.log("Sending email with metadata:", JSON.stringify(metadata, null, 2));
         
         // Use default values if metadata fields are missing
-        const donorFirstName = metadata?.donorFirstName || 'Valued Donor';
-        const donorMiddleName = metadata?.donorMiddleName || '';
-        const donorLastName = metadata?.donorLastName || '';
-        const donorEmail = 'zain@kinshipcanada.com'; // TODO: fix the hardcoded fields
-        const donorAddressLineAddress = metadata?.donorAddressLineAddress || '';
-        const donorAddressCity = metadata?.donorAddressCity || '';
-        const donorAddressState = metadata?.donorAddressState || '';
-        const donorAddressCountry = metadata?.donorAddressCountry || 'US'; // TODO: fix the hardcoded fields
-        const donorAddressPostalCode = metadata?.donorAddressPostalCode || '';
+        const donorFirstName = metadata?.donorFirstName;
+        const donorMiddleName = metadata?.donorMiddleName;
+        const donorLastName = metadata?.donorLastName;
+        const donorEmail = metadata?.donorEmail;
+        const donorAddressLineAddress = metadata?.donorAddressLineAddress;
+        const donorAddressCity = metadata?.donorAddressCity;
+        const donorAddressState = metadata?.donorAddressState;
+        const donorAddressCountry = metadata?.donorAddressCountry;
+        const donorAddressPostalCode = metadata?.donorAddressPostalCode;
         
         const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`;
         const emailBody = `

@@ -22,7 +22,6 @@ model Donor {
   donorAddressCountry     Country    @default(CA)
   donorAddressPostalCode  String
   stripeCustomerIds       String[]
-  donations               Donation[]
 }
 
 model Donation {
@@ -37,10 +36,6 @@ model Donation {
 
   feesChargedInCents   Int
   feesDonatedInCents   Int
-
-  // Donor details TODO: remove once the auth is removed
-  donorId                 String?
-  donor                   Donor?  @relation(fields: [donorId], references: [id])
 
   // Stripe identifiers
   stripeCustomerId      String?

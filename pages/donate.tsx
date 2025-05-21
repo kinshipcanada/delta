@@ -1,7 +1,7 @@
 "use client"
 import { Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
-import { Donation, DonationRegion } from "@prisma/client"
+import { Donation, DonationRegion, DonationStatus, Donor } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { useState } from "react"
@@ -19,116 +19,157 @@ import { TypographyH2, TypographyH4, TypographyP } from "@components/ui/typograp
 const causes: CauseV2[] = [
     {
         region: DonationRegion.ANYWHERE,
-        title: "Where Most Needed",
-        choices: []
+        cause: "Where Most Needed",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Sehme Sadat",
-        choices: []
+        cause: "Sehme Sadat",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Sehme Imam",
-        choices: []
+        cause: "Sehme Imam",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Vision Kinship",
-        choices: []
+        cause: "Vision Kinship",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Orphans",
-        choices: []
+        cause: "Orphans",
+        choices: [],
+        subCause: undefined 
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Education",
-        choices: []
+        cause: "Education",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Poverty Relief",
-        choices: []
+        cause: "Poverty Relief",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Medical Aid",
-        choices: []
+        cause: "Medical Aid",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Housing",
-        choices: []
+        cause: "Housing",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Widows",
-        choices: []
+        cause: "Widows",
+        choices: [],
+        subCause: undefined
     },
     {
         region: DonationRegion.ANYWHERE,
-        title: "Ramadhan Campaign",
+        cause: "Ramadhan Campaign",
         choices: [
             {
                 amountCents: 50000,
-                description: "Feed one jamaat (community) for one night"
+                subCause: "Feed one jamaat (community) for one night"
             },
             {
                 amountCents: 4200,
-                description: "One food ration package (grain, oil, sugar, lentils, small amount of meat, etc) for one family"
+                subCause: "One food ration package (grain, oil, sugar, lentils, small amount of meat, etc) for one family"
             },
             {
                 amountCents: 20000,
-                description: "Slaughter one animal to feed as many people as possible (Qurbani)"
+                subCause: "Slaughter one animal to feed as many people as possible (Qurbani)"
             },
-        ]
+        ],
     },
 ]
 
 
 type DefaultCauseChoice = {
     amountCents: number
-    description: string
+    subCause: string
 }
 
 type CauseV2 = {
+    id?: string
+    donation_id?: string
     region: DonationRegion
-    title: string
+    amountDonatedCents?: number
+    inHonorOf?: string
+    cause: string
+    subCause?: string
     choices: DefaultCauseChoice[]
-    amountCents?: number
 }
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
 export default function Donate() {
-
-    const [view, setView] = useState<'donation' | 'payment' | 'confirmation'>('donation')
-    const [donation, setDonation] = useState<Donation | undefined>(undefined)
-
-    const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined)
-    const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed)
+    const [view, setView] = useState<'donation' | 'payment' | 'confirmation'>('donation');
+    const [donation, setDonation] = useState<Donation | undefined>(undefined);
+    const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);
+    const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed);
+    
+    // const [causes, setCauses] = useState<CauseV2[]>([]);
+    
+    const [donorInfo, setDonorInfo] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        address: {
+            lineAddress: '',
+            city: '',
+            state: '',
+            country: '',
+            postalCode: '',
+        }
+    });
 
     if (view === 'donation') {
-        return <DonationForm setDonation={setDonation} setStripeClientSecret={setStripeClientSecret} setView={setView} />
+        return (
+            <DonationForm 
+                setDonation={setDonation} 
+                setStripeClientSecret={setStripeClientSecret} 
+                setView={setView} 
+                donorInfo={donorInfo}
+                setDonorInfo={setDonorInfo}
+            />
+        );
     } else if (view === 'payment') {
         return (
             <Elements options={{
                 appearance: { 'theme': 'stripe' },
                 clientSecret: stripeClientSecret,
             }} stripe={stripeClientPromise}>
-                <PaymentForm donation={donation} setDonation={setDonation} setView={setView} setConfirmationType={setConfirmationType} />
+                <PaymentForm 
+                    donation={donation} 
+                    setDonation={setDonation} 
+                    setView={setView} 
+                    setConfirmationType={setConfirmationType} 
+                    donorInfo={donorInfo}
+                />
             </Elements>
-        )
-    } else if (view === 'confirmation'){
-        return <ConfirmationForm donation={donation} confirmationType={confirmationType} />
+        );
+    } else if (view === 'confirmation') {
+        return <ConfirmationForm donation={donation} confirmationType={confirmationType} />;
     } else {
-        <div>Something went wrong. Please try again later</div>
+        return <div>Something went wrong. Please try again later</div>;
     }
 }
 
-function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { donation: Donation | undefined, setDonation: (donation: Donation) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, setConfirmationType: (value: ConfirmationType) => void}) {
+function PaymentForm({ donation, setDonation, setView, setConfirmationType, donorInfo }: { donation: Donation | undefined, setDonation: (donation: Donation) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, setConfirmationType: (value: ConfirmationType) => void, donorInfo: any }) {
 
     const [loading, setLoading] = useState<boolean>(false)
     const [stripeMessages, setStripeMessages] = useState<string | undefined>(undefined)
@@ -142,29 +183,17 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType }: { 
 
     const paymentElementOptions: StripePaymentElementOptions = {
         defaultValues: {
-            // TODO: revert to prev after authentication is removed
             billingDetails: {
-                name: `firstName lastName`,
-                email: `zain@kinshipcanada.com`,
+                name: `${donorInfo.firstName} ${donorInfo.lastName}`,
+                email: donorInfo.email,
                 address: {
-                  country: `CA`,
-                  postal_code: `M5A 0J5`,
-                  state: `ON`,
-                  city: `Toronto`,
-                  line1: `123 Main St`
+                  country: donorInfo.address.country,
+                  postal_code: donorInfo.address.postalCode,
+                  state: donorInfo.address.state,
+                  city: donorInfo.address.city,
+                  line1: donorInfo.address.lineAddress
                 }
             }
-            // billingDetails: {
-            //     name: `${donation.donorFirstName} ${donation.donorLastName}`,
-            //     email: donation.donorEmail,
-            //     address: {
-            //       country: donation.donorAddressCountry,
-            //       postal_code: donation.donorAddressPostalCode,
-            //       state: donation.donorAddressState,
-            //       city: donation.donorAddressCity,
-            //       line1: donation.donorAddressLineAddress
-            //     }
-            // }
         }
     }
 
@@ -318,7 +347,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
 
 const HEADER_CLASS="text-lg font-bold leading-7 tracking-tight text-slate-800 sm:truncate sm:text-xl"
 
-function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDonation: (donation: Donation) => void, setStripeClientSecret: (clientSecret: string) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void}) {
+function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, setDonorInfo }: { setDonation: (donation: Donation) => void, setStripeClientSecret: (clientSecret: string) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, donorInfo: any, setDonorInfo: (info: any) => void}) {
     const [loading, setLoading] = useState<boolean>(false)
     
     const [selectedCauses, setSelectedCauses] = useState<CauseV2[]>([])
@@ -336,20 +365,70 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
     const getStripeClientSecret = async (donation: Donation) => {
         setLoading(true)
 
+        const isAutoAddressComplete = formattedAddress && 
+            formattedAddress.streetNumber && 
+            formattedAddress.route && 
+            formattedAddress.locality && 
+            formattedAddress.administrativeAreaLevel1 && 
+            formattedAddress.country && 
+            formattedAddress.postalCode;
+
+        const address = isAutoAddressComplete ? {
+            lineAddress: `${formattedAddress!.streetNumber} ${formattedAddress!.route}`,
+            city: formattedAddress!.locality!,
+            state: formattedAddress!.administrativeAreaLevel1!,
+            country: formattedAddress!.country!,
+            postalCode: formattedAddress!.postalCode!,
+        } : {
+            lineAddress: `${formattedAddress?.streetNumber || ''} ${formattedAddress?.route || ''}`,
+            city: formattedAddress?.locality || '',
+            state: formattedAddress?.administrativeAreaLevel1 || '',
+            country: formattedAddress?.country || '',
+            postalCode: formattedAddress?.postalCode || '',
+        };
+
+        const donorInfo = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            ...address
+        };
+        
+        const causesData = selectedCauses.map(cause => {
+            const causeEntry: any = {
+                id: uuidv4(),
+                donation_id: donation.id,
+                region: cause.region,
+                amountDonatedCents: cause.amountDonatedCents || 0,
+                cause: cause.cause,
+            };
+
+            if (inHonorOf && inHonorOf.trim() !== "") {
+                causeEntry.inHonorOf = inHonorOf;
+            }
+
+            if (cause.subCause && cause.subCause.trim() !== "") {
+                causeEntry.subCause = cause.subCause;
+            }
+            return causeEntry;
+        });
+
         const response = await callKinshipAPI<string>('/api/v2/stripe/createPaymentIntent', {
-            donation
-        })
+            donation,
+            donorInfo,
+            causesData
+        });
 
         if (response.error || response.data == undefined) {
-            alert("Internal error - please try again later")
-            setLoading(false)
+            alert("Internal error - please try again later");
+            setLoading(false);
             return;
         } else {
-            setStripeClientSecret(response.data)
-            setLoading(false)
-            setView('payment')
+            setStripeClientSecret(response.data);
+            setLoading(false);
+            setView('payment');
         }
-    }
+    };
 
     const validateDonation = async () => {
         let issues = []
@@ -375,41 +454,27 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
         }
 
         for (const cause of selectedCauses) {
-            if (cause.amountCents === undefined) {
-                issues.push(`Please select an amount to donate to ${cause.title}`)
+            if (cause.amountDonatedCents === undefined) {
+                issues.push(`Please select an amount to donate to ${cause.cause}`)
             }
         }
 
         const sum = sumCauses(selectedCauses)
 
-        
         if (issues.length > 0) {
             alert(issues.join('\n'))
             return;
         } else { 
             console.log(selectedCauses)
+
             const donation: Donation = {
                 id: uuidv4(),
+                status: "PROCESSING" as DonationStatus,
                 date: new Date(),
-                status: "PROCESSING",
-                // causeName: null,
-                // causeRegion: "ANYWHERE",
-                // transactionStatus: "PENDING",
                 amountDonatedInCents: sum,
                 amountChargedInCents: sum,
                 feesChargedInCents: 0,
                 feesDonatedInCents: 0,
-                donorId: null, // will get rid of after donor model is removed
-                // TODO: revert to prev after authentication is removed
-                // donorFirstName: firstName,
-                // donorMiddleName: null,
-                // donorLastName: lastName,
-                // donorEmail: email,
-                // donorAddressLineAddress: `${formattedAddress!.streetNumber} ${formattedAddress!.route}`,
-                // donorAddressCity: formattedAddress!.locality!,
-                // donorAddressState: formattedAddress!.administrativeAreaLevel1!,
-                // donorAddressCountry: formattedAddress!.country! == "Canada" ? "CA" : "AD",
-                // donorAddressPostalCode: formattedAddress!.postalCode!,
                 stripeCustomerId: null,
                 stripeTransferId: null,
                 stripeChargeId: null,
@@ -447,22 +512,22 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                     </TypographyH4>
                     <div className="flex items-center grid grid-cols-2 gap-4">
                     {causes.map((cause)=> (
-                        <div key={cause.title}>
+                        <div key={cause.cause}>
                             <input 
                                 type="checkbox"
-                                id={cause.title} 
-                                name={cause.title} 
-                                value={cause.title} 
+                                id={cause.cause} 
+                                name={cause.cause} 
+                                value={cause.cause} 
                                 className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
                                 onChange={(e) => {
                                     if (e.target.checked) {
                                         setSelectedCauses([...selectedCauses, cause])
                                     } else {
-                                        setSelectedCauses(selectedCauses.filter((selectedCause) => selectedCause.title != cause.title))
+                                        setSelectedCauses(selectedCauses.filter((selectedCause) => selectedCause.cause != cause.cause))
                                     }
                                 }}
                             />
-                            <label htmlFor={cause.title}>{cause.title}</label>
+                            <label htmlFor={cause.cause}>{cause.cause}</label>
                         </div>
                     ))}
                         </div>
@@ -476,7 +541,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                             Choose How Much To Donate
                         </TypographyH4>
                         {selectedCauses.map((cause) => (
-                            <AmountSelection key={cause.title} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
+                            <AmountSelection key={cause.cause} cause={cause} selectedCauses={selectedCauses} setSelectedCauses={setSelectedCauses} />
                         ))}
 
                         
@@ -560,9 +625,9 @@ function DonationForm({ setDonation, setStripeClientSecret, setView }: { setDona
                         <h1 className={HEADER_CLASS}>Total: ${centsToDollars(sumCauses(selectedCauses))}</h1>
                         <ul>
                             {selectedCauses.map((cause) => (
-                                <li key={cause.title} className="flex space-x-2 items-center">
+                                <li key={cause.cause} className="flex space-x-2 items-center">
                                     <CheckCircleIcon className="w-5 h-5 text-green-600" />
-                                    <span>{cause.title}: {centsToDollars(cause.amountCents ?? 0)}</span>
+                                    <span>{cause.cause}: {centsToDollars(cause.amountDonatedCents ?? 0)}</span>
                                 </li>
                             ))} 
                         </ul>
@@ -666,17 +731,24 @@ function ManualAddressCollection(
 }
 
 function sumCauses(causes: CauseV2[]) {
-    return causes.reduce((acc, cause) => acc + (cause.amountCents || 0), 0)
+    return causes.reduce((acc, cause) => acc + (cause.amountDonatedCents || 0), 0)
 }
 
 function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: CauseV2, selectedCauses: CauseV2[], setSelectedCauses: (causes: CauseV2[]) => void}) {
     const [customAmount, setCustomAmount] = useState<number | null>(null);
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
 
-    const handleAmountChange = (amount: number) => {
+    const handleAmountChange = (amount: number, description?: string) => {
         setSelectedCauses(selectedCauses.map((selectedCause) => 
-            selectedCause.title === cause.title ? { ...selectedCause, amountCents: amount } : selectedCause
+            selectedCause.cause === cause.cause 
+                ? { 
+                    ...selectedCause, 
+                    amountDonatedCents: amount,
+                    subCause: description || selectedCause.subCause 
+                  } 
+                : selectedCause
         ));
+        
         setSelectedAmount(amount);
         if (amount !== customAmount) {
             setCustomAmount(null);
@@ -687,26 +759,28 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
         setSelectedAmount(0);
         setCustomAmount(0);
         setSelectedCauses(selectedCauses.map((selectedCause) => 
-            selectedCause.title === cause.title ? { ...selectedCause, amountCents: 0 } : selectedCause
+            selectedCause.cause === cause.cause ? { ...selectedCause, amountDonatedCents: 0 } : selectedCause
         ));
     };
 
     return (
         <div className="overflow-hidden rounded-lg bg-white shadow-sm border">
             <div className="px-4 py-5 sm:p-6 flex justify-between">
-                <p className={HEADER_CLASS} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>{cause.title}</p>
+                <p className={HEADER_CLASS} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>{cause.cause}</p>
                 <div className="flex flex-col space-y-3 justify-start items-start">
                     {cause.choices.map((choice) => (
-                        <span key={choice.description} className="flex items-center space-x-4">
+                        <span key={choice.subCause} className="flex items-center space-x-4">
                             <input 
                                 type="radio"
-                                id={`${cause.title}-${choice.description}`}
-                                name={cause.title} 
+                                id={`${cause.cause}-${choice.subCause}`}
+                                name={cause.cause} 
                                 value={choice.amountCents} 
                                 checked={selectedAmount === choice.amountCents}
-                                onChange={() => handleAmountChange(choice.amountCents)}
+                                onChange={() => handleAmountChange(choice.amountCents, choice.subCause)}
                             />
-                            <label htmlFor={`${cause.title}-${choice.description}`}><span className="font-bold">${centsToDollars(choice.amountCents)}</span> {choice.description}</label>
+                            <label htmlFor={`${cause.cause}-${choice.subCause}`}>
+                                <span className="font-bold">${centsToDollars(choice.amountCents)}</span> {choice.subCause}
+                            </label>
                         </span>
                     ))}
                     {
@@ -724,7 +798,7 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                                         setCustomAmount(value);
                                         setSelectedAmount(value);
                                         setSelectedCauses(selectedCauses.map((selectedCause) => 
-                                            selectedCause.title === cause.title ? { ...selectedCause, amountCents: Number(dollarsToCents(value)) } : selectedCause
+                                            selectedCause.cause === cause.cause ? { ...selectedCause, amountDonatedCents: Number(dollarsToCents(value)) } : selectedCause
                                         ));
                                     }}
                                 />
@@ -733,13 +807,13 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                             <span className="flex items-center space-x-4">
                                 <input 
                                     type="radio"
-                                    id={`${cause.title}-custom`} 
-                                    name={cause.title} 
+                                    id={`${cause.cause}-custom`} 
+                                    name={cause.cause} 
                                     value={customAmount || ''}
                                     checked={selectedAmount === customAmount && customAmount !== null}
                                     onChange={handleCustomSelect}
                                 />
-                                <label htmlFor={`${cause.title}-custom`} onClick={handleCustomSelect}>Custom</label>
+                                <label htmlFor={`${cause.cause}-custom`} onClick={handleCustomSelect}>Custom</label>
                                 <div className="flex items-center space-x-1">
                                     <span className="text-xl font-bold">$</span>
                                     <input 
@@ -752,7 +826,7 @@ function AmountSelection({ cause, selectedCauses, setSelectedCauses }: { cause: 
                                             setCustomAmount(value);
                                             setSelectedAmount(value);
                                             setSelectedCauses(selectedCauses.map((selectedCause) => 
-                                                selectedCause.title === cause.title ? { ...selectedCause, amountCents: Number(dollarsToCents(value)) } : selectedCause
+                                                selectedCause.cause === cause.cause ? { ...selectedCause, amountDonatedCents: Number(dollarsToCents(value)) } : selectedCause
                                             ));
                                         }}
                                         onClick={handleCustomSelect}
