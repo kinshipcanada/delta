@@ -89,7 +89,9 @@ const Receipt: React.FC<Props> = (props) => {
         <main className="mt-8 bg-white overflow-hidden border border-gray-400 rounded-lg divide-y divide-gray-300">
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
             <div>
-                <h1 className = 'text-xl font-bold leading-7 text-gray-900 sm:text-2xl sm:truncate mb-2'>Official Receipt For Income Tax Purposes</h1>
+                <h1 className = 'text-xl font-bold leading-7 text-gray-900 sm:text-2xl sm:truncate mb-2'>
+                    Official Receipt{receipt.country === Country.CA ? " For Income Tax Purposes" : ""}
+                </h1>
                 <p className="font-medium text-gray-700 mb-1">Kinship Canada is a registered charity</p>
                 <p className="font-medium text-gray-700">Registration Number 855070728 RR 0001</p>
                 <p className="font-medium text-gray-700">Date Of Donation: {parseFrontendDate(receipt.date)}</p>
