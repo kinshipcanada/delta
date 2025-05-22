@@ -98,7 +98,7 @@ export default function Address({ addressString, setAddressString, formattedAddr
               onSelect={handleSelect}
               searchOptions={{
               types: [],
-              componentRestrictions: { country: "ca" },
+              // componentRestrictions: { country: "ca" },
               }}
           >
               {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { toast } from "react-hot-toast"
 import { useAuth } from '../../components/prebuilts/Authentication'
 import { DonorEngine, NoIdDonorProfile } from '@lib/methods/donors'
-import { Country, Donor } from '@prisma/client'
+import { Country, donor } from '@prisma/client'
 import { countries, states_and_provinces } from '@lib/utils/constants'
 import { Label, SelectionInput, TextInput } from '@components/primitives'
 
@@ -60,21 +60,21 @@ export default function Register() {
 				return
 			} 
 
-			const donorProfile: Donor = {
+			const donorProfile: donor = {
 				id: data.user.id,
-				donorFirstName: firstName,
-				donorMiddleName: null,
-				donorLastName: lastName,
-				donorEmail: email,
-				donorAddressLineAddress: address,
-				donorAddressCity: city,
-				donorAddressState: province,
-				donorAddressCountry: country,
-				donorAddressPostalCode: postalCode,
-				stripeCustomerIds: []
+				donor_first_name: firstName,
+				donor_middle_name: null,
+				donor_last_name: lastName,
+				donor_email: email,
+				donor_address_line_address: address,
+				donor_address_city: city,
+				donor_address_state: province,
+				donor_address_country: country,
+				donor_address_postal_code: postalCode,
+				stripe_customer_ids: []
 			}
 
-			await callKinshipAPI<Donor>("/api/v2/donor/create", {
+			await callKinshipAPI<donor>("/api/v2/donor/create", {
 				donor: donorProfile,
 			})
 				

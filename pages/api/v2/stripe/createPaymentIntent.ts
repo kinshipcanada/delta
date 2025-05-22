@@ -1,34 +1,29 @@
 import Stripe from 'stripe';
 import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
-import { Donation, DonationStatus } from '@prisma/client';
+import { Country, donation, status_enum } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
 import { posthogLogger } from '@lib/posthog-server';
 
-const createDonationMetadata = (donation: Donation) => {
+// TODO: update after authentication is removed
+const createDonationMetadata = (donation: donation, donorInfo: { [key: string]: string }, causesData: any[]) => {
     return {
-        donationId: donation.id,
-        loggedAt: new Date().toDateString(),
-        syncStatus: "unsynced",
-        allocationBreakdown: JSON.stringify(donation.allocationBreakdown),
-        status: DonationStatus.PROCESSING,
-        adheringLabels: JSON.stringify(donation.adheringLabels),
-        causeName: donation.causeName,
-        causeRegion: donation.causeRegion,
-        amountDonatedInCents: donation.amountDonatedInCents,
-        feesDonatedInCents: donation.feesDonatedInCents,
-        donorFirstName: donation.donorFirstName,
-        donorMiddleName: donation.donorMiddleName,
-        donorLastName: donation.donorLastName,
-        donorEmail: donation.donorEmail,
-        donorAddressLineAddress: donation.donorAddressLineAddress,
-        donorAddressCity: donation.donorAddressCity,
-        donorAddressState: donation.donorAddressState,
-        donorAddressCountry: donation.donorAddressCountry,
-        donorAddressPostalCode: donation.donorAddressPostalCode,
-        allocatedToCauses: donation.allocatedToCauses,
-        unallocatedToCauses: donation.unallocatedToCauses,
-
+        donation_id: donation.id,
+        date: new Date().toDateString(),
+        sync_status: "unsynced",
+        status: status_enum.PROCESSING,
+        amount_donated_cents: donation.amount_donated_cents,
+        fees_covered_by_donor: donation.fees_covered_by_donor,
+        donor_first_name: donorInfo.firstName,
+        donor_middle_name: donorInfo.middleName,
+        donor_last_name: donorInfo.lastName,
+        donor_email: donorInfo.email,
+        donor_address_line_address: donorInfo.lineAddress,
+        donor_address_city: donorInfo.city,
+        donor_address_state: donorInfo.state,
+        donor_address_country: donorInfo.country as Country,
+        donor_address_postal_code: donorInfo.postalCode,
+        causes: JSON.stringify(causesData)
     }
 }
 
@@ -40,7 +35,9 @@ export default async function handler(
   res: NextApiResponse,
 ) {
 
-    const donation: Donation = req.body.donation
+    const donation: donation = req.body.donation
+    const donorInfo: { [key: string]: string } = req.body.donorInfo
+    const causesData: any[] = req.body.causesData || [];
 
     try {
 
@@ -50,34 +47,26 @@ export default async function handler(
 
         let stripeCustomerId: string;
 
-        if (donation.stripeCustomerId) {
-            // Get the first stripe customer id to use for this donor
-            stripeCustomerId = donation.stripeCustomerId
-        } else {
-            // If there is no created customer_id, see if we can fetch one from stripe, otherwise create one.
-            // We have to do this, because we can't attach a billing address or customer objects directly to Stripe payment intents, just the id as a string
-            const donorEngine = new DonorEngine()
-            stripeCustomerId = await donorEngine.createStripeProfile({
-                donorFirstName: donation.donorFirstName,
-                donorMiddleName: donation.donorMiddleName,
-                donorLastName: donation.donorLastName,
-                donorEmail: donation.donorEmail,
-                donorAddressLineAddress: donation.donorAddressLineAddress,
-                donorAddressCity: donation.donorAddressCity,
-                donorAddressState: donation.donorAddressState,
-                donorAddressCountry: donation.donorAddressCountry,
-                donorAddressPostalCode: donation.donorAddressPostalCode,
-                stripeCustomerIds: []
-            })
-        }
+        const donorEngine = new DonorEngine()
+        stripeCustomerId = await donorEngine.createStripeProfile({
+            donor_first_name: donorInfo.firstName,
+            donor_middle_name: donorInfo.middleName,
+            donor_last_name: donorInfo.lastName,
+            donor_email: donorInfo.email,
+            donor_address_line_address: donorInfo.lineAddress,
+            donor_address_city: donorInfo.city,
+            donor_address_state: donorInfo.state,
+            donor_address_country: donorInfo.country as Country,
+            donor_address_postal_code: donorInfo.postalCode,
+            stripe_customer_ids: []
+        })
 
         const paymentIntent = await stripeClient.paymentIntents.create({
-            amount: donation.amountChargedInCents,
-            // Causes is added here for backwards compatability
-            metadata: createDonationMetadata(donation),
+            amount: donation.amount_charged_cents,
+            metadata: createDonationMetadata(donation, donorInfo, causesData),
             customer: stripeCustomerId,
             currency: 'cad',
-            receipt_email: donation.donorEmail,
+            receipt_email: donorInfo.email,
             payment_method_types: ['acss_debit', 'card'],
             payment_method_options: {
                 acss_debit: {
@@ -99,7 +88,7 @@ export default async function handler(
         res.status(200).send(response);
     } catch (error) {
         console.error(`Error creating Stripe Payment Intent for donation: ${error}`)
-        posthogLogger(error)
+        posthogLogger(error as Error)
         const response: ObjectIdApiResponse = { error: "Sorry, something went wrong on our end" }
         res.status(500).json(response);
     }
