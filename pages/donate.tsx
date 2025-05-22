@@ -1,7 +1,7 @@
 "use client"
 import { Alert, Button, ButtonSize, ButtonStyle, EventColors, Label, SelectionInput } from "@components/primitives"
 import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpers"
-import { Donation, DonationRegion, DonationStatus, Donor } from "@prisma/client"
+import { donation, status_enum, region_enum } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
 import { useState } from "react"
@@ -25,61 +25,61 @@ const causes: CauseV2[] = [
         cause: "Where Most Needed",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Sehme Sadat",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Sehme Imam",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Vision Kinship",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Orphans",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Education",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Poverty Relief",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Medical Aid",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Housing",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
     {
         cause: "Widows",
         choices: [],
         subCause: undefined,
-        region: DonationRegion.ANYWHERE
+        region: region_enum.CANADA
     },
 ]
 
@@ -94,7 +94,7 @@ type CauseV2 = {
     donation_id?: string
     amountDonatedCents?: number
     inHonorOf?: string
-    region?: DonationRegion
+    region?: region_enum
     cause: string
     subCause?: string
     choices: DefaultCauseChoice[]
@@ -104,7 +104,7 @@ const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABL
 
 export default function Donate() {
     const [view, setView] = useState<'donation' | 'payment' | 'confirmation'>('donation');
-    const [donation, setDonation] = useState<Donation | undefined>(undefined);
+    const [donation, setDonation] = useState<donation | undefined>(undefined);
     const [stripeClientSecret, setStripeClientSecret] = useState<string | undefined>(undefined);
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed);
     
@@ -154,7 +154,7 @@ export default function Donate() {
     }
 }
 
-function PaymentForm({ donation, setDonation, setView, setConfirmationType, donorInfo }: { donation: Donation | undefined, setDonation: (donation: Donation) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, setConfirmationType: (value: ConfirmationType) => void, donorInfo: any }) {
+function PaymentForm({ donation, setDonation, setView, setConfirmationType, donorInfo }: { donation: donation | undefined, setDonation: (donation: donation) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, setConfirmationType: (value: ConfirmationType) => void, donorInfo: any }) {
 
     const [loading, setLoading] = useState<boolean>(false)
     const [stripeMessages, setStripeMessages] = useState<string | undefined>(undefined)
@@ -234,7 +234,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType, dono
                 <PaymentElement id="payment-element" options={paymentElementOptions} />
                 <div className='w-full flex justify-end'>
                     <Button 
-                        text={loading ? "Processing Donation" : `Donate ${centsToDollars(donation.amountChargedInCents)}`}
+                        text={loading ? "Processing Donation" : `Donate ${centsToDollars(donation.amount_charged_cents)}`}
                         icon={<CreditCardIcon />}
                         style={ButtonStyle.Primary}
                         size={ButtonSize.Large} 
@@ -254,7 +254,7 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType, dono
     )
 }
 
-function ConfirmationForm({ donation, confirmationType }: { donation: Donation | undefined, confirmationType: ConfirmationType }) {
+function ConfirmationForm({ donation, confirmationType }: { donation: donation | undefined, confirmationType: ConfirmationType }) {
 
     if (!donation) {
         return (
@@ -270,9 +270,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                     <h1 className="text-base font-medium text-blue-600">Donation Successful</h1>
                     <p className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Thank You!</p>
                     
-                    {/* TODO: revert to prev after authentication is removed */}
-                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to email@email.com. Please reach out to info@kinshipcanada.com with any questions.</p>
-                    {/* <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.donorEmail}. Please reach out to info@kinshipcanada.com with any questions.</p> */}
+                    <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.email}. Please reach out to info@kinshipcanada.com with any questions.</p>
         
                     <dl className="mt-12 text-sm font-medium">
                     <dt className="text-gray-900">Donation ID</dt>
@@ -288,13 +286,9 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                         <dt className="font-medium text-gray-900">Address Details</dt>
                         <dd className="mt-2 text-gray-700">
                             <address className="not-italic">
-                                {/* TODO: revert to prev after authentication is removed */}
-                                <span className="block">123 Main St</span>
-                                <span className="block">Toronto ON M5A 0J5</span>
-                                <span className="block">Canada</span>
-                                {/* <span className="block">{donation.donorAddressLineAddress}</span>
-                                <span className="block">{donation.donorAddressCity} {donation.donorAddressState}</span>
-                                <span className="block">{donation.donorAddressCountry}, {donation.donorAddressPostalCode}</span> */}
+                                <span className="block">{donation.line_address}</span>
+                                <span className="block">{donation.city} {donation.state}</span>
+                                <span className="block">{donation.country}, {donation.postal_code}</span>
                             </address>
                         </dd>
                         </div>
@@ -302,11 +296,8 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                         <dt className="font-medium text-gray-900">Donor Details</dt>
                         <dd className="mt-2 text-gray-700">
                             <address className="not-italic">
-                                {/* TODO: revert to prev after authentication is removed */}
-                                <span className="block">firstName lastName</span>
-                                <span className="block">email@email.com</span>
-                                {/* <span className="block">{donation.donorFirstName} {donation.donorLastName}</span>
-                                <span className="block">{donation.donorEmail}</span> */}
+                                <span className="block">{donation.donor_name}</span>
+                                <span className="block">{donation.email}</span>
                             </address>
                         </dd>
                         </div>
@@ -318,7 +309,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
                     <dl className="space-y-6 border-t border-gray-200 pt-10 text-lg">
                         <div className="flex justify-between">
                             <dt className="font-regular text-gray-900">Total Donated</dt>
-                            <dd className="text-gray-700 font-extrabold">${centsToDollars(donation.amountChargedInCents)}</dd>
+                            <dd className="text-gray-700 font-extrabold">${centsToDollars(donation.amount_charged_cents)}</dd>
                         </div>
                     </dl>
                     </div>
@@ -332,7 +323,7 @@ function ConfirmationForm({ donation, confirmationType }: { donation: Donation |
 
 const HEADER_CLASS="text-lg font-bold leading-7 tracking-tight text-slate-800 sm:truncate sm:text-xl"
 
-function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, setDonorInfo }: { setDonation: (donation: Donation) => void, setStripeClientSecret: (clientSecret: string) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, donorInfo: any, setDonorInfo: (info: any) => void}) {
+function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, setDonorInfo }: { setDonation: (donation: donation) => void, setStripeClientSecret: (clientSecret: string) => void, setView: (view: 'donation' | 'payment' | 'confirmation') => void, donorInfo: any, setDonorInfo: (info: any) => void}) {
     const devToolsEnabled = process.env.NEXT_PUBLIC_DEV_ENVIRONMENT && process.env.NEXT_PUBLIC_DEV_ENVIRONMENT == "true"
     const [loading, setLoading] = useState<boolean>(false)
     
@@ -380,7 +371,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
         setManualAddressCollectionMode(false);
     };
 
-    const getStripeClientSecret = async (donation: Donation) => {
+    const getStripeClientSecret = async (donation: donation) => {
         setLoading(true)
 
         const isAutoAddressComplete = formattedAddress && 
@@ -423,7 +414,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
             if (cause.region) {
                 causeEntry.region = cause.region;
             } else {
-                causeEntry.region = DonationRegion.ANYWHERE;
+                causeEntry.region = region_enum.CANADA;
             }
 
             if (inHonorOf && inHonorOf.trim() !== "") {
@@ -490,17 +481,24 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
         } else { 
             console.log(selectedCauses)
 
-            const donation: Donation = {
+            const donation: donation = {
                 id: uuidv4(),
-                status: "PROCESSING" as DonationStatus,
+                status: "PROCESSING" as status_enum,
                 date: new Date(),
-                amountDonatedInCents: sum,
-                amountChargedInCents: sum,
-                feesChargedInCents: 0,
-                feesDonatedInCents: 0,
-                stripeCustomerId: null,
-                stripeTransferId: null,
-                stripeChargeId: null,
+                donor_name: `${firstName} ${lastName}`,
+                email: email,
+                amount_donated_cents: sum,
+                amount_charged_cents: sum,
+                line_address: formattedAddress?.route || address || '',
+                city: formattedAddress?.locality || '',
+                state: formattedAddress?.administrativeAreaLevel1 || '',
+                country: formattedAddress?.country || '',
+                postal_code: formattedAddress?.postalCode || '',
+                fee_charged_by_processor: 0,
+                fees_covered_by_donor: 0,
+                stripe_customer_id: null,
+                stripe_transfer_id: null,
+                stripe_charge_id: null,
                 version: 2,
             }
 

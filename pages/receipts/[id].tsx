@@ -1,14 +1,13 @@
 import React from "react";
 import type { GetServerSideProps } from "next";
 import prisma from '../../lib/prisma'
-import { Country, Donation } from "@prisma/client";
+import { Country, donation } from "@prisma/client";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { parseFrontendDate } from "@lib/utils/helpers";
 import Head from "next/head";
 import Link from "next/link";
 import { Loading, LoadingColors } from "@components/primitives";
 
-// TODO: update after authentication is removed
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.query.id as string
     const isStripeId = id.startsWith("pi_") || id.startsWith("ch_")
@@ -30,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 type Props = {
   isGenerating: boolean,
-  donation?: Donation
+  donation?: donation
 }
 
 const Receipt: React.FC<Props> = (props) => {
@@ -76,15 +75,11 @@ const Receipt: React.FC<Props> = (props) => {
     return (
       <div className = 'w-screen h-screen sm:p-12 p-8'>
         <Head>
-            {/* TODO: update after authentication is removed */}
-            {/* <title>{receipt.donorFirstName}&apos;s tax receipt</title> */}
-            <title>Kinship Canada Receipt</title>
+            <title>{receipt.donor_name}&apos;s tax receipt</title>
         </Head>
         <div className="md:flex md:items-center md:justify-between flex">
             <div className="flex-1 min-w-0">
-                {/* TODO: update after authentication is removed */}
-                {/* <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donorFirstName}&apos;{receipt.donorFirstName[receipt.donorFirstName.length-1] == "s" ? null : "s"} receipt from {parseFrontendDate(receipt.donatedAt)}</h2> */}
-                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Kinship Canada Receipt</h2>
+                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">{receipt.donor_name}&apos;s receipt from {parseFrontendDate(receipt.date)}</h2>
             </div>
             <div className="sm:mt-4 flex md:mt-0 md:ml-4">
                 {/* <SecondaryButton iconLeft={DocumentIcon} text = "Download PDF" link = "/" /> */}
@@ -105,10 +100,7 @@ const Receipt: React.FC<Props> = (props) => {
             </div>
         </div>
         <div className="px-4 py-5 sm:p-6">
-            {/* TODO: update after authentication is removed */}
-            {/* <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your {receipt.donorAddressCountry == Country.CA ? "CRA-Eligible Tax" : "Donation"} Receipt. You donated a total amount of ${(receipt.amountChargedInCents/100).toFixed(2)} CAD.</p> */}
-            <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your Receipt. You donated a total amount of ${(receipt.amountChargedInCents/100).toFixed(2)} CAD.</p>
-            
+            <p className="font-medium text-gray-800 mb-2">Thank you for donating with Kinship Canada. This is your {receipt.country == Country.CA ? "CRA-Eligible Tax" : "Donation"} Receipt. You donated a total amount of ${(receipt.amount_charged_cents/100).toFixed(2)} CAD.</p>
             {/* <span className = 'flex mb-1'>
                 <p  className="font-bold text-gray-800  mr-1">{(id as string).substring(0, 3) == "pi_" ? "Payment ID" : (id as string).substring(0,3) == "ch_" ? "Payment ID" : "Kinship Receipt ID"}:</p> 
                 <p className="font-medium text-gray-800">{id}</p>
@@ -121,33 +113,24 @@ const Receipt: React.FC<Props> = (props) => {
             <h2 className="mb-2 mt-3 text-md font-bold leading-7 text-gray-900 sm:text-lg sm:truncate">Donor Details</h2>
             <span className = 'flex mb-1'>
                 <p  className="font-bold text-gray-800 mr-1">Donor Name:</p>
-                {/* TODO: update after authentication is removed */}
-                {/* <p className="font-medium text-gray-800 mb-1">{receipt.donorFirstName}{' '}{receipt.donorLastName}</p> */}
-                <p className="font-medium text-gray-800 mb-1">Kinship Canada</p>
+                <p className="font-medium text-gray-800 mb-1">{receipt.donor_name}</p>
             </span>
             <span className = 'flex mb-1'>
                 <p  className="font-bold text-gray-800 mr-1">Donor Address: </p>
-                {/* TODO: update after authentication is removed */}
-                {/* <p className="font-medium text-gray-800 mb-1">{receipt.donorAddressLineAddress}{', '}{receipt.donorAddressCity}{', '}{receipt.donorAddressState}{', '}{receipt.donorAddressPostalCode}{', '}{receipt.donorAddressCountry == "CA" ? "Canada": receipt.donorAddressCountry}</p> */}
-                <p className="font-medium text-gray-800 mb-1">43 Matson Drive, Bolton, Ontario, L7E0B1, Canada</p>
+                <p className="font-medium text-gray-800 mb-1">{receipt.line_address}{', '}{receipt.city}{', '}{receipt.state}{', '}{receipt.postal_code}{', '}{receipt.country == "CA" ? "Canada": receipt.country}</p>
             </span>
 
             <h2 className="mb-2 mt-3 text-md font-bold leading-7 text-gray-900 sm:text-lg sm:truncate">Donation Details</h2>
             <span className = 'flex mb-1'>
                 <p  className="font-bold text-gray-800 mr-1">Total Amount Donated:</p>
-                <p className="font-medium text-gray-800 mb-1">${(receipt.amountChargedInCents/100).toFixed(2)}</p>
+                <p className="font-medium text-gray-800 mb-1">${(receipt.amount_charged_cents/100).toFixed(2)}</p>
             </span>
-            {/* TODO: Fix once authentication is removed - temporarily hardcoded eligibility check */}
-            {/* {receipt.donorAddressCountry == Country.CA && (
+            {receipt.country == Country.CA && (
                 <span className = 'flex mb-1'>
                     <p  className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
-                    <p className="font-medium text-gray-800 mb-1">${receipt.donorAddressCountry == Country.CA ? (receipt.amountChargedInCents/100).toFixed(2) : receipt.donorAddressCountry == Country.CA ? (receipt.amountChargedInCents/100).toFixed(2) : '0.00'}</p>
+                    <p className="font-medium text-gray-800 mb-1">${receipt.country == Country.CA ? (receipt.amount_charged_cents/100).toFixed(2) : '0.00'}</p>
                 </span>
-            )} */}
-            <span className = 'flex mb-1'>
-                <p className="font-bold text-gray-800 mr-1">Total Amount Eligible: </p>
-                <p className="font-medium text-gray-800 mb-1">${(receipt.amountChargedInCents/100).toFixed(2)}</p>
-            </span>
+            )}
         </div>
         </main>
         <div className = 'mt-4 flex w-full text-center justify-center text text-base'>Valid with the Canada Revenue Agency ·{' '} <Link href = 'https://www.canada.ca/en/revenue-agency.html'><a className = 'ml-2 text-blue-600'>https://www.canada.ca/en/revenue-agency.html</a></Link></div>

@@ -1,28 +1,28 @@
 import Stripe from 'stripe';
 import { ObjectIdApiResponse } from '@lib/classes/api';
 import { NextApiRequest, NextApiResponse } from "next";
-import { Country, Donation, DonationStatus } from '@prisma/client';
+import { Country, donation, status_enum } from '@prisma/client';
 import { DonorEngine } from '@lib/methods/donors';
 import { posthogLogger } from '@lib/posthog-server';
 
 // TODO: update after authentication is removed
-const createDonationMetadata = (donation: Donation, donorInfo: { [key: string]: string }, causesData: any[]) => {
+const createDonationMetadata = (donation: donation, donorInfo: { [key: string]: string }, causesData: any[]) => {
     return {
-        donationId: donation.id,
+        donation_id: donation.id,
         date: new Date().toDateString(),
-        syncStatus: "unsynced",
-        status: DonationStatus.PROCESSING,
-        amountDonatedInCents: donation.amountDonatedInCents,
-        feesDonatedInCents: donation.feesDonatedInCents,
-        donorFirstName: donorInfo.firstName,
-        donorMiddleName: donorInfo.middleName,
-        donorLastName: donorInfo.lastName,
-        donorEmail: donorInfo.email,
-        donorAddressLineAddress: donorInfo.lineAddress,
-        donorAddressCity: donorInfo.city,
-        donorAddressState: donorInfo.state,
-        donorAddressCountry: donorInfo.country as Country,
-        donorAddressPostalCode: donorInfo.postalCode,
+        sync_status: "unsynced",
+        status: status_enum.PROCESSING,
+        amount_donated_cents: donation.amount_donated_cents,
+        fees_covered_by_donor: donation.fees_covered_by_donor,
+        donor_first_name: donorInfo.firstName,
+        donor_middle_name: donorInfo.middleName,
+        donor_last_name: donorInfo.lastName,
+        donor_email: donorInfo.email,
+        donor_address_line_address: donorInfo.lineAddress,
+        donor_address_city: donorInfo.city,
+        donor_address_state: donorInfo.state,
+        donor_address_country: donorInfo.country as Country,
+        donor_address_postal_code: donorInfo.postalCode,
         causes: JSON.stringify(causesData)
     }
 }
@@ -35,7 +35,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
 
-    const donation: Donation = req.body.donation
+    const donation: donation = req.body.donation
     const donorInfo: { [key: string]: string } = req.body.donorInfo
     const causesData: any[] = req.body.causesData || [];
 
@@ -49,20 +49,20 @@ export default async function handler(
 
         const donorEngine = new DonorEngine()
         stripeCustomerId = await donorEngine.createStripeProfile({
-            donorFirstName: donorInfo.firstName,
-            donorMiddleName: donorInfo.middleName,
-            donorLastName: donorInfo.lastName,
-            donorEmail: donorInfo.email,
-            donorAddressLineAddress: donorInfo.lineAddress,
-            donorAddressCity: donorInfo.city,
-            donorAddressState: donorInfo.state,
-            donorAddressCountry: donorInfo.country as Country,
-            donorAddressPostalCode: donorInfo.postalCode,
-            stripeCustomerIds: []
+            donor_first_name: donorInfo.firstName,
+            donor_middle_name: donorInfo.middleName,
+            donor_last_name: donorInfo.lastName,
+            donor_email: donorInfo.email,
+            donor_address_line_address: donorInfo.lineAddress,
+            donor_address_city: donorInfo.city,
+            donor_address_state: donorInfo.state,
+            donor_address_country: donorInfo.country as Country,
+            donor_address_postal_code: donorInfo.postalCode,
+            stripe_customer_ids: []
         })
 
         const paymentIntent = await stripeClient.paymentIntents.create({
-            amount: donation.amountChargedInCents,
+            amount: donation.amount_charged_cents,
             metadata: createDonationMetadata(donation, donorInfo, causesData),
             customer: stripeCustomerId,
             currency: 'cad',

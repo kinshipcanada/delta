@@ -9,9 +9,9 @@ import { HorizontalSpacer } from "../../primitives/Spacer";
 import { ButtonStyle, EventColors, SpacerSize, StandardIconSizing, Style } from "../../primitives/types";
 import { BoldText, Text } from "../../primitives/Typography";
 import { JustifyEnd } from "../../primitives/Utils";
-import { Donation as PrismaDonation, Donor } from "@prisma/client";
+import { donation as PrismaDonation, donor } from "@prisma/client";
 
-export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: Donor }> = ({ donation, donor }) => {
+export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: donor }> = ({ donation, donor }) => {
     return (
         <PanelWithFooter
             footer={
@@ -27,7 +27,7 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: D
                         Donor
                     </BoldText>
                     <Text>
-                        {donor ? `${donor.donorFirstName} ${donor.donorMiddleName ?? ""} ${donor.donorLastName}` : ""}
+                        {donor ? `${donor.donor_first_name} ${donor.donor_middle_name ?? ""} ${donor.donor_last_name}` : ""}
                     </Text>
                 </div>
                 <div className="pt-4 w-full sm:grid sm:grid-cols-2 sm:gap-4">
@@ -36,12 +36,12 @@ export const PrismaDonationPanel: React.FC<{ donation: PrismaDonation; donor?: D
                         Amount Donated
                     </BoldText>
                     <Text>
-                        ${ centsToDollars(donation.amountChargedInCents) }
+                        ${ centsToDollars(donation.amount_charged_cents) }
                         <HorizontalSpacer size={SpacerSize.Small} />
                         <Badge 
-                            text={donor?.donorAddressCountry === "CA" ? "Tax Receipt" : "Donation Receipt"} 
+                            text={donor?.donor_address_country === "CA" ? "Tax Receipt" : "Donation Receipt"} 
                             style={Style.Outlined} 
-                            color={donor?.donorAddressCountry === "CA" ? EventColors.Success : EventColors.Neutral} 
+                            color={donor?.donor_address_country === "CA" ? EventColors.Success : EventColors.Neutral} 
                         />
 
                     </Text>

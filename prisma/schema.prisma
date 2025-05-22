@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,68 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Donor {
-  id                      String     @id @default(uuid())
-  donorFirstName          String
-  donorMiddleName         String?
-  donorLastName           String
-  donorEmail              String
-  donorAddressLineAddress String
-  donorAddressCity        String
-  donorAddressState       String
-  donorAddressCountry     Country    @default(CA)
-  donorAddressPostalCode  String
-  stripeCustomerIds       String[]
+model donor {
+  id                         String     @id @default(uuid())
+  donor_first_name           String
+  donor_middle_name          String?
+  donor_last_name            String
+  donor_email                String
+  donor_address_line_address String
+  donor_address_city         String
+  donor_address_state        String
+  donor_address_country      Country    @default(CA)
+  donor_address_postal_code  String
+  stripe_customer_ids        String[]
 }
 
-model Donation {
-  id            String   @id @default(uuid())
-
-  // Donation details
-  status         DonationStatus @default(PROCESSING) // keep this
-  date           DateTime @default(now())
-
-  amountDonatedInCents Int
-  amountChargedInCents Int
-
-  feesChargedInCents   Int
-  feesDonatedInCents   Int
-
-  // Stripe identifiers
-  stripeCustomerId      String?
-
-  stripeTransferId      String? // will create script for this later
-  stripeChargeId        String? // not sure how these fit in
-
-  version               Float?
-
-  causes Cause[] @relation("DonationCauses")
+model cause {
+  id           String       @id @db.VarChar
+  donation_id  String       @db.VarChar
+  region       region_enum? @default(ANYWHERE)
+  amount_cents Int
+  in_honor_of  String?      @db.VarChar
+  cause        String       @db.VarChar
+  subcause     String?      @db.VarChar
+  donation     donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model Cause {
-  id                    String         @id @default(uuid())
-  donation_id           String
-  donation              Donation       @relation("DonationCauses", fields: [donation_id], references: [id])
-  amountDonatedCents    Int
-  inHonorOf             String?
-  region                DonationRegion @default(ANYWHERE)
-  cause                 String
-  subCause              String?
-}
-
-enum DonationStatus {
-  PROCESSING
-  DELIVERED_TO_PARTNERS
-  PARTIALLY_DISTRIBUTED
-  FULLY_DISTRIBUTED
-}
-
-enum DonationRegion {
-  ANYWHERE // not sure if we want to keep this
-  IRAQ
-  INDIA
-  TANZANIA
-  CANADA
+model donation {
+  id                       String       @id @db.VarChar
+  status                   status_enum?
+  date                     DateTime     @db.Timestamp(6)
+  donor_name               String       @db.VarChar
+  email                    String       @db.VarChar
+  amount_donated_cents     Int
+  amount_charged_cents     Int
+  line_address             String       @db.VarChar
+  city                     String       @db.VarChar
+  state                    String       @db.VarChar
+  country                  String       @db.VarChar
+  postal_code              String       @db.VarChar
+  fee_charged_by_processor Int
+  fees_covered_by_donor    Int
+  stripe_customer_id       String?      @db.VarChar
+  stripe_transfer_id       String?      @db.VarChar
+  stripe_charge_id         String?      @db.VarChar
+  version                  Float?
+  cause                    cause[]
 }
 
 enum Country {
@@ -324,4 +304,19 @@ enum Country {
   YE
   ZM
   ZW
+}
+
+enum region_enum {
+  ANYWHERE
+  INDIA
+  TANZANIA
+  CANADA
+  IRAQ
+}
+
+enum status_enum {
+  PROCESSING
+  DELIVERED_TO_PARTNERS
+  PARTIALLY_DISTRIBUTED
+  FULLY_DISTRIBUTED
 }

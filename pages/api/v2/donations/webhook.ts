@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { DonationEngine } from "@lib/methods/donations";
-import { Donation, Cause } from "@prisma/client";
+import { donation, cause } from "@prisma/client";
 import { NotificationEngine } from "@lib/methods/notifications";
 import { posthogLogger } from '@lib/posthog-server';
 
@@ -15,7 +15,7 @@ export default async function handler(
         console.log("Webhook received:", JSON.stringify(req.body, null, 2));
         
         const donationEngine = new DonationEngine()
-        const donation: Donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
+        const donation: donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
         
         const metadata = req.body.data.object.metadata || {};
         const causesString = metadata.causes;

@@ -1,5 +1,5 @@
 import prisma from "@lib/prisma";
-import { Country, Donation, DonationRegion, DonationStatus, PrismaClient } from "@prisma/client";
+import { Country, donation, region_enum, status_enum, PrismaClient } from "@prisma/client";
 import { JsonObject } from "@prisma/client/runtime/library";
 import Stripe from "stripe"
 
@@ -60,12 +60,12 @@ export class DonationEngine {
     }
 
 
-    private async insertDonationObject(donation: Donation): Promise<Donation> {
+    private async insertDonationObject(donation: donation): Promise<donation> {
         console.log(`[DonationEngine] Inserting donation into database with ID: ${donation.id}`);
         console.log(`[DonationEngine] Donation data:`, JSON.stringify({
             id: donation.id,
             status: donation.status,
-            amount: donation.amountChargedInCents
+            amount_cents: donation.amount_charged_cents
         }));
         
         try {
@@ -145,71 +145,136 @@ export class DonationEngine {
                 : chargeObject.balance_transaction
         }
 
+        // Log the metadata for debugging
+        console.log("[DonationEngine] Charge object metadata:", JSON.stringify(chargeObject.metadata, null, 2));
+
         const {
-            donationId,
+            donation_id,
             status,
-            amountDonatedInCents,
-            feesDonatedInCents,
-        } = chargeObject.metadata
+            amount_donated_cents,
+            fees_covered_by_donor,
+            donor_first_name,
+            donor_last_name,
+            donor_email,
+            donor_address_line_address,
+            donor_address_city,
+            donor_address_state,
+            donor_address_country,
+            donor_address_postal_code,
+        } = chargeObject.metadata || {}; // Use default {} to prevent error if metadata itself is null/undefined
+
+        // Validate critical metadata fields
+        if (!donation_id) {
+            console.error("[DonationEngine] Critical error: 'donation_id' is missing from Stripe charge metadata.");
+            throw new Error("'donation_id' is missing from Stripe charge metadata. Cannot create donation.");
+        }
+        if (typeof donation_id !== 'string') {
+            console.error(`[DonationEngine] Critical error: 'donation_id' is not a string. Received: ${donation_id}`);
+            throw new Error(`'donation_id' must be a string. Received: ${typeof donation_id}`);
+        }
+
+        let parsedAmountDonatedCents: number;
+        if (amount_donated_cents === undefined || amount_donated_cents === null) {
+            console.error("[DonationEngine] Critical error: 'amount_donated_cents' is missing from Stripe charge metadata.");
+            throw new Error("'amount_donated_cents' is missing from Stripe charge metadata.");
+        }
+        parsedAmountDonatedCents = Number(amount_donated_cents);
+        if (isNaN(parsedAmountDonatedCents)) {
+            console.error(`[DonationEngine] Critical error: 'amount_donated_cents' from metadata ('${amount_donated_cents}') is not a valid number.`);
+            throw new Error(`'amount_donated_cents' ('${amount_donated_cents}') is not a valid number.`);
+        }
+
+        let parsedFeesCoveredByDonor: number = 0;
+        if (fees_covered_by_donor !== undefined && fees_covered_by_donor !== null) {
+            const tempFees = Number(fees_covered_by_donor);
+            if (!isNaN(tempFees)) {
+                parsedFeesCoveredByDonor = tempFees;
+            } else {
+                console.warn(`[DonationEngine] Warning: 'fees_covered_by_donor' from metadata ('${fees_covered_by_donor}') is not a valid number. Defaulting to 0.`);
+            }
+        }
+
+        // Improved donor_name logic
+        let determinedDonorName = "Unknown";
+        if (donor_first_name && typeof donor_first_name === 'string' && donor_last_name && typeof donor_last_name === 'string') {
+            determinedDonorName = `${donor_first_name} ${donor_last_name}`;
+        } else if (donor_first_name && typeof donor_first_name === 'string') {
+            determinedDonorName = donor_first_name;
+        } else if (donor_last_name && typeof donor_last_name === 'string') {
+            determinedDonorName = donor_last_name;
+        }
+        
+        // Log status for debugging; Prisma will perform final enum validation
+        if (status !== undefined && status !== null) {
+            console.log(`[DonationEngine] Received status from metadata: '${status}'. Prisma will validate against enum values.`);
+        }
 
         if (!chargeObject.payment_method_details) {
+            console.error("[DonationEngine] Error: No payment method object attached to Stripe charge object");
             throw new Error("No payment method object attached to Stripe charge object")
         }
 
         const donation: any = {
-            id: donationId,
-            status: status as DonationStatus,
+            id: donation_id, // Validated string
+            status: status ? status as status_enum : undefined, // Prisma handles undefined for optional enum; validates value if present
             date: new Date(chargeObject.created * 1000),
-            amountDonatedInCents: Number(amountDonatedInCents),
-            amountChargedInCents: chargeObject.amount_captured,
-            feesChargedInCents: balanceTransactionObject ? balanceTransactionObject.fee : -1,
-            feesDonatedInCents: Number(feesDonatedInCents),
-            stripeCustomerId: customerObject.id,
-            stripeChargeId: chargeObject.id,
-            stripeTransferId: null,
+            amount_donated_cents: parsedAmountDonatedCents, // Validated number
+            amount_charged_cents: chargeObject.amount_captured,
+            fee_charged_by_processor: balanceTransactionObject ? balanceTransactionObject.fee : -1,
+            fees_covered_by_donor: parsedFeesCoveredByDonor, // Number, defaults to 0
+            stripe_customer_id: customerObject.id,
+            stripe_charge_id: chargeObject.id,
+            stripe_transfer_id: null,
             version: null,
+            donor_name: determinedDonorName,
+            email: donor_email || customerObject.email || "",
+            line_address: donor_address_line_address || "",
+            city: donor_address_city || "",
+            state: donor_address_state || "",
+            country: donor_address_country || "",
+            postal_code: donor_address_postal_code || "",
         }
 
-        console.log("[DonationEngine] Created donation object:", JSON.stringify(donation));
-        return donation as Donation
+        console.log("[DonationEngine] Constructed donation object for insertion:", JSON.stringify(donation, null, 2));
+        return donation as donation
     }
 
-    async saveCauseForDonation(donationId: string, causeData: any) {
-        console.log(`[DonationEngine] Attempting to save cause for donation ID: ${donationId}. Cause Data: ${JSON.stringify(causeData)}`);
+    async saveCauseForDonation(donation_id: string, causeData: any) {
+        console.log(`[DonationEngine] Attempting to save cause for donation ID: ${donation_id}. Cause Data: ${JSON.stringify(causeData)}`);
 
         const dataToCreate: any = {
             id: causeData.id,
-            donation_id: donationId,
-            amountDonatedCents: causeData.amountDonatedCents,
+            donation_id: donation_id,
+            amount_cents: causeData.amountDonatedCents,
             cause: causeData.cause,
         };
 
         if (causeData.region) {
             dataToCreate.region = causeData.region;
         } else {
-            dataToCreate.region = DonationRegion.ANYWHERE;
+            dataToCreate.region = region_enum.ANYWHERE;
         }
 
         if (causeData.subCause) {
-            dataToCreate.subCause = causeData.subCause;
+            dataToCreate.subcause = causeData.subCause;
         }
 
         if (causeData.inHonorOf) {
-            dataToCreate.inHonorOf = causeData.inHonorOf;
+            dataToCreate.in_honor_of = causeData.inHonorOf;
         }
 
-        console.log(`[DonationEngine] Prepared data for cause insertion for donation ID ${donationId}:`, JSON.stringify(dataToCreate));
+        console.log(`[DonationEngine] Prepared data for cause insertion for donation ID ${donation_id}:`, JSON.stringify(dataToCreate));
 
         try {
             const savedCause = await prisma.cause.create({
                 data: dataToCreate,
             });
-            console.log(`[DonationEngine] Successfully saved cause to database. Donation ID: ${donationId}, Cause ID: ${savedCause.id}`);
+            console.log(`[DonationEngine] Successfully saved cause to database. Donation ID: ${donation_id}, Cause ID: ${savedCause.id}`);
             return savedCause;
         } catch (error) {
-            console.error(`[DonationEngine] Error inserting cause into database for donation ID ${donationId}:`, error);
-            console.error(`[DonationEngine] Failed cause data for donation ID ${donationId}:`, JSON.stringify(causeData));
-            throw error; // Re-throw to allow the caller (e.g., webhook handler) to manage the overall transaction
+            console.error(`[DonationEngine] Error inserting cause into database for donation ID ${donation_id}:`, error);
+            console.error(`[DonationEngine] Failed cause data for donation ID ${donation_id}:`, JSON.stringify(causeData));
+            throw error;
         }
     }
 }

@@ -1,5 +1,5 @@
 import prisma from "@lib/prisma";
-import { Donation, Donor, PrismaClient } from "@prisma/client";
+import { donation, donor, PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 
 export interface FetchDonorProfileProps {
@@ -12,8 +12,8 @@ export interface AttachOrDetachPaymentMethodProps {
     paymentMethodId: string
 }
 
-export type UpdatableDonorProfile = Pick<Donor, "donorFirstName" | "donorLastName" | "donorMiddleName" | "donorAddressLineAddress" | "donorAddressState" | "donorAddressCity" | "donorAddressCountry" | "donorAddressPostalCode">
-export type NoIdDonorProfile = Pick<Donor, "donorFirstName" | "donorLastName" | "donorMiddleName" | "donorAddressLineAddress" | "donorAddressState" | "donorAddressCity" | "donorAddressCountry" | "donorAddressPostalCode" | "stripeCustomerIds" | "donorEmail">
+export type UpdatableDonorProfile = Pick<donor, "donor_first_name" | "donor_last_name" | "donor_middle_name" | "donor_address_line_address" | "donor_address_state" | "donor_address_city" | "donor_address_country" | "donor_address_postal_code">
+export type NoIdDonorProfile = Pick<donor, "donor_first_name" | "donor_last_name" | "donor_middle_name" | "donor_address_line_address" | "donor_address_state" | "donor_address_city" | "donor_address_country" | "donor_address_postal_code" | "stripe_customer_ids" | "donor_email">
 
 export class DonorEngine {
     readonly stripeClient: Stripe;
@@ -31,34 +31,34 @@ export class DonorEngine {
     }
 
     public async createStripeProfile(donor: NoIdDonorProfile) {
-        if (donor.stripeCustomerIds.length > 0) {
-            return donor.stripeCustomerIds[0]
+        if (donor.stripe_customer_ids.length > 0) {
+            return donor.stripe_customer_ids[0]
         }
 
         const stripeCustomer = await this.stripeClient.customers.create({
-            email: donor.donorEmail,
-            name: `${donor.donorFirstName} ${donor.donorMiddleName ? `${donor.donorMiddleName} ` : ''}${donor.donorLastName}`,
+            email: donor.donor_email,
+            name: `${donor.donor_first_name} ${donor.donor_middle_name ? `${donor.donor_middle_name} ` : ''}${donor.donor_last_name}`,
             address: {
-                line1: donor.donorAddressLineAddress,
-                postal_code: donor.donorAddressPostalCode,
-                city: donor.donorAddressCity,
-                country: donor.donorAddressCountry,
-                state: donor.donorAddressState,
+                line1: donor.donor_address_line_address,
+                postal_code: donor.donor_address_postal_code,
+                city: donor.donor_address_city,
+                country: donor.donor_address_country,
+                state: donor.donor_address_state,
             }
         })
 
         return stripeCustomer.id
     }
     
-    public async createDonorProfile(donor: Donor) {
-        if (donor.stripeCustomerIds.length == 0) {
+    public async createDonorProfile(donor: donor) {
+        if (donor.stripe_customer_ids.length == 0) {
             const stripeCustomerId = await this.createStripeProfile(donor)
-            donor.stripeCustomerIds.push(stripeCustomerId)
+            donor.stripe_customer_ids.push(stripeCustomerId)
         }
 
         const existingDonorProfile = await this.prismaClient.donor.findFirst({
             where: {
-                donorEmail: donor.donorEmail
+                donor_email: donor.donor_email
             }
         })
 
@@ -81,17 +81,17 @@ export class DonorEngine {
         throw new Error("Method not implemented")
     }
 
-    async fetchDonorProfile(props: FetchDonorProfileProps): Promise<Donor> {
+    async fetchDonorProfile(props: FetchDonorProfileProps): Promise<donor> {
         if (!props.id && !props.email) {
             throw new Error("Donor id or email required to fetch profile")
         }
 
-        let donorProfile: Donor;
+        let donorProfile: donor;
 
         if (props.email) {
             donorProfile = await this.prismaClient.donor.findFirstOrThrow({
                 where: {
-                    donorEmail: props.email
+                    donor_email: props.email
                 }
             })
         } else {
@@ -102,7 +102,7 @@ export class DonorEngine {
             })
         }
 
-        if (props.id && props.email && (donorProfile.id != props.id || donorProfile.donorEmail != props.email)) {
+        if (props.id && props.email && (donorProfile.id != props.id || donorProfile.donor_email != props.email)) {
             throw new Error("An unexpected internal error occured")
         }
 
@@ -113,7 +113,7 @@ export class DonorEngine {
         try {
             const resp = await this.prismaClient.donor.findFirstOrThrow({
                 where: {
-                    donorEmail
+                    donor_email: donorEmail
                 },
             })
     
