@@ -7,15 +7,15 @@ import { useRouter } from 'next/router';
 import { Loading } from '../primitives/Loading';
 import { LoadingColors } from '../primitives/types';
 import { CenterOfPageBox } from '../primitives/Boxes';
-import { Donor } from '@prisma/client';
-import { Donation } from '@prisma/client';
+import { donor } from '@prisma/client';
+import { donation } from '@prisma/client';
 import { CheckCircleIcon, ClockIcon, InformationCircleIcon, UserIcon, XCircleIcon } from '@heroicons/react/20/solid';
 import { AuthProvider } from './Authentication';
 import { Cause } from '@lib/classes/causes';
 
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
-  const [donor, setDonor] = useState<Donor>()
-  const [donations, setDonations] = useState<Donation[]>([])
+  const [donor, setDonor] = useState<donor>()
+  const [donations, setDonations] = useState<donation[]>([])
   const [authContextLoading, setAuthContextLoading] = useState<boolean>(true)
   const [authReloadStatus, triggerAuthReload] = useState<boolean>(false)
   const [shouldRedirect, setShouldRedirect] = useState<boolean>(false)
@@ -29,10 +29,10 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       if (loggedInUser.data.user) {
         if (isApp) {
           const [donorResponse, donationsResponse] = await Promise.all([
-            callKinshipAPI<Donor>("/api/v2/donor/fetch_profile", {
+            callKinshipAPI<donor>("/api/v2/donor/fetch_profile", {
               id: loggedInUser.data.user.id,
             }),
-            callKinshipAPI<Donation[]>('/api/v2/donor/fetch_donations', {
+            callKinshipAPI<donation[]>('/api/v2/donor/fetch_donations', {
               email: loggedInUser.data.user.email,
             }),
           ]);
@@ -46,7 +46,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
           }
           
         } else {
-          const donorResponse = await callKinshipAPI<Donor>("/api/v2/donor/fetch_profile", {
+          const donorResponse = await callKinshipAPI<donor>("/api/v2/donor/fetch_profile", {
             id: loggedInUser.data.user.id,
           })
             
@@ -109,67 +109,4 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       </main>
     </AuthProvider>
   )
-}
-
-export const DonationSummary = ({ globalDonation }: { globalDonation: Donation }) => {
-  const generateDonationCausesString = (causes: Cause[]) => {
-    let causesNames = []
-
-    for (const cause of causes) { causesNames.push(cause.label) }
-
-    return causesNames.join(", ")
-  }
-
-  return (
-      <section
-          aria-labelledby="summary-heading"
-          className="bg-gray-50 py-12 text-slate-600 md:px-10 lg:col-start-2 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:bg-transparent lg:px-0 lg:pb-24 lg:pt-0"
-        >
-          <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-            <dl>
-              <dt className="text-sm font-medium">Amount Donating</dt>
-              <dd className="mt-1 mb-4 text-3xl font-bold tracking-tight text-slate-600">${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents) : 0.00}</dd>
-            </dl>
-
-            <dl className="space-y-6 border-t border-slate-800 border-opacity-10 pt-6 text-sm font-medium">
-              <div className="flex items-center justify-between">
-                <dt>Tax Receipt Eligibility</dt>
-                <dd>
-                  {globalDonation.donorAddressCountry == "CA" ? (
-                    <span className='flex items-center'>
-                      <CheckCircleIcon className='w-5 h-5 text-green-500 mr-1' />
-                      Eligible (issued immediately)
-                    </span>
-                  ) : (
-                    <span className='flex items-center'>
-                      <XCircleIcon className='w-5 h-5 text-red-500 mr-1' />
-                      Ineligible (Tax Receipts only available in Canada)
-                    </span>
-                  )}
-                </dd>
-              </div>                  
-               
-              {globalDonation && (globalDonation.donorFirstName.length > 0 || globalDonation.donorLastName.length > 0) && (
-                <div className="flex items-center justify-between">
-                  <dt>Receipt Will Be Issued To</dt>
-                  <dd className='flex items-center'>
-                    <UserIcon className='w-5 h-5 text-blue-600 mr-1' />
-                    {globalDonation.donorFirstName} {globalDonation.donorLastName}
-                  </dd>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <dt>Credit Card Processing Fees</dt>
-                <dd>${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents * 0.029) : 0.00}</dd>
-              </div>
-
-              <div className="flex items-center justify-between border-t border-slate-800 border-opacity-10 pt-6 text-slate-600">
-                <dt className="text-base">Total</dt>
-                <dd className="text-base">${globalDonation ? centsToDollars(globalDonation.amountDonatedInCents * 0.029 + globalDonation.amountDonatedInCents) : 0.00}</dd>
-              </div>
-            </dl>
-          </div>
-      </section>
-    )
 }

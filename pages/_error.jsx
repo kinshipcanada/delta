@@ -1,30 +1,44 @@
 import Error from "next/error";
-import posthog from "posthog-js";
 
 const CustomErrorComponent = (props) => {
   return <Error statusCode={props.statusCode} />;
 };
 
 CustomErrorComponent.getInitialProps = async (contextData) => {
-  const { res, err } = contextData;
+  const { res, err, req } = contextData;
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
   
-  if (typeof window !== 'undefined') {
-    const errorToCapture = err || new Error(`_error.js - status ${statusCode}`);
-    
-    posthog.captureException(errorToCapture, {
-      statusCode: statusCode,
-      url: window.location.href,
-      type: 'unhandled_error'
+  const errorToCapture = err || new Error(`Error - status ${statusCode}`);
+  
+  try {
+    // Get the absolute URL for the API route
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const host = req?.headers?.host || 'localhost:3000';
+    const apiUrl = `${protocol}://${host}/api/log-error`;
+
+    await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        error: {
+          message: errorToCapture.message,
+          stack: errorToCapture.stack,
+          name: errorToCapture.name
+        },
+        context: {
+          statusCode,
+          type: 'server_error',
+          path: contextData.pathname
+        }
+      })
     });
-  } else {
-    try {
-      const { posthogLogger } = require('../lib/posthog-server');
-      const errorToCapture = err || new Error(`Server error - status ${statusCode}`);
-      posthogLogger(errorToCapture, 'next_error_page');
-    } catch (e) {
-      console.error('Failed to log server-side error to PostHog:', e);
-    }
+  } catch (loggingError) {
+    console.error('Failed to log server-side error:', {
+      originalError: errorToCapture,
+      loggingError
+    });
   }
 
   return {

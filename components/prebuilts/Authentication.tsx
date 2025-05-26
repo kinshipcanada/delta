@@ -1,9 +1,9 @@
 // AuthContext.tsx
-import { Donor } from '@prisma/client';
+import { donor } from '@prisma/client';
 import { createContext, useContext, ReactNode } from 'react';
 
 type AuthContextType = {
-  donor?: Donor;
+  donor?: donor;
   authReloadStatus: boolean;
   triggerAuthReload: (value: boolean) => void;
   authContextLoading: boolean;

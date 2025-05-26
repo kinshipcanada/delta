@@ -1,5 +1,5 @@
 import prisma from "@lib/prisma";
-import { Donation, Donor, PaymentMethodType, PrismaClient } from "@prisma/client";
+import { donation } from "@prisma/client";
 import Stripe from "stripe";
 import { ServerClient } from 'postmark'
 import { DonationEngine } from "./donations";
@@ -37,25 +37,39 @@ export class NotificationEngine {
         }
     }
 
-    public async emailDonationReceipt(donation: Donation) {
-        const subjectLine = `Your donation of $${centsToDollars(donation.amountChargedInCents)} to Kinship Canada`
+
+    // TODO: fix the hardcoded fields
+    public async emailDonationReceipt(donation: donation, metadata: any) {
+        console.log("Sending email with metadata:", JSON.stringify(metadata, null, 2));
+        
+        // Use donation fields as fallback if metadata fields are missing
+        const donor_name = metadata?.donor_name || donation.donor_name;
+        const email = metadata?.email || donation.email;
+        const line_address = metadata?.line_address || donation.line_address;
+        const city = metadata?.city || donation.city;
+        const state = metadata?.state || donation.state;
+        const country = metadata?.country || donation.country;
+        const postal_code = metadata?.postal_code || donation.postal_code;
+        
+        const subjectLine = `Your donation of $${centsToDollars(donation.amount_charged_cents)} to Kinship Canada`;
         const emailBody = `
-            Dear ${donation.donorFirstName},
+            Dear ${donor_name},
 
-            Thank you for your donation of $${centsToDollars(donation.amountChargedInCents)} ${donation.currency}.
+            Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.
 
-            You can access your ${donation.donorAddressCountry == "CA" ? "CRA-eligible" : null } receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+            You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
 
             Thank you very much,
             The Team At Kinship Canada
 
             Invoice ID: ${donation.id}
-            Date Donated: ${parseFrontendDate(donation.donatedAt)}
-            Amount Donated: ${centsToDollars(donation.amountChargedInCents)}
-            Receipt Issued To: ${donation.donorFirstName} ${donation.donorMiddleName ? donation.donorMiddleName : ""} ${donation.donorLastName}
-            Donor Address: ${donation.donorAddressLineAddress}, ${donation.donorAddressCity}, ${donation.donorAddressState}, ${donation.donorAddressCountry} (${donation.donorAddressPostalCode})
+            Date Donated: ${parseFrontendDate(donation.date)}
+            Amount Donated: ${centsToDollars(donation.amount_charged_cents)}
+            Receipt Issued To: ${donor_name}
+            Donor Address: ${line_address}, ${city}, ${state}, ${country} (${postal_code})
         `
-
-        return await this.sendEmail(donation.donorEmail, subjectLine, emailBody)
+        
+        console.log(`Sending email to: ${email}`);        
+        return await this.sendEmail(email, subjectLine, emailBody);
     }
 }
