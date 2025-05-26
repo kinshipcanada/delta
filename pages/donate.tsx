@@ -4,7 +4,7 @@ import { callKinshipAPI, centsToDollars, dollarsToCents } from "@lib/utils/helpe
 import { donation, status_enum, region_enum } from "@prisma/client"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { StripePaymentElementOptions, loadStripe } from "@stripe/stripe-js"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Address, { GoogleFormattedAddress } from "@components/Address"
 import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/20/solid"
 import { v4 as uuidv4 } from 'uuid'
@@ -16,6 +16,8 @@ import { Checkbox } from "@radix-ui/react-checkbox"
 import { XMarkIcon } from "@heroicons/react/24/outline"
 import { FileWarningIcon } from "lucide-react"
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import { useRouter } from "next/router"
+import Link from "next/link"
 
 // TODO: redo this page once authentication is removed to reflect 
 // the fields from the donation models
@@ -101,6 +103,13 @@ type CauseV2 = {
 }
 
 const stripeClientPromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+
+const ReceiptLoadingSpinner = () => (
+    <div className="inline-flex items-center">
+        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-600 mr-2"></div>
+        <span className="text-blue-600">Issuing your Donation ID...</span>
+    </div>
+);
 
 export default function Donate() {
     const [view, setView] = useState<'donation' | 'payment' | 'confirmation'>('donation');
@@ -255,6 +264,42 @@ function PaymentForm({ donation, setDonation, setView, setConfirmationType, dono
 }
 
 function ConfirmationForm({ donation, confirmationType }: { donation: donation | undefined, confirmationType: ConfirmationType }) {
+    const [isPolling, setIsPolling] = useState(true);
+    const [confirmedDonation, setConfirmedDonation] = useState<donation | undefined>(donation);
+
+    useEffect(() => {
+        let pollInterval: NodeJS.Timeout;
+
+        const pollForDonation = async () => {
+            if (!donation?.id) return;
+
+            try {
+                const response = await fetch(`/api/v2/donations/webhook?id=${donation.id}`);
+                const data = await response.json();
+                
+                if (data?.data?.id) {
+                    setConfirmedDonation(data.data);
+                    setIsPolling(false);
+                    clearInterval(pollInterval);
+                }
+            } catch (error) {
+                console.error('Error polling for donation:', error);
+            }
+        };
+
+        if (donation?.id && isPolling) {
+            // Initial check
+            pollForDonation();
+            // Poll every 2 seconds
+            pollInterval = setInterval(pollForDonation, 2000);
+        }
+
+        return () => {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        };
+    }, [donation?.id, isPolling]);
 
     if (!donation) {
         return (
@@ -273,8 +318,20 @@ function ConfirmationForm({ donation, confirmationType }: { donation: donation |
                     <p className="mt-2 text-base text-gray-500">A receipt will be issued soon and sent to {donation.email}. Please reach out to info@kinshipcanada.com with any questions.</p>
         
                     <dl className="mt-12 text-sm font-medium">
-                    <dt className="text-gray-900">Donation ID</dt>
-                    <dd className="mt-2 text-blue-600">{donation.id}</dd>
+                        <dt className="text-gray-900">Donation ID</dt>
+                        <dd className="mt-2">
+                            {isPolling ? (
+                                <div>
+                                    <ReceiptLoadingSpinner />
+                                </div>
+                            ) : (
+                                <Link href={`/receipts/${confirmedDonation?.id}`}>
+                                    <a className="text-blue-600 hover:text-blue-800 hover:underline">
+                                        Receipt Issued! Click Here to Access Your Receipt
+                                    </a>
+                                </Link>
+                            )}
+                        </dd>
                     </dl>
                 </div>
         

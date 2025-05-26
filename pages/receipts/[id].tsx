@@ -12,18 +12,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.query.id as string
     const isStripeId = id.startsWith("pi_") || id.startsWith("ch_")
 
-    // Fetch the receipt from the primary source
-    const donation = await prisma.donation.findFirst({
-      where: {
-        id: id
-      }
-    })
+    try {
+        // Fetch the donation directly from Prisma
+        const donation = await prisma.donation.findUnique({
+            where: {
+                id: id
+            }
+        });
 
-    return {
-      props: { 
-        isGenerating: isStripeId,
-        donation: JSON.parse(JSON.stringify(donation))
-      }
+        return {
+            props: { 
+                isGenerating: isStripeId,
+                donation: donation ? JSON.parse(JSON.stringify(donation)) : null
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching donation:', error);
+        return {
+            props: { 
+                isGenerating: isStripeId,
+                donation: null
+            }
+        }
     }
 };
 

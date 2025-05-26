@@ -3,14 +3,39 @@ import { DonationEngine } from "@lib/methods/donations";
 import { donation, cause } from "@prisma/client";
 import { NotificationEngine } from "@lib/methods/notifications";
 import { posthogLogger } from '@lib/posthog-server';
+import prisma from "@lib/prisma";
 
 /**
- * @description Creates a new donation. Only to be called by Stripe's webhook
+ * @description Creates a new donation via Stripe's webhook or checks donation status
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+    // Handle GET requests for donation status checks
+    if (req.method === 'GET') {
+        const { id } = req.query;
+        if (!id) {
+            return res.status(400).send({ error: "Donation ID is required" });
+        }
+
+        try {
+            const donation = await prisma.donation.findUnique({
+                where: { id: id as string }
+            });
+
+            if (!donation) {
+                return res.status(404).send({ error: "Donation not found" });
+            }
+
+            return res.status(200).send({ data: donation });
+        } catch (error) {
+            console.error('Error fetching donation:', error);
+            return res.status(500).send({ error: "Error fetching donation" });
+        }
+    }
+
+    // Handle POST requests for Stripe webhooks
     try {
         console.log("Webhook received:", JSON.stringify(req.body, null, 2));
         
