@@ -30,7 +30,8 @@ export class NotificationEngine {
                 "From": this.fromEmail,
                 "To": toEmail,
                 "Subject": subject,
-                "TextBody": emailContent
+                "HtmlBody": emailContent,
+                "TextBody": emailContent.replace(/<[^>]*>/g, '') // Strip HTML for text version
             })
         } catch (error) {
             throw new Error(`Error sending email to ${toEmail}: ${error}`)
@@ -53,20 +54,24 @@ export class NotificationEngine {
         
         const subjectLine = `Your donation of $${centsToDollars(donation.amount_charged_cents)} to Kinship Canada`;
         const emailBody = `
-            Dear ${donor_name},
+            <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+                Dear ${donor_name},<br><br>
 
-            Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.
+                Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.<br><br>
 
-            You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+                You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here:<br> <a href="${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}" style="color: #0066cc; text-decoration: underline;">Click here to view your receipt</a><br><br>
 
-            Thank you very much,
-            The Team At Kinship Canada
+                Thank you very much,<br>
+                The Team At Kinship Canada<br><br>
 
-            Invoice ID: ${donation.id}
-            Date Donated: ${parseFrontendDate(donation.date)}
-            Amount Donated: ${centsToDollars(donation.amount_charged_cents)}
-            Receipt Issued To: ${donor_name}
-            Donor Address: ${line_address}, ${city}, ${state}, ${country} (${postal_code})
+                <div style="color: #666666; font-size: 14px;">
+                    Invoice ID: ${donation.id}<br>
+                    Date Donated: ${parseFrontendDate(donation.date)}<br>
+                    Amount Donated: ${centsToDollars(donation.amount_charged_cents)}<br>
+                    Receipt Issued To: ${donor_name}<br>
+                    Donor Address: ${line_address}, ${city}, ${state}, ${country} (${postal_code})
+                </div>
+            </div>
         `
         
         console.log(`Sending email to: ${email}`);        
