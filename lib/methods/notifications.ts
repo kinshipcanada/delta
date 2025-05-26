@@ -59,7 +59,7 @@ export class NotificationEngine {
 
                 Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.<br><br>
 
-                You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here:<br> <a href="${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}" style="color: #0066cc; text-decoration: underline;">Click here to view your receipt</a><br><br>
+                You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here: <a href="${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}" style="color: #0066cc; text-decoration: underline;">Click here to view your receipt</a><br><br>
 
                 Thank you very much,<br>
                 The Team At Kinship Canada<br><br>
