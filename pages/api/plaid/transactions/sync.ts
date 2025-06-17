@@ -3,12 +3,27 @@ import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 import { AxiosError } from 'axios';
 import prisma from '@lib/prisma';
 
+// Get environment variables
+const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
+const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
+
+// Select the appropriate secret key based on environment
+let PLAID_SECRET: string | undefined;
+if (PLAID_ENV === 'production') {
+  PLAID_SECRET = process.env.PLAID_PROD_SECRET_KEY;
+} else if (PLAID_ENV === 'development') {
+  PLAID_SECRET = process.env.PLAID_DEV_SECRET_KEY;
+} else {
+  // Default to sandbox
+  PLAID_SECRET = process.env.PLAID_SECRET || process.env.PLAID_SANDBOX_SECRET_KEY;
+}
+
 const configuration = new Configuration({
-  basePath: PlaidEnvironments[process.env.PLAID_ENV || 'sandbox'],
+  basePath: PlaidEnvironments[PLAID_ENV],
   baseOptions: {
     headers: {
-      'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-      'PLAID-SECRET': process.env.PLAID_SANDBOX_SECRET_KEY,
+      'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
+      'PLAID-SECRET': PLAID_SECRET,
     },
   },
 });

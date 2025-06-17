@@ -4,8 +4,18 @@ import { AxiosError } from 'axios';
 
 // Get environment variables
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
-const PLAID_SECRET = process.env.PLAID_SECRET || process.env.PLAID_SANDBOX_SECRET_KEY;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
+
+// Select the appropriate secret key based on environment
+let PLAID_SECRET: string | undefined;
+if (PLAID_ENV === 'production') {
+  PLAID_SECRET = process.env.PLAID_PROD_SECRET_KEY;
+} else if (PLAID_ENV === 'development') {
+  PLAID_SECRET = process.env.PLAID_DEV_SECRET_KEY;
+} else {
+  // Default to sandbox
+  PLAID_SECRET = process.env.PLAID_SECRET || process.env.PLAID_SANDBOX_SECRET_KEY;
+}
 
 // Log configuration at startup
 console.log("Plaid API Configuration:", {
