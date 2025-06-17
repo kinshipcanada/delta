@@ -68,8 +68,9 @@ export default async function handler(
       NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
     });
 
-    // Hard-coded valid Plaid products and country codes
-    const products = ['transactions', 'auth'] as Products[];
+    // Only request products that your Plaid account has access to
+    // Removing 'auth' since your account doesn't have access to it
+    const products = ['transactions'] as Products[];
     const countryCodes = ['CA'] as CountryCode[]; // You can add 'US' if needed
     
     const webhookUrl = process.env.NEXT_PUBLIC_DOMAIN 
