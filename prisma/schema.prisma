@@ -52,6 +52,48 @@ model donation {
   stripe_charge_id         String?      @db.VarChar
   version                  Float?
   cause                    cause[]
+  distributions            distributions[]
+}
+
+model distributions {
+  id                            String       @id @default(uuid())
+  donation_id                   String       @db.VarChar
+  amount_donated                Float?
+  date                          DateTime     @db.Timestamp(6)
+  status                        status_enum?
+  name                          String?      @db.VarChar
+  email                         String?      @db.VarChar
+  desc                          String?      @db.Text
+  distribution                  String?      @db.VarChar
+  distribution_2                String?      @db.VarChar
+  distribution_3                String?      @db.VarChar
+  vision_kinship_1              Float?
+  vision_kinship_2              Float?
+  vision_kinship_3              Float?
+  vision_kinship_4              Float?
+  vision_kinship_5              Float?
+  vision_kinship_6              Float?
+  vision_kinship_2025           Float?
+  ramadhan_india                Float?
+  ramadhan_iraq                 Float?
+  ramadhan_africa               Float?
+  education_africa              Float?
+  poverty_relief_africa         Float?
+  orphan_campaign_al_anwar_iraq Float?
+  imam_ridha_khums_iraq         Float?
+  orphans_india                 Float?
+  medical_aid_india             Float?
+  housing_india                 Float?
+  widows_india                  Float?
+  sadaqah_india                 Float?
+  education_india               Float?
+  fidya_india                   Float?
+  quran_india                   Float?
+  khums_sadat_india             Float?
+  poverty_relief_india          Float?
+  arbaeen_iraq                  Float?
+  donations_for_admin_payments  Float?
+  donation                      donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum Country {

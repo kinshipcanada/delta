@@ -33,6 +33,14 @@ export default async function handler(
     const ACCESS_TOKEN = tokenResponse.data.access_token;
     const ITEM_ID = tokenResponse.data.item_id;
 
+    // For demo purposes, we'll log the access token - in production, you should save it securely
+    console.log("Access Token:", ACCESS_TOKEN);
+    console.log("Item ID:", ITEM_ID);
+    
+    // Hacky way to make access token available for demo purposes
+    // In production, you would store this in a database
+    process.env.PLAID_ACCESS_TOKEN = ACCESS_TOKEN;
+
     // TODO: Store these tokens securely in your database
     // For example:
     // await prisma.plaidCredentials.create({

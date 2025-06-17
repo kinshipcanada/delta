@@ -62,10 +62,210 @@ const PlaidEndpoint = ({ name, description, endpoint, buttonText }: PlaidEndpoin
   );
 };
 
+// Component to display transactions
+interface Transaction {
+  id: string;
+  date: string;
+  name: string;
+  amount: number;
+  category: string;
+}
+
+interface Account {
+  id: string;
+  name: string;
+  type: string;
+  subtype: string;
+  mask: string;
+  balance: {
+    current: number;
+    available: number | null;
+    limit: number | null;
+    currencyCode: string;
+  };
+}
+
+const TransactionList = ({ transactions }: { transactions: Transaction[] }) => {
+  if (!transactions || transactions.length === 0) {
+    return <p className="text-gray-500">No transactions found.</p>;
+  }
+
+  return (
+    <div className="mt-4">
+      <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {transactions.map((tx) => (
+              <tr key={tx.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tx.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{tx.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tx.category}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <span className={tx.amount > 0 ? "text-red-600" : "text-green-600"}>
+                    ${Math.abs(tx.amount).toFixed(2)}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// After the other PlaidEndpoint component, add this new component
+const UberTransactionsEndpoint = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [uberTransactions, setUberTransactions] = useState<Transaction[]>([]);
+  const [issuingReceipt, setIssuingReceipt] = useState<string | null>(null);
+  const [receiptIssued, setReceiptIssued] = useState<Record<string, boolean>>({});
+
+  const fetchUberTransactions = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/plaid/transactions/sync');
+      const data = await res.json();
+      
+      if (data.error) {
+        setError(data.error);
+      } else if (data.transactions) {
+        // Filter for transactions containing "Uber" in the name
+        const uberTxs = data.transactions.filter((tx: any) => 
+          tx.name.toLowerCase().includes('uber')
+        );
+        setUberTransactions(uberTxs);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+    setIsLoading(false);
+  };
+
+  const handleIssueReceipt = async (transaction: any) => {
+    try {
+      setIssuingReceipt(transaction.id);
+      
+      // Simulate API call to issue receipt
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update state to show receipt was issued
+      setReceiptIssued(prev => ({
+        ...prev,
+        [transaction.id]: true
+      }));
+      
+      // In a real app, you would call your API to create a receipt
+      // For example:
+      // await fetch('/api/receipts/create', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     transactionId: transaction.id,
+      //     amount: transaction.amount,
+      //     date: transaction.date,
+      //     merchant: transaction.name,
+      //     category: transaction.category
+      //   })
+      // });
+      
+    } catch (err) {
+      setError('Failed to issue receipt');
+      console.error('Error issuing receipt:', err);
+    } finally {
+      setIssuingReceipt(null);
+    }
+  };
+
+  return (
+    <div className="border rounded-lg p-6 mb-4 bg-white shadow-sm">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Uber Transactions</h3>
+          <p className="text-sm text-gray-600 mt-1">Find all your Uber-related expenses</p>
+        </div>
+        <Button
+          onClick={fetchUberTransactions}
+          text={isLoading ? 'Loading...' : 'Find Uber Transactions'}
+          style={ButtonStyle.Primary}
+        />
+      </div>
+      
+      {error && (
+        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+      
+      {uberTransactions.length > 0 ? (
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {uberTransactions.map((tx: any) => (
+            <div 
+              key={tx.id} 
+              className="flex flex-col p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium text-blue-900">{tx.name}</span>
+                <span className="font-bold text-blue-800">${Math.abs(tx.amount).toFixed(2)}</span>
+              </div>
+              <div className="text-sm text-blue-700">{tx.date}</div>
+              <div className="mt-2 text-xs text-blue-600">{tx.category}</div>
+              <div className="mt-3 flex justify-end">
+                {receiptIssued[tx.id] ? (
+                  <div className="px-3 py-1 bg-gray-200 text-gray-700 text-sm font-medium rounded-md flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Receipt Issued
+                  </div>
+                ) : (
+                  <button 
+                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors disabled:bg-green-300 disabled:cursor-not-allowed"
+                    onClick={() => handleIssueReceipt(tx)}
+                    disabled={issuingReceipt === tx.id}
+                  >
+                    {issuingReceipt === tx.id ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </span>
+                    ) : "Issue Receipt"}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
+          <p className="text-gray-600">No Uber transactions found. Try another search!</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function AdminPage() {
   const [linkToken, setLinkToken] = useState(null);
   const [isLinked, setIsLinked] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const generateToken = async () => {
     try {
@@ -94,10 +294,32 @@ export default function AdminPage() {
     }
   };
 
-  // on mount, generate a new link token
   useEffect(() => {
     generateToken();
   }, []);
+
+  // Function to fetch transactions and account data after successful linking
+  const fetchPlaidData = async () => {
+    setIsLoadingData(true);
+    try {
+      // Fetch transactions
+      const txResponse = await fetch('/api/plaid/transactions/sync');
+      const txData = await txResponse.json();
+      if (txData.success && txData.transactions) {
+        setTransactions(txData.transactions);
+      }
+
+      // Fetch account balances
+      const acctResponse = await fetch('/api/plaid/accounts/balance');
+      const acctData = await acctResponse.json();
+      if (acctData.success && acctData.accounts) {
+        setAccounts(acctData.accounts);
+      }
+    } catch (error) {
+      console.error('Error fetching Plaid data:', error);
+    }
+    setIsLoadingData(false);
+  };
 
   // Handle successful Plaid Link
   const onSuccess = useCallback(async (public_token: string) => {
@@ -111,6 +333,8 @@ export default function AdminPage() {
       
       if (data.success) {
         setIsLinked(true);
+        // Fetch transactions and account data after successful linking
+        await fetchPlaidData();
       } else {
         console.error('Failed to link bank account:', data.error);
       }
@@ -119,8 +343,6 @@ export default function AdminPage() {
     }
   }, []);
 
-  // ready tells us if the link token is ready to be used
-  // open is the function that is called when the Plaid Link modal is opened
   const { open, ready } = usePlaidLink({
     token: linkToken,
     onSuccess,
@@ -164,32 +386,80 @@ export default function AdminPage() {
         <>
           <div className="bg-green-50 p-4 rounded-md mb-8">
             <p className="text-green-800">
-              Bank account successfully linked! You can now test the available endpoints below.
+              Bank account successfully linked! You can now view your financial data below.
             </p>
           </div>
 
-          <div className="space-y-6">
-            <PlaidEndpoint
-              name="Test Transaction Sync"
-              description="Retrieve the latest transactions from your linked account"
-              endpoint="transactions/sync"
-              buttonText="Get Transactions"
-            />
-            
-            <PlaidEndpoint
-              name="Account Balance"
-              description="Check the current balance of your linked accounts"
-              endpoint="accounts/balance"
-              buttonText="Check Balance"
-            />
+          {isLoadingData ? (
+            <div className="text-center py-8">
+              <svg className="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="mt-2 text-gray-600">Loading your financial data...</p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {/* Account Balances Section */}
+              {accounts.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-xl font-semibold mb-4">Account Balances</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {accounts.map(account => (
+                      <div key={account.id} className="border rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900">{account.name}</h3>
+                        <p className="text-sm text-gray-500">{account.type} • {account.mask}</p>
+                        <div className="mt-2">
+                          <p className="text-xl font-bold">${account.balance.current?.toFixed(2)}</p>
+                          <p className="text-sm text-gray-500">
+                            Available: ${account.balance.available?.toFixed(2) || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            <PlaidEndpoint
-              name="Account Info"
-              description="View detailed information about your linked accounts"
-              endpoint="accounts/info"
-              buttonText="View Info"
-            />
-          </div>
+              {/* Transactions Section */}
+              {transactions.length > 0 ? (
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-xl font-semibold mb-4">Recent Transactions</h2>
+                  <TransactionList transactions={transactions} />
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-xl font-semibold mb-4">Recent Transactions</h2>
+                  <p className="text-gray-500">No transactions found. Try refreshing or check back later.</p>
+                  <Button
+                    onClick={fetchPlaidData}
+                    text="Refresh Transactions"
+                    style={ButtonStyle.Secondary}
+                  />
+                </div>
+              )}
+
+              {/* Manual API Testing Endpoints */}
+              <div className="border-t pt-8">
+                <h2 className="text-xl font-semibold mb-4">API Testing</h2>
+                <PlaidEndpoint
+                  name="Test Transaction Sync"
+                  description="Retrieve the latest transactions from your linked account"
+                  endpoint="transactions/sync"
+                  buttonText="Get Transactions"
+                />
+                
+                <PlaidEndpoint
+                  name="Account Balance"
+                  description="Check the current balance of your linked accounts"
+                  endpoint="accounts/balance"
+                  buttonText="Check Balance"
+                />
+
+                <UberTransactionsEndpoint />
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
