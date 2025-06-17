@@ -259,6 +259,113 @@ const UberTransactionsEndpoint = () => {
   );
 };
 
+// Add this component after the UberTransactionsEndpoint component
+const PlaidDebugger = () => {
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const checkEnvironment = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/plaid/check-env');
+      const data = await response.json();
+      setDebugInfo(data);
+    } catch (error) {
+      console.error('Error checking environment:', error);
+      setDebugInfo({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+    setIsLoading(false);
+  };
+
+  // Generate suggestions based on missing variables
+  const getSuggestions = () => {
+    if (!debugInfo || !debugInfo.missingVariables) return [];
+    
+    const suggestions = [];
+    
+    if (debugInfo.missingVariables.includes('PLAID_CLIENT_ID')) {
+      suggestions.push('Add your Plaid Client ID to the environment variables');
+    }
+    
+    if (debugInfo.missingVariables.includes('PLAID_SECRET')) {
+      suggestions.push('Add your Plaid Secret Key to the environment variables');
+    }
+    
+    if (debugInfo.missingVariables.includes('NEXT_PUBLIC_DOMAIN')) {
+      suggestions.push('Set NEXT_PUBLIC_DOMAIN to your application domain (e.g., https://your-app.vercel.app)');
+      suggestions.push('Alternatively, check if VERCEL_URL is available and use that for local development');
+    }
+    
+    return suggestions;
+  };
+
+  return (
+    <div className="border rounded-lg p-6 mb-4 bg-white shadow-sm">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Plaid Debugger</h3>
+          <p className="text-sm text-gray-600 mt-1">Check Plaid configuration and environment</p>
+        </div>
+        <Button
+          onClick={checkEnvironment}
+          text={isLoading ? 'Checking...' : 'Check Environment'}
+          style={ButtonStyle.Secondary}
+        />
+      </div>
+      
+      {debugInfo && (
+        <div className="mt-4 space-y-4">
+          {debugInfo.missingVariables && debugInfo.missingVariables.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded p-3">
+              <p className="text-red-700 font-medium">Missing environment variables:</p>
+              <ul className="list-disc pl-5 mt-1">
+                {debugInfo.missingVariables.map((variable: string) => (
+                  <li key={variable} className="text-red-600">{variable}</li>
+                ))}
+              </ul>
+              
+              {getSuggestions().length > 0 && (
+                <div className="mt-3 pt-3 border-t border-red-200">
+                  <p className="text-red-700 font-medium">Suggestions:</p>
+                  <ul className="list-disc pl-5 mt-1">
+                    {getSuggestions().map((suggestion, index) => (
+                      <li key={index} className="text-red-600">{suggestion}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+            <h4 className="font-medium mb-2">Environment Check</h4>
+            <pre className="text-sm overflow-auto">
+              {JSON.stringify(debugInfo.environment, null, 2)}
+            </pre>
+          </div>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <h4 className="font-medium mb-2">Plaid Setup Guide</h4>
+            <ol className="list-decimal pl-5 space-y-2 text-sm text-blue-800">
+              <li>Make sure you have a Plaid developer account</li>
+              <li>Get your <strong>Client ID</strong> and <strong>Secret Key</strong> from the Plaid Dashboard</li>
+              <li>Add these variables to your Vercel environment:
+                <ul className="list-disc pl-5 mt-1">
+                  <li>PLAID_CLIENT_ID</li>
+                  <li>PLAID_SECRET (or PLAID_SANDBOX_SECRET_KEY for sandbox)</li>
+                  <li>PLAID_ENV (set to "sandbox" for testing)</li>
+                  <li>NEXT_PUBLIC_DOMAIN (your app's URL)</li>
+                </ul>
+              </li>
+              <li>Redeploy your application after adding the variables</li>
+            </ol>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function AdminPage() {
   const [linkToken, setLinkToken] = useState(null);
   const [isLinked, setIsLinked] = useState(false);
@@ -270,22 +377,31 @@ export default function AdminPage() {
   const generateToken = async () => {
     try {
       console.log("Requesting link token...");
-      const response = await fetch('/api/plaid/create-link-token');
+      const response = await fetch('/api/plaid/create-link-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Link token error:", errorData);
-        setLinkError(`Error: ${errorData.error}`);
+        console.error("Link token error response:", errorData);
+        setLinkError(`Error: ${errorData.error || 'Failed to create link token'}`);
+        if (errorData.details) {
+          console.error("Error details:", errorData.details);
+        }
         return;
       }
       
       const data = await response.json();
-      console.log("Link token received:", data);
+      console.log("Link token response received:", data);
       
       if (data.link_token) {
         setLinkToken(data.link_token);
         setLinkError(null);
       } else {
+        console.error("No link token in response:", data);
         setLinkError("No link token in response");
       }
     } catch (error) {
@@ -457,6 +573,8 @@ export default function AdminPage() {
                 />
 
                 <UberTransactionsEndpoint />
+                
+                <PlaidDebugger />
               </div>
             </div>
           )}
