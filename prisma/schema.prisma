@@ -8,7 +8,7 @@ datasource db {
 }
 
 model donor {
-  id                         String     @id @default(uuid())
+  id                         String   @id @default(uuid())
   donor_first_name           String
   donor_middle_name          String?
   donor_last_name            String
@@ -16,7 +16,7 @@ model donor {
   donor_address_line_address String
   donor_address_city         String
   donor_address_state        String
-  donor_address_country      Country    @default(CA)
+  donor_address_country      Country  @default(CA)
   donor_address_postal_code  String
   stripe_customer_ids        String[]
 }
@@ -33,40 +33,40 @@ model cause {
 }
 
 model donation {
-  id                       String       @id @db.VarChar
+  id                       String          @id @db.VarChar
   status                   status_enum?
-  date                     DateTime     @db.Timestamp(6)
-  donor_name               String       @db.VarChar
-  email                    String       @db.VarChar
+  date                     DateTime        @db.Timestamp(6)
+  donor_name               String          @db.VarChar
+  email                    String          @db.VarChar
   amount_donated_cents     Int
   amount_charged_cents     Int
-  line_address             String       @db.VarChar
-  city                     String       @db.VarChar
-  state                    String       @db.VarChar
-  country                  String       @db.VarChar
-  postal_code              String       @db.VarChar
+  line_address             String          @db.VarChar
+  city                     String          @db.VarChar
+  state                    String          @db.VarChar
+  country                  String          @db.VarChar
+  postal_code              String          @db.VarChar
   fee_charged_by_processor Int
   fees_covered_by_donor    Int
-  stripe_customer_id       String?      @db.VarChar
-  stripe_transfer_id       String?      @db.VarChar
-  stripe_charge_id         String?      @db.VarChar
+  stripe_customer_id       String?         @db.VarChar
+  stripe_transfer_id       String?         @db.VarChar
+  stripe_charge_id         String?         @db.VarChar
   version                  Float?
   cause                    cause[]
-  distributions            distributions[]
+  distribution            distribution[]
 }
 
-model distributions {
-  id                            String       @id @default(uuid())
-  donation_id                   String       @db.VarChar
+model distribution {
+  id                            String   @id
+  date                          DateTime @db.Timestamp(6)
+  donation_id                   String   @db.VarChar
+  goal_id                       String?  @db.VarChar
   amount_donated                Float?
-  date                          DateTime     @db.Timestamp(6)
-  status                        status_enum?
-  name                          String?      @db.VarChar
-  email                         String?      @db.VarChar
-  desc                          String?      @db.Text
-  distribution                  String?      @db.VarChar
-  distribution_2                String?      @db.VarChar
-  distribution_3                String?      @db.VarChar
+  name                          String?  @db.VarChar
+  email                         String?  @db.VarChar
+  desc                          String?
+  distribution                  String?  @db.VarChar
+  distribution_2                String?  @db.VarChar
+  distribution_3                String?  @db.VarChar
   vision_kinship_1              Float?
   vision_kinship_2              Float?
   vision_kinship_3              Float?
@@ -93,7 +93,18 @@ model distributions {
   poverty_relief_india          Float?
   arbaeen_iraq                  Float?
   donations_for_admin_payments  Float?
-  donation                      donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  donation                      donation @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  goals                         goals?   @relation(fields: [goal_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model goals {
+  id                 String          @id
+  distribution_title String?         @db.VarChar
+  goal_amount        Float
+  region             region_enum?    @default(ANYWHERE)
+  created_at         DateTime        @default(now()) @db.Timestamp(6)
+  updated_at         DateTime        @default(now()) @db.Timestamp(6)
+  distribution      distribution[]
 }
 
 enum Country {
@@ -349,11 +360,11 @@ enum Country {
 }
 
 enum region_enum {
-  ANYWHERE
   INDIA
   TANZANIA
   CANADA
   IRAQ
+  ANYWHERE
 }
 
 enum status_enum {

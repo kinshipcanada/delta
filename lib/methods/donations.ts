@@ -24,7 +24,7 @@ export class DonationEngine {
         this.stripeClient = new Stripe(stripePrivateKey, {
             apiVersion: "2023-08-16"
         })
-        this.prismaClient = prisma
+        this.prismaClient = new PrismaClient()
     }
 
 
@@ -37,7 +37,7 @@ export class DonationEngine {
             console.log(`[DonationEngine] Successfully fetched donation data from Stripe: ${donation.id}`);
 
             try {
-                const existingDonation = await prisma.donation.findUnique({
+                const existingDonation = await this.prismaClient.donation.findUnique({
                     where: { id: donation.id }
                 });
                 
@@ -69,7 +69,7 @@ export class DonationEngine {
         }));
         
         try {
-            return await prisma.donation.create({
+            return await this.prismaClient.donation.create({
                 data: {
                     ...donation,
                 }
@@ -242,6 +242,20 @@ export class DonationEngine {
     async saveCauseForDonation(donation_id: string, causeData: any) {
         console.log(`[DonationEngine] Attempting to save cause for donation ID: ${donation_id}. Cause Data: ${JSON.stringify(causeData)}`);
 
+        // Check if cause already exists to prevent duplicate insertion
+        try {
+            const existingCause = await this.prismaClient.cause.findUnique({
+                where: { id: causeData.id }
+            });
+            
+            if (existingCause) {
+                console.log(`[DonationEngine] Cause with ID ${causeData.id} already exists, skipping insertion`);
+                return existingCause;
+            }
+        } catch (error) {
+            console.error(`[DonationEngine] Error checking for existing cause:`, error);
+        }
+
         const dataToCreate: any = {
             id: causeData.id,
             donation_id: donation_id,
@@ -266,7 +280,7 @@ export class DonationEngine {
         console.log(`[DonationEngine] Prepared data for cause insertion for donation ID ${donation_id}:`, JSON.stringify(dataToCreate));
 
         try {
-            const savedCause = await prisma.cause.create({
+            const savedCause = await this.prismaClient.cause.create({
                 data: dataToCreate,
             });
             console.log(`[DonationEngine] Successfully saved cause to database. Donation ID: ${donation_id}, Cause ID: ${savedCause.id}`);
@@ -274,6 +288,73 @@ export class DonationEngine {
         } catch (error) {
             console.error(`[DonationEngine] Error inserting cause into database for donation ID ${donation_id}:`, error);
             console.error(`[DonationEngine] Failed cause data for donation ID ${donation_id}:`, JSON.stringify(causeData));
+            throw error;
+        }
+    }
+
+    async saveDistributionForDonation(donationData: donation, causesArray: any[]) {
+        console.log(`[DonationEngine] Attempting to save distributions for donation ID: ${donationData.id}. Causes Data: ${JSON.stringify(causesArray)}`);
+
+        try {
+            const { v4: uuidv4 } = require('uuid');
+            const savedDistributions = [];
+
+            // Create a separate distribution record for each cause
+            for (const cause of causesArray) {
+                // Calculate the amount for this cause
+                const causeAmount = cause.amountDonatedCents || 0;
+
+                const dataToCreate: any = {
+                    id: uuidv4(),
+                    date: donationData.date,
+                    donation_id: donationData.id,
+                    goal_id: null,
+                    amount_donated: causeAmount, // Use the individual cause amount
+                    name: donationData.donor_name,
+                    email: donationData.email,
+                    desc: cause.cause, // Use the individual cause description
+                    vision_kinship_1: null,
+                    vision_kinship_2: null,
+                    vision_kinship_3: null,
+                    vision_kinship_4: null,
+                    vision_kinship_5: null,
+                    vision_kinship_6: null,
+                    vision_kinship_2025: null,
+                    ramadhan_india: null,
+                    ramadhan_iraq: null,
+                    ramadhan_africa: null,
+                    education_africa: null,
+                    poverty_relief_africa: null,
+                    orphan_campaign_al_anwar_iraq: null,
+                    imam_ridha_khums_iraq: null,
+                    orphans_india: null,
+                    medical_aid_india: null,
+                    housing_india: null,
+                    widows_india: null,
+                    sadaqah_india: null,
+                    education_india: null,
+                    fidya_india: null,
+                    quran_india: null,
+                    khums_sadat_india: null,
+                    poverty_relief_india: null,
+                    arbaeen_iraq: null,
+                    donations_for_admin_payments: null
+                };
+
+                console.log(`[DonationEngine] Preparing distribution record for cause ${cause.cause} with amount ${causeAmount} for donation ID ${donationData.id}`);
+
+                const savedDistribution = await this.prismaClient.distribution.create({
+                    data: dataToCreate,
+                });
+                
+                console.log(`[DonationEngine] Successfully saved distribution for cause ${cause.cause}. Distribution ID: ${savedDistribution.id}`);
+                savedDistributions.push(savedDistribution);
+            }
+            
+            console.log(`[DonationEngine] Successfully saved ${savedDistributions.length} distribution records for donation ID: ${donationData.id}`);
+            return savedDistributions;
+        } catch (error) {
+            console.error(`[DonationEngine] Error inserting distributions into database for donation ID ${donationData.id}:`, error);
             throw error;
         }
     }

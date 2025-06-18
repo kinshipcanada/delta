@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import { Button, ButtonStyle } from '@components/primitives';
+import { useRouter } from 'next/router';
 
 interface PlaidEndpointProps {
   name: string;
@@ -123,15 +124,15 @@ const TransactionList = ({ transactions }: { transactions: Transaction[] }) => {
   );
 };
 
-// After the other PlaidEndpoint component, add this new component
-const UberTransactionsEndpoint = () => {
+// After the other PlaidEndpoint component, replace the UberTransactionsEndpoint with this new component
+const ReceivedETransfersEndpoint = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uberTransactions, setUberTransactions] = useState<Transaction[]>([]);
+  const [eTransfers, setETransfers] = useState<Transaction[]>([]);
   const [issuingReceipt, setIssuingReceipt] = useState<string | null>(null);
   const [receiptIssued, setReceiptIssued] = useState<Record<string, boolean>>({});
 
-  const fetchUberTransactions = async () => {
+  const fetchETransfers = async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -141,11 +142,11 @@ const UberTransactionsEndpoint = () => {
       if (data.error) {
         setError(data.error);
       } else if (data.transactions) {
-        // Filter for transactions containing "Uber" in the name
-        const uberTxs = data.transactions.filter((tx: any) => 
-          tx.name.toLowerCase().includes('uber')
+        // Filter for transactions containing "e-Transfer - Autodeposit" in the name
+        const receivedETransfers = data.transactions.filter((tx: any) => 
+          tx.name.toLowerCase().includes('e-transfer - autodeposit')
         );
-        setUberTransactions(uberTxs);
+        setETransfers(receivedETransfers);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -192,12 +193,12 @@ const UberTransactionsEndpoint = () => {
     <div className="border rounded-lg p-6 mb-4 bg-white shadow-sm">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Uber Transactions</h3>
-          <p className="text-sm text-gray-600 mt-1">Find all your Uber-related expenses</p>
+          <h3 className="text-lg font-semibold text-gray-900">Received e-Transfers</h3>
+          <p className="text-sm text-gray-600 mt-1">Find all your received e-transfers</p>
         </div>
         <Button
-          onClick={fetchUberTransactions}
-          text={isLoading ? 'Loading...' : 'Find Uber Transactions'}
+          onClick={fetchETransfers}
+          text={isLoading ? 'Loading...' : 'Find e-Transfers'}
           style={ButtonStyle.Primary}
         />
       </div>
@@ -208,9 +209,9 @@ const UberTransactionsEndpoint = () => {
         </div>
       )}
       
-      {uberTransactions.length > 0 ? (
+      {eTransfers.length > 0 ? (
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {uberTransactions.map((tx: any) => (
+          {eTransfers.map((tx: any) => (
             <div 
               key={tx.id} 
               className="flex flex-col p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm"
@@ -252,14 +253,14 @@ const UberTransactionsEndpoint = () => {
         </div>
       ) : (
         <div className="mt-4 bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
-          <p className="text-gray-600">No Uber transactions found. Try another search!</p>
+          <p className="text-gray-600">No e-transfers found. Try another search!</p>
         </div>
       )}
     </div>
   );
 };
 
-// Add this component after the UberTransactionsEndpoint component
+// Add this component after the ReceivedETransfersEndpoint component
 const PlaidDebugger = () => {
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -367,12 +368,14 @@ const PlaidDebugger = () => {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [linkToken, setLinkToken] = useState(null);
   const [isLinked, setIsLinked] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const generateToken = async () => {
     try {
@@ -464,6 +467,30 @@ export default function AdminPage() {
     onSuccess,
   });
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/plaid/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ accessToken: process.env.PLAID_ACCESS_TOKEN }),
+      });
+
+      if (response.ok) {
+        setIsLinked(false);
+        setTransactions([]);
+        setAccounts([]);
+        router.push('/');
+      } else {
+        const errorData = await response.json();
+        console.error('Logout error:', errorData);
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold mb-8">Bank Account Integration</h1>
@@ -547,13 +574,17 @@ export default function AdminPage() {
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h2 className="text-xl font-semibold mb-4">Recent Transactions</h2>
                   <p className="text-gray-500">No transactions found. Try refreshing or check back later.</p>
-                  <Button
-                    onClick={fetchPlaidData}
-                    text="Refresh Transactions"
-                    style={ButtonStyle.Secondary}
-                  />
                 </div>
               )}
+
+              {/* Always show the Refresh Transactions button */}
+              <div className="mt-4">
+                <Button
+                  onClick={fetchPlaidData}
+                  text={isLoadingData ? "Refreshing..." : "Refresh Transactions"}
+                  style={ButtonStyle.Secondary}
+                />
+              </div>
 
               {/* Manual API Testing Endpoints */}
               <div className="border-t pt-8">
@@ -572,10 +603,25 @@ export default function AdminPage() {
                   buttonText="Check Balance"
                 />
 
-                <UberTransactionsEndpoint />
+                <ReceivedETransfersEndpoint />
                 
                 <PlaidDebugger />
               </div>
+            </div>
+          )}
+
+          {isLinked && (
+            <div className="mt-8">
+              <Button
+                onClick={handleLogout}
+                text="Logout"
+                style={ButtonStyle.Secondary}
+              />
+              <Button
+                onClick={() => router.push('/admin/donations-explorer')}
+                text="Go to Donations Explorer"
+                style={ButtonStyle.Primary}
+              />
             </div>
           )}
         </>

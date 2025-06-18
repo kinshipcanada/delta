@@ -15,7 +15,7 @@ export default async function handler(
         console.log("Webhook received:", JSON.stringify(req.body, null, 2));
         
         const donationEngine = new DonationEngine()
-        const donation: donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
+        const donation = await donationEngine.createDonationByWebhook(req.body.data.object.id)
         
         const metadata = req.body.data.object.metadata || {};
         const causesString = metadata.causes;
@@ -34,7 +34,12 @@ export default async function handler(
                 await donationEngine.saveCauseForDonation(donation.id, cause);
             }
         }
-        
+
+        // Save one distribution record for all causes
+        if (donation && donation.id && causesArray.length > 0) {
+            await donationEngine.saveDistributionForDonation(donation, causesArray);
+        }
+
         const notificationEngine = new NotificationEngine()
         
         await notificationEngine.emailDonationReceipt(donation, req.body.data.object.metadata || {})

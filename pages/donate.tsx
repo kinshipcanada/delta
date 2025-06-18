@@ -25,61 +25,61 @@ const causes: CauseV2[] = [
         cause: "Where Most Needed",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Sehme Sadat",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Sehme Imam",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Vision Kinship",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Orphans",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Education",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Poverty Relief",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Medical Aid",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Housing",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
     {
         cause: "Widows",
         choices: [],
         subCause: undefined,
-        region: region_enum.CANADA
+        region: region_enum.ANYWHERE
     },
 ]
 
@@ -342,7 +342,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
     const prefillUSDonor = () => {
         setFirstName("John");
         setLastName("Doe");
-        setEmail("john.doe@example.com");
+        setEmail("zain@kinshipcanada.com");
         setFormattedAddress({
             streetNumber: "1600",
             route: "Amphitheatre Parkway",
@@ -358,7 +358,7 @@ function DonationForm({ setDonation, setStripeClientSecret, setView, donorInfo, 
     const prefillCanadianDonor = () => {
         setFirstName("Jane");
         setLastName("Doe");
-        setEmail("jane.doe@example.ca");
+        setEmail("zain@kinshipcanada.com");
         setFormattedAddress({
             streetNumber: "123",
             route: "Main Street",
