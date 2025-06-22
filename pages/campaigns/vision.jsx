@@ -24,7 +24,7 @@ const families = [
 
 function FamilyCard({ family }) {
     return (
-      <Link href = '/donate'><a href={'/donate'}>
+      <Link href="/donate" className="inline-block">
         <div
           className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
         >
@@ -71,7 +71,6 @@ function FamilyCard({ family }) {
         </div> */}
         </div>
         </div>
-        </a>
       </Link>
     )
 }

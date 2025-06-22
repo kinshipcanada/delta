@@ -36,7 +36,7 @@ const families = [
 
 function FamilyCard({ family }) {
     return (
-      <Link href = '/donate'><a href={'/donate'}>
+      <Link href="/donate" className="inline-block">
         <div
           className="grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-8"
         >
@@ -72,7 +72,6 @@ function FamilyCard({ family }) {
         </p>
         </div>
         </div>
-        </a>
       </Link>
     )
 }
@@ -250,7 +249,7 @@ export function Example() {
               repellendus etur quidem assumenda.
             </p>
             <div className="mt-10 flex items-center gap-x-4">
-              <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">What’s included</h4>
+              <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">What's included</h4>
               <div className="h-px flex-auto bg-gray-100" />
             </div>
             <ul

@@ -30,6 +30,7 @@ model cause {
   cause        String       @db.VarChar
   subcause     String?      @db.VarChar
   donation     donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  donation_distribution donation_distribution[]
 }
 
 model donation {
@@ -52,14 +53,34 @@ model donation {
   stripe_charge_id         String?         @db.VarChar
   version                  Float?
   cause                    cause[]
-  distribution            distribution[]
+  distribution            donation_distribution[]
+  distribution_backfill   distribution_backfill[]
 }
 
 model distribution {
+  id                    String @id
+  amount_cents          Int
+  tag                   String? @db.VarChar
+  partner_name          String? @db.VarChar
+  date_of_distribution  DateTime @db.Timestamp(6)
+  donation_distribution donation_distribution[]
+}
+
+model donation_distribution {
+  id              String @id
+  donation_id     String @db.VarChar
+  distribution_id String @db.VarChar
+  cause_id        String @db.VarChar
+  amount_cents    Int?
+  donation        donation @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  distribution    distribution @relation(fields: [distribution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cause           cause @relation(fields: [cause_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model distribution_backfill {
   id                            String   @id
   date                          DateTime @db.Timestamp(6)
   donation_id                   String   @db.VarChar
-  goal_id                       String?  @db.VarChar
   amount_donated                Float?
   name                          String?  @db.VarChar
   email                         String?  @db.VarChar
@@ -94,17 +115,6 @@ model distribution {
   arbaeen_iraq                  Float?
   donations_for_admin_payments  Float?
   donation                      donation @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  goals                         goals?   @relation(fields: [goal_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model goals {
-  id                 String          @id
-  distribution_title String?         @db.VarChar
-  goal_amount        Float
-  region             region_enum?    @default(ANYWHERE)
-  created_at         DateTime        @default(now()) @db.Timestamp(6)
-  updated_at         DateTime        @default(now()) @db.Timestamp(6)
-  distribution      distribution[]
 }
 
 enum Country {

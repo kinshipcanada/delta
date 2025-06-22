@@ -1,4 +1,26 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        stream: false,
+        canvas: false,
+        module: false,
+        path: false,
+        os: false,
+        crypto: false,
+      };
+    }
+
+    return config;
+  },
+  // Enable experimental features for ES modules
+  experimental: {
+    esmExternals: 'loose',
+    forceSwcTransforms: true // Force SWC transforms
+  },
   poweredByHeader: false,
   async redirects() {
     return [
@@ -44,5 +66,8 @@ module.exports = {
       },
     ]
   },
+  transpilePackages: ['@react-pdf/renderer'],
 };
+
+module.exports = nextConfig
 

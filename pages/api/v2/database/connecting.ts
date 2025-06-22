@@ -11,34 +11,84 @@ export default async function handler(
   }
 
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+
+    // Fetch total count of donations
+    const { count: totalCount, error: countError } = await supabase
+      .from('donation')
+      .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+      console.error('Database error (count):', countError);
+      throw countError;
+    }
+
+    if (totalCount === null) {
+      throw new Error('Failed to get total count of donations');
+    }
+
+    // Fetch paginated donations
+    const { data: donations, error: donationsError } = await supabase
+      .from('donation')
+      .select('*')
+      .order('date', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (donationsError) {
+      console.error('Database error (donations):', donationsError);
+      throw donationsError;
+    }
+
     // Fetch distributions
     const { data: distributions, error: distributionsError } = await supabase
       .from('distribution')
-      .select('*')
-      .order('date', { ascending: false });
+      .select(`
+        *,
+        donation_distribution (
+          id,
+          donation_id,
+          cause_id,
+          amount_cents,
+          donation:donation_id (*),
+          cause:cause_id (*)
+        )
+      `);
 
     if (distributionsError) {
       console.error('Database error (distributions):', distributionsError);
       throw distributionsError;
     }
 
-    // Fetch goals
-    const { data: goals, error: goalsError } = await supabase
-      .from('goals')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Fetch donation_distributions separately to get all donation allocations
+    const { data: donationDistributions, error: donationDistributionsError } = await supabase
+      .from('donation_distribution')
+      .select(`
+        *,
+        donation:donation_id (*),
+        distribution:distribution_id (*),
+        cause:cause_id (*)
+      `);
 
-    if (goalsError) {
-      console.error('Database error (goals):', goalsError);
-      throw goalsError;
+    if (donationDistributionsError) {
+      console.error('Database error (donation_distributions):', donationDistributionsError);
+      throw donationDistributionsError;
     }
 
-    // Return success response with both datasets
+    // Return success response with all datasets and pagination info
     return res.status(200).json({
       success: true,
       data: {
+        donations: donations || [],
         distributions: distributions || [],
-        goals: goals || []
+        donationDistributions: donationDistributions || [],
+        pagination: {
+          total: totalCount,
+          page,
+          limit,
+          totalPages: Math.ceil(totalCount / limit)
+        }
       }
     });
 

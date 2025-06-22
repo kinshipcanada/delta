@@ -31,13 +31,13 @@ const causes: CauseV2[] = [
         cause: "Sehme Sadat",
         choices: [],
         subCause: undefined,
-        region: region_enum.ANYWHERE
+        region: region_enum.INDIA
     },
     {
         cause: "Sehme Imam",
         choices: [],
         subCause: undefined,
-        region: region_enum.ANYWHERE
+        region: region_enum.IRAQ
     },
     {
         cause: "Vision Kinship",

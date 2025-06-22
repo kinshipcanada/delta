@@ -3,56 +3,81 @@ import { supabase } from '@lib/utils/helpers';
 import { region_enum } from '@prisma/client';
 import Link from 'next/link';
 
-interface Distribution {
+interface Donation {
   id: string;
+  status: string;
   date: string;
-  donation_id: string;
-  amount_donated: number;
-  name: string;
+  donor_name: string;
   email: string;
-  desc: string;
-  distribution: string;
-  distribution_2: string;
+  amount_donated_cents: number;
+  amount_charged_cents: number;
+  line_address: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
 }
 
-interface Goal {
+interface Distribution {
   id: string;
-  distribution_title: string;
-  goal_amount: number;
+  amount_cents: number;
+  tag: string | null;
+  partner_name: string | null;
+  date_of_distribution: string;
+  donation_distribution: DonationDistribution[];
+}
+
+interface Cause {
+  id: string;
+  donation_id: string;
   region: region_enum;
-  created_at: string;
-  updated_at: string;
+  amount_cents: number;
+  in_honor_of: string | null;
+  cause: string;
+  subcause: string | null;
+}
+
+interface DonationDistribution {
+  id: string;
+  donation_id: string;
+  distribution_id: string;
+  cause_id: string;
+  amount_cents: number | null;
+  donation: Donation;
+  cause: Cause;
 }
 
 interface ApiResponse {
   success: boolean;
   data?: {
+    donations: Donation[];
     distributions: Distribution[];
-    goals: Goal[];
+    donationDistributions: DonationDistribution[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
   error?: string;
 }
 
 export default function DistributionDashboard() {
   const [distributions, setDistributions] = useState<Distribution[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newGoal, setNewGoal] = useState({
-    distribution_title: '',
-    goal_amount: '',
-    region: 'ANYWHERE' as region_enum
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchData = async () => {
+  const fetchData = async (page: number = 1) => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Fetching distributions and goals...');
+      console.log('Fetching distributions...');
       
-      const response = await fetch('/api/v2/database/connecting');
+      const response = await fetch(`/api/v2/database/connecting?page=${page}&limit=10`);
       const result = await response.json() as ApiResponse;
 
       if (!response.ok) {
@@ -64,9 +89,9 @@ export default function DistributionDashboard() {
       }
 
       setDistributions(result.data.distributions);
-      setGoals(result.data.goals || []);
+      setTotalPages(result.data.pagination.totalPages);
+      setCurrentPage(page);
       console.log('Distributions loaded:', result.data.distributions.length);
-      console.log('Goals loaded:', result.data.goals.length);
 
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -81,46 +106,38 @@ export default function DistributionDashboard() {
     fetchData();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // Set target amount to 0 if not provided
-      const targetAmount = newGoal.goal_amount ? parseFloat(newGoal.goal_amount) : 0;
-
-      const response = await fetch('/api/v2/database/adding_goal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...newGoal,
-          goal_amount: targetAmount, // Use the target amount or default to 0
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create goal');
+  const generateLetterData = (distribution: Distribution) => {
+    // Group causes by region
+    const groupedCauses = distribution.donation_distribution.reduce((acc: Record<string, any>, dd) => {
+      const key = dd.cause.region;
+      if (!acc[key]) {
+        acc[key] = {
+          partner: distribution.partner_name || 'Unnamed Partner',
+          region: dd.cause.region,
+          causes: [],
+          totalAmount: '0'
+        };
       }
-
-      // Reset form and close modal
-      setNewGoal({
-        distribution_title: '',
-        goal_amount: '',
-        region: 'ANYWHERE' as region_enum
+      
+      acc[key].causes.push({
+        cause: dd.cause.cause,
+        amount: ((dd.amount_cents || 0) / 100).toFixed(2)
       });
-      setIsModalOpen(false);
+      
+      const currentTotal = parseFloat(acc[key].totalAmount);
+      acc[key].totalAmount = (currentTotal + ((dd.amount_cents || 0) / 100)).toFixed(2);
+      
+      return acc;
+    }, {});
 
-      // Refresh goals data
-      await fetchData();
-    } catch (err) {
-      console.error('Error creating goal:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create goal');
-    } finally {
-      setLoading(false);
-    }
+    return {
+      institutionName: distribution.partner_name || 'Unnamed Partner',
+      recipientName: '', // This can be customized if needed
+      date: new Date(distribution.date_of_distribution).toLocaleDateString(),
+      reference: distribution.tag || distribution.id,
+      totalAmount: (distribution.amount_cents / 100).toFixed(2),
+      partnerGroups: Object.values(groupedCauses)
+    };
   };
 
   if (loading) {
@@ -148,169 +165,50 @@ export default function DistributionDashboard() {
           </div>
         )}
 
-        {/* Button Layout Area */}
-        <div className="mb-8">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <div className="flex flex-wrap gap-3">
-              {goals.map(goal => (
-                <Link key={goal.id} href={`/admin/goals/${goal.id}`} passHref>
-                  <div className="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all p-4 cursor-pointer">
-                    <div className="text-center">
-                      <div className="font-medium text-gray-900">
-                        {goal.distribution_title}
-                      </div>
-                      {goal.goal_amount ? (
-                        <div className="text-lg font-semibold text-blue-600">
-                          ${goal.goal_amount.toLocaleString()}
-                        </div>
-                      ) : (
-                        <div className="text-lg font-semibold text-gray-600">
-                          <span className="block h-6"></span>
-                        </div>
-                      )}
-                      <div className="text-xs text-gray-500 mt-1">
-                        Region: {goal.region}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors shadow-sm hover:shadow-md"
+        {/* Distribution Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {distributions.map((distribution) => (
+            <div 
+              key={distribution.id}
+              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Add Goal
-            </button>
-          </div>
-        </div>
+              <div className="flex flex-col gap-3 mb-4">
+                {distribution.tag && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 self-start">
+                    {distribution.tag}
+                  </span>
+                )}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {distribution.partner_name || 'Unnamed Distribution'}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {new Date(distribution.date_of_distribution).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-2xl font-bold text-gray-900">
+                  ${(distribution.amount_cents / 100).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {distribution.donation_distribution.length} donation{distribution.donation_distribution.length !== 1 ? 's' : ''} allocated
+                </p>
+              </div>
 
-        {/* Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full">
-              <h2 className="text-2xl font-bold mb-4">Add New Goal</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="distribution_title">
-                    Goal Name
-                  </label>
-                  <input
-                    type="text"
-                    id="distribution_title"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    value={newGoal.distribution_title}
-                    onChange={(e) => setNewGoal({...newGoal, distribution_title: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="goal_amount">
-                    Target Amount ($)
-                  </label>
-                  <input
-                    type="number"
-                    id="goal_amount"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    value={newGoal.goal_amount}
-                    onChange={(e) => setNewGoal({...newGoal, goal_amount: e.target.value})}
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                <div className="mb-6">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="region">
-                    Region
-                  </label>
-                  <select
-                    id="region"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    value={newGoal.region}
-                    onChange={(e) => setNewGoal({...newGoal, region: e.target.value as region_enum})}
-                    required
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <Link 
+                    href={`/admin/goals/${distribution.id}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center"
                   >
-                    {Object.values(region_enum).map((region) => (
-                      <option key={region} value={region}>
-                        {region}
-                      </option>
-                    ))}
-                  </select>
+                    View Details →
+                  </Link>
                 </div>
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="mr-2 px-4 py-2 text-gray-600 hover:text-gray-800"
-                    onClick={() => {
-                      setNewGoal({
-                        distribution_title: '',
-                        goal_amount: '',
-                        region: 'ANYWHERE' as region_enum
-                      });
-                      setIsModalOpen(false);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                    disabled={loading}
-                  >
-                    {loading ? 'Creating...' : 'Create Goal'}
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
-        )}
-
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6">
-            <h2 className="text-lg font-medium text-gray-900">
-              Unallocated Distributions ({distributions.length})
-            </h2>
-          </div>
-          
-          {distributions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No distributions found</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donor</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cause</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {distributions.map((dist) => (
-                    <tr key={dist.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(dist.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{dist.name}</div>
-                        <div className="text-sm text-gray-500">{dist.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${(dist.amount_donated / 100).toLocaleString() || '0'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {dist.desc || '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          ))}
         </div>
       </div>
     </div>

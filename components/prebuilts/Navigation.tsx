@@ -29,7 +29,7 @@ export default function Navigation() {
         <Popover className="bg-white sticky z-50 top-0">
             <div className="flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10 border border-gray-300">
                 <div>
-                  <a href="#" className="flex items-center">
+                  <Link href="/" className="flex items-center">
                       <span className="sr-only">Kinship Canada</span>
                       <img
                       className="h-8 w-auto sm:h-10"
@@ -40,7 +40,7 @@ export default function Navigation() {
                       <span className="hidden sm:block flex-shrink-0 ml-3 font-bold text-xl">
                           Kinship Canada
                       </span>
-                  </a>
+                  </Link>
                 </div>
 
                 {/* Menu */}
@@ -88,10 +88,11 @@ export default function Navigation() {
 
 export const MenuLink: FC<{ text: string, link: string, current: boolean }> = ({ text, link, current }) => {
     return (
-        <Link href={link}>
-          <a className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}>
-              { text }
-          </a>
+        <Link 
+          href={link}
+          className={classNames(current ? 'text-slate-900' : 'text-slate-500', "text-base font-medium hover:text-slate-900")}
+        >
+          {text}
         </Link>
     )
 }
@@ -147,30 +148,29 @@ function Support() {
                 <div className="z-20 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
                     <div className="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
                       {solutions.map((item) => (
-                        <Link href = {item.href} key={item.name}>
-                          <a
-                            href={item.href}
-                            className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
-                          >
-                            <item.icon className="flex-shrink-0 h-6 w-6 text-blue-600" aria-hidden="true" />
-                            <div className="ml-4">
-                              <p className="text-base font-medium text-gray-900">{item.name}</p>
-                              <p className="mt-1 text-sm text-gray-500">{item.description}</p>
-                            </div>
-                          </a>
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 transition ease-in-out duration-150"
+                        >
+                          <item.icon className="flex-shrink-0 h-6 w-6 text-blue-600" aria-hidden="true" />
+                          <div className="ml-4">
+                            <p className="text-base font-medium text-gray-900">{item.name}</p>
+                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                          </div>
                         </Link>
                       ))}
                     </div>
                     <div className="px-5 py-5 bg-gray-50 space-y-6 sm:flex sm:space-y-0 sm:space-x-10 sm:px-8">
                       {callsToAction.map((item) => (
                         <div key={item.name} className="flow-root">
-                          <a
+                          <Link
                             href={item.href}
                             className="-m-3 p-3 flex items-center rounded-md text-base font-medium text-gray-900 hover:bg-gray-100 transition ease-in-out duration-150"
                           >
                             <item.icon className="flex-shrink-0 h-6 w-6 text-gray-400" aria-hidden="true" />
                             <span className="ml-3">{item.name}</span>
-                          </a>
+                          </Link>
                         </div>
                       ))}
                     </div>
