@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@lib/utils/helpers';
 import { region_enum } from '@prisma/client';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useAuth } from '@components/prebuilts/Authentication';
 
 interface Donation {
   id: string;
@@ -64,11 +66,43 @@ interface ApiResponse {
 }
 
 export default function DistributionDashboard() {
+  const router = useRouter();
+  const { donor } = useAuth();
   const [distributions, setDistributions] = useState<Distribution[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isPlaidLinked, setIsPlaidLinked] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!donor) {
+      router.push('/admin/login');
+      return;
+    }
+
+    // Check Plaid session
+    const checkPlaidSession = async () => {
+      try {
+        const response = await fetch('/api/plaid/check-env');
+        const data = await response.json();
+        
+        if (!data.success || !data.hasValidSession) {
+          router.push('/admin/login');
+          return;
+        }
+        
+        // If we have a valid session, fetch data
+        fetchData();
+      } catch (err) {
+        console.error('Error checking Plaid session:', err);
+        router.push('/admin/login');
+      }
+    };
+
+    checkPlaidSession();
+  }, [router]);
 
   const fetchData = async (page: number = 1) => {
     setLoading(true);
@@ -101,10 +135,6 @@ export default function DistributionDashboard() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const generateLetterData = (distribution: Distribution) => {
     // Group causes by region

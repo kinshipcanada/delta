@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Button, ButtonStyle } from '@components/primitives';
+import { useRouter } from 'next/router';
+import { useAuth } from '@components/prebuilts/Authentication';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -55,13 +57,34 @@ interface Donation {
 }
 
 export default function DonationsPage() {
+  const router = useRouter();
+  const { donor } = useAuth();
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPlaidLinked, setIsPlaidLinked] = useState(false);
 
   useEffect(() => {
-    fetchDonations();
-  }, []);
+    const checkPlaidSession = async () => {
+      try {
+        const response = await fetch('/api/plaid/check-env');
+        const data = await response.json();
+        
+        if (!data.success || !data.hasValidSession) {
+          router.push('/admin/login');
+          return;
+        }
+        
+        // If we have a valid session, fetch donations
+        fetchDonations();
+      } catch (err) {
+        console.error('Error checking Plaid session:', err);
+        router.push('/admin/login');
+      }
+    };
+
+    checkPlaidSession();
+  }, [router]);
 
   const fetchDonations = async () => {
     try {

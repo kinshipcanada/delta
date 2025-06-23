@@ -215,13 +215,13 @@ export class DonationEngine {
         }
 
         const donation: any = {
-            id: donation_id, // Validated string
-            status: status ? status as status_enum : undefined, // Prisma handles undefined for optional enum; validates value if present
+            id: donation_id,
+            status: status ? status as status_enum : undefined,
             date: new Date(chargeObject.created * 1000),
-            amount_donated_cents: parsedAmountDonatedCents, // Validated number
+            amount_donated_cents: parsedAmountDonatedCents,
             amount_charged_cents: chargeObject.amount_captured,
             fee_charged_by_processor: balanceTransactionObject ? balanceTransactionObject.fee : -1,
-            fees_covered_by_donor: parsedFeesCoveredByDonor, // Number, defaults to 0
+            fees_covered_by_donor: parsedFeesCoveredByDonor,
             stripe_customer_id: customerObject.id,
             stripe_charge_id: chargeObject.id,
             stripe_transfer_id: null,
@@ -299,62 +299,163 @@ export class DonationEngine {
             const { v4: uuidv4 } = require('uuid');
             const savedDistributions = [];
 
-            // Create a separate distribution record for each cause
-            for (const cause of causesArray) {
-                // Calculate the amount for this cause
-                const causeAmount = cause.amountDonatedCents || 0;
+            // Constants for distribution IDs
+            const INDIA_DISTRIBUTION_ID = '6e56a45b-d36c-4413-93b8-c9820d16462e';
+            const IRAQ_DISTRIBUTION_ID = '093c62f1-b17b-46ca-ac52-38ff851768b5';
+            const AFRICA_DISTRIBUTION_ID = '1fd2bd8a-e8ac-4520-af67-9ed62d418587';
 
-                const dataToCreate: any = {
-                    id: uuidv4(),
-                    date: donationData.date,
-                    donation_id: donationData.id,
-                    goal_id: null,
-                    amount_donated: causeAmount, // Use the individual cause amount
-                    name: donationData.donor_name,
-                    email: donationData.email,
-                    desc: cause.cause, // Use the individual cause description
-                    vision_kinship_1: null,
-                    vision_kinship_2: null,
-                    vision_kinship_3: null,
-                    vision_kinship_4: null,
-                    vision_kinship_5: null,
-                    vision_kinship_6: null,
-                    vision_kinship_2025: null,
-                    ramadhan_india: null,
-                    ramadhan_iraq: null,
-                    ramadhan_africa: null,
-                    education_africa: null,
-                    poverty_relief_africa: null,
-                    orphan_campaign_al_anwar_iraq: null,
-                    imam_ridha_khums_iraq: null,
-                    orphans_india: null,
-                    medical_aid_india: null,
-                    housing_india: null,
-                    widows_india: null,
-                    sadaqah_india: null,
-                    education_india: null,
-                    fidya_india: null,
-                    quran_india: null,
-                    khums_sadat_india: null,
-                    poverty_relief_india: null,
-                    arbaeen_iraq: null,
-                    donations_for_admin_payments: null
-                };
-
-                console.log(`[DonationEngine] Preparing distribution record for cause ${cause.cause} with amount ${causeAmount} for donation ID ${donationData.id}`);
-
-                const savedDistribution = await this.prismaClient.distribution.create({
-                    data: dataToCreate,
+            // Helper function to get total allocated amount for a distribution
+            const getTotalAllocatedAmount = async (distributionId: string) => {
+                const allocations = await this.prismaClient.donation_distribution.aggregate({
+                    where: { distribution_id: distributionId },
+                    _sum: { amount_cents: true }
                 });
+                return allocations._sum.amount_cents || 0;
+            };
+
+            // Helper function to get distribution total amount
+            const getDistributionTotalAmount = async (distributionId: string) => {
+                const distribution = await this.prismaClient.distribution.findUnique({
+                    where: { id: distributionId }
+                });
+                return distribution?.amount_cents || 0;
+            };
+
+            // Helper function to get allocation percentage for a distribution
+            const getAllocationPercentage = async (distributionId: string) => {
+                const totalAmount = await getDistributionTotalAmount(distributionId);
+                const allocatedAmount = await getTotalAllocatedAmount(distributionId);
+                return totalAmount > 0 ? (allocatedAmount / totalAmount) * 100 : 0;
+            };
+
+            // Helper function to check if a distribution has capacity
+            const hasCapacity = async (distributionId: string, amount: number) => {
+                const totalAllocated = await getTotalAllocatedAmount(distributionId);
+                const distributionTotal = await getDistributionTotalAmount(distributionId);
+                return (totalAllocated + amount) <= distributionTotal;
+            };
+
+            // Helper function to determine target distribution for shared causes
+            const determineSharedCauseDistribution = async (cause: any) => {
+                const amount = cause.amountDonatedCents;
+                console.log(`[DonationEngine] Determining shared distribution for cause: ${cause.cause} (${amount} cents)`);
                 
-                console.log(`[DonationEngine] Successfully saved distribution for cause ${cause.cause}. Distribution ID: ${savedDistribution.id}`);
-                savedDistributions.push(savedDistribution);
+                const indiaPercentage = await getAllocationPercentage(INDIA_DISTRIBUTION_ID);
+                const africaPercentage = await getAllocationPercentage(AFRICA_DISTRIBUTION_ID);
+
+                console.log(`[DonationEngine] Current allocation percentages - India: ${indiaPercentage.toFixed(2)}%, Africa: ${africaPercentage.toFixed(2)}%`);
+
+                // Check capacity first
+                const canAddToIndia = await hasCapacity(INDIA_DISTRIBUTION_ID, amount);
+                const canAddToAfrica = await hasCapacity(AFRICA_DISTRIBUTION_ID, amount);
+
+                console.log(`[DonationEngine] Capacity check - India: ${canAddToIndia}, Africa: ${canAddToAfrica}`);
+
+                if (!canAddToIndia && !canAddToAfrica) {
+                    console.log(`[DonationEngine] Neither distribution has capacity`);
+                    return null;
+                }
+
+                if (!canAddToIndia) {
+                    console.log(`[DonationEngine] India full, using Africa`);
+                    return AFRICA_DISTRIBUTION_ID;
+                }
+                if (!canAddToAfrica) {
+                    console.log(`[DonationEngine] Africa full, using India`);
+                    return INDIA_DISTRIBUTION_ID;
+                }
+
+                // Both have capacity, use percentage-based allocation
+                const percentageDifference = Math.abs(indiaPercentage - africaPercentage);
+                if (percentageDifference > 5) {
+                    const selectedId = indiaPercentage < africaPercentage ? INDIA_DISTRIBUTION_ID : AFRICA_DISTRIBUTION_ID;
+                    console.log(`[DonationEngine] Selected ${selectedId} based on percentage difference of ${percentageDifference.toFixed(2)}%`);
+                    return selectedId;
+                }
+
+                // If percentages are close, alternate based on timestamp
+                const selectedId = Date.now() % 2 === 0 ? INDIA_DISTRIBUTION_ID : AFRICA_DISTRIBUTION_ID;
+                console.log(`[DonationEngine] Percentages close, alternating to: ${selectedId}`);
+                return selectedId;
+            };
+
+            for (const cause of causesArray) {
+                console.log(`\n[DonationEngine] Processing cause: ${cause.cause} for donation ID: ${donationData.id}`);
+                console.log(`[DonationEngine] Cause details:`, JSON.stringify(cause, null, 2));
+                
+                const causeLower = cause.cause.toLowerCase();
+                const region = cause.region?.toUpperCase();
+                let targetDistributionId = null;
+
+                // Handle causes that go to India distribution if capacity available
+                if (
+                    causeLower === "vision kinship" ||
+                    (causeLower === "orphans" && (region === "INDIA" || region === "ANYWHERE")) ||
+                    causeLower === "medical aid" ||
+                    causeLower === "housing" ||
+                    causeLower === "widows" ||
+                    causeLower === "fidya" ||
+                    causeLower === "quran" ||
+                    causeLower === "sehme sadat"
+                ) {
+                    console.log(`[DonationEngine] Cause matches India-specific criteria`);
+                    if (await hasCapacity(INDIA_DISTRIBUTION_ID, cause.amountDonatedCents)) {
+                        targetDistributionId = INDIA_DISTRIBUTION_ID;
+                    } else {
+                        console.log(`[DonationEngine] India distribution at capacity. Skipping distribution linking for cause: ${cause.cause}`);
+                        continue;
+                    }
+                }
+                // Handle Iraq-specific causes
+                else if (
+                    region === "IRAQ" ||
+                    (causeLower === "orphans" && region === "IRAQ") ||
+                    causeLower === "sehme imam"
+                ) {
+                    console.log(`[DonationEngine] Cause matches Iraq-specific criteria`);
+                    targetDistributionId = IRAQ_DISTRIBUTION_ID;
+                }
+                // Handle Education, Poverty Relief, and Where Most Needed with balanced allocation
+                else if (causeLower === "education" || causeLower === "poverty relief" || causeLower === "where most needed") {
+                    console.log(`[DonationEngine] Cause qualifies for balanced allocation`);
+                    targetDistributionId = await determineSharedCauseDistribution(cause);
+                    if (!targetDistributionId) {
+                        console.log(`[DonationEngine] Both India and Africa distributions at capacity. Skipping distribution linking for cause: ${cause.cause}`);
+                        continue;
+                    }
+                    console.log(`[DonationEngine] Selected ${targetDistributionId === INDIA_DISTRIBUTION_ID ? 'India' : 'Africa'} distribution for ${cause.cause} based on balanced allocation`);
+                } else {
+                    console.log(`[DonationEngine] Cause ${cause.cause} doesn't match any distribution criteria`);
+                }
+
+                if (targetDistributionId) {
+                    try {
+                        console.log(`[DonationEngine] Creating donation_distribution record for distribution: ${targetDistributionId}`);
+                        const donationDistribution = await this.prismaClient.donation_distribution.create({
+                            data: {
+                                id: uuidv4(),
+                                donation_id: donationData.id,
+                                distribution_id: targetDistributionId,
+                                cause_id: cause.id,
+                                amount_cents: cause.amountDonatedCents
+                            }
+                        });
+
+                        console.log(`[DonationEngine] Successfully created donation_distribution record:`, JSON.stringify(donationDistribution, null, 2));
+                        savedDistributions.push(donationDistribution);
+                    } catch (error) {
+                        console.error(`[DonationEngine] Error creating donation_distribution for cause ${cause.cause}:`, error);
+                        throw error;
+                    }
+                } else {
+                    console.log(`[DonationEngine] No matching distribution found for cause: ${cause.cause}`);
+                }
             }
             
-            console.log(`[DonationEngine] Successfully saved ${savedDistributions.length} distribution records for donation ID: ${donationData.id}`);
+            console.log(`[DonationEngine] Successfully processed ${savedDistributions.length} distribution records for donation ID: ${donationData.id}`);
             return savedDistributions;
         } catch (error) {
-            console.error(`[DonationEngine] Error inserting distributions into database for donation ID ${donationData.id}:`, error);
+            console.error(`[DonationEngine] Error processing distributions for donation ID ${donationData.id}:`, error);
             throw error;
         }
     }

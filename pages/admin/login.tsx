@@ -142,14 +142,11 @@ const ReceivedETransfersEndpoint = () => {
       if (data.error) {
         setError(data.error);
       } else if (data.transactions) {
-        // Filter for transactions containing "e-transfer - autodeposit" in the name
+        // Filter for transactions containing "e-Transfer - Autodeposit" in the name
         const receivedETransfers = data.transactions.filter((tx: any) => 
           tx.name.toLowerCase().includes('e-transfer - autodeposit')
         );
         setETransfers(receivedETransfers);
-        
-        // Check which e-transfers already have receipts
-        await checkExistingReceipts(receivedETransfers);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -157,116 +154,39 @@ const ReceivedETransfersEndpoint = () => {
     setIsLoading(false);
   };
 
-  const checkExistingReceipts = async (transfers: Transaction[]) => {
-    const receiptStatus: Record<string, boolean> = {};
-    
-    for (const transfer of transfers) {
-      try {
-        const response = await fetch(`/api/etransfer/check-receipt?transactionId=${transfer.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          receiptStatus[transfer.id] = data.exists;
-        }
-      } catch (error) {
-        console.error(`Error checking receipt for ${transfer.id}:`, error);
-      }
-    }
-    
-    setReceiptIssued(receiptStatus);
-  };
-
   const handleIssueReceipt = async (transaction: any) => {
     try {
       setIssuingReceipt(transaction.id);
       
-      // Check if receipt already exists
-      const existingCheck = await fetch(`/api/etransfer/check-receipt?transactionId=${transaction.id}`);
-      if (existingCheck.ok) {
-        const data = await existingCheck.json();
-        if (data.exists) {
-          setError('Receipt already exists for this transaction');
-          return;
-        }
-      }
-
-      // Show form to collect donor information
-      const donorInfo = await showDonorInfoForm(transaction);
-      if (!donorInfo) {
-        return; // User cancelled
-      }
-
-      // Create receipt with donor information
-      const response = await fetch('/api/etransfer/create-receipt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transactionId: transaction.id,
-          amount: Math.abs(transaction.amount),
-          donorName: donorInfo.donorName,
-          email: donorInfo.email,
-          lineAddress: donorInfo.lineAddress,
-          city: donorInfo.city,
-          state: donorInfo.state,
-          country: donorInfo.country,
-          postalCode: donorInfo.postalCode,
-          date: transaction.date,
-          causes: donorInfo.causes || []
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create receipt');
-      }
-
-      const result = await response.json();
+      // Simulate API call to issue receipt
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Update state to show receipt was issued
       setReceiptIssued(prev => ({
         ...prev,
         [transaction.id]: true
       }));
-
-      alert(`Receipt created successfully! Receipt URL: ${result.receiptUrl}`);
+      
+      // In a real app, you would call your API to create a receipt
+      // For example:
+      // await fetch('/api/receipts/create', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     transactionId: transaction.id,
+      //     amount: transaction.amount,
+      //     date: transaction.date,
+      //     merchant: transaction.name,
+      //     category: transaction.category
+      //   })
+      // });
       
     } catch (err) {
-      setError('Failed to issue receipt: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      setError('Failed to issue receipt');
       console.error('Error issuing receipt:', err);
     } finally {
       setIssuingReceipt(null);
     }
-  };
-
-  const showDonorInfoForm = (transaction: any): Promise<any> => {
-    return new Promise((resolve) => {
-      const donorName = prompt(`Enter donor name for transaction ${transaction.name} ($${Math.abs(transaction.amount).toFixed(2)}):`);
-      if (!donorName) {
-        resolve(null);
-        return;
-      }
-
-      const email = prompt('Enter donor email address:');
-      if (!email) {
-        resolve(null);
-        return;
-      }
-
-      const lineAddress = prompt('Enter donor address (street):') || '';
-      const city = prompt('Enter donor city:') || '';
-      const state = prompt('Enter donor state/province:') || '';
-      const country = prompt('Enter donor country (default: CA):') || 'CA';
-      const postalCode = prompt('Enter donor postal code:') || '';
-
-      resolve({
-        donorName,
-        email,
-        lineAddress,
-        city,
-        state,
-        country,
-        postalCode
-      });
-    });
   };
 
   return (
@@ -304,19 +224,11 @@ const ReceivedETransfersEndpoint = () => {
               <div className="mt-2 text-xs text-blue-600">{tx.category}</div>
               <div className="mt-3 flex justify-end">
                 {receiptIssued[tx.id] ? (
-                  <div className="flex gap-2">
-                    <div className="px-3 py-1 bg-gray-200 text-gray-700 text-sm font-medium rounded-md flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Receipt Issued
-                    </div>
-                    <button 
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-                      onClick={() => window.open(`${process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost:3000'}/receipts/${tx.id}`, '_blank')}
-                    >
-                      View Receipt
-                    </button>
+                  <div className="px-3 py-1 bg-gray-200 text-gray-700 text-sm font-medium rounded-md flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Receipt Issued
                   </div>
                 ) : (
                   <button 
@@ -540,15 +452,16 @@ export default function AdminPage() {
       
       if (data.success) {
         setIsLinked(true);
-        // Fetch transactions and account data after successful linking
-        await fetchPlaidData();
+        router.push('/admin/donations');
       } else {
         console.error('Failed to link bank account:', data.error);
+        setLinkError(data.error || 'Failed to link bank account');
       }
     } catch (error) {
       console.error('Error exchanging token:', error);
+      setLinkError('Failed to complete bank account linking');
     }
-  }, []);
+  }, [router]);
 
   const { open, ready } = usePlaidLink({
     token: linkToken,

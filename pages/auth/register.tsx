@@ -152,11 +152,7 @@ export default function Register() {
 				<h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign up for Kinship Canada</h2>
 				<p className="mt-2 text-center text-lg text-gray-600">
 					Already{' '}
-					<Link href = '/auth/login'>
-						<a className="font-medium text-blue-600 hover:text-blue-500">
-						have an account?
-						</a>
-					</Link>
+					<Link href="/auth/login">Click here</Link>
 				</p>
 			</div>
 

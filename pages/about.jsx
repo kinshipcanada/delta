@@ -119,7 +119,7 @@ export default function About() {
                         We also believe that giving charity should be a pleasant and easy experience. We are proud to offer a dashboard from which you can download your tax receipts, receive proof of donation, and more.
                     </div>
                     <div className="mt-10 flex text-base max-w-prose mx-auto lg:max-w-none">
-                        <Link href = '/donate'>
+                        <Link href="/donate">
                             <button
                             type="button"
                             className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

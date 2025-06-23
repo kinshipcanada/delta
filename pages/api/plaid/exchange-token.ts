@@ -48,27 +48,17 @@ export default async function handler(
     const ACCESS_TOKEN = tokenResponse.data.access_token;
     const ITEM_ID = tokenResponse.data.item_id;
 
-    // For demo purposes, we'll log the access token - in production, you should save it securely
-    console.log("Access Token:", ACCESS_TOKEN);
-    console.log("Item ID:", ITEM_ID);
-    
-    // Hacky way to make access token available for demo purposes
-    // In production, you would store this in a database
-    process.env.PLAID_ACCESS_TOKEN = ACCESS_TOKEN;
+    // Store the access token in an HTTP-only cookie
+    // Set cookie to expire in 30 days
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    res.setHeader(
+      'Set-Cookie', 
+      [
+        `plaid_access_token=${ACCESS_TOKEN}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${thirtyDays}`,
+        `plaid_item_id=${ITEM_ID}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${thirtyDays}`
+      ]
+    );
 
-    // TODO: Store these tokens securely in your database
-    // For example:
-    // await prisma.plaidCredentials.create({
-    //   data: {
-    //     accessToken: ACCESS_TOKEN,
-    //     itemId: ITEM_ID,
-    //     // You might want to add additional fields like:
-    //     // dateLinked: new Date(),
-    //     // status: 'active'
-    //   }
-    // });
-
-    // Only return success status to the client, not the sensitive tokens
     return res.json({
       success: true,
       message: 'Bank account successfully linked'

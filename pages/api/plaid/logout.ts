@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
-const PLAID_SECRET = process.env.PLAID_SECRET; // Use the appropriate secret based on your environment
+const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
 
 const configuration = new Configuration({
@@ -23,12 +23,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { accessToken } = req.body; // Get the access token from the request body
+    const accessToken = req.cookies.plaid_access_token;
+    
+    if (accessToken) {
+      // Call the Plaid API to revoke the access token
+      await plaidClient.itemRemove({
+        access_token: accessToken,
+      });
+    }
 
-    // Call the Plaid API to revoke the access token
-    await plaidClient.itemRemove({
-      access_token: accessToken,
-    });
+    // Clear the Plaid cookies
+    res.setHeader(
+      'Set-Cookie', 
+      [
+        'plaid_access_token=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0',
+        'plaid_item_id=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0'
+      ]
+    );
 
     res.status(200).json({ success: true });
   } catch (error) {
