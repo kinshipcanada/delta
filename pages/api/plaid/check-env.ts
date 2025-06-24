@@ -1,19 +1,33 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // We'll allow this in all environments but hide sensitive values in production
+  // Get environment variables
+  const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
+  const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
   const isProd = process.env.NODE_ENV === 'production';
-  
+
+  // Select the appropriate secret key based on environment
+  let PLAID_SECRET: string | undefined;
+  if (PLAID_ENV === 'production') {
+    PLAID_SECRET = process.env.PLAID_PROD_SECRET_KEY;
+  } else if (PLAID_ENV === 'development') {
+    PLAID_SECRET = process.env.PLAID_DEV_SECRET_KEY;
+  } else {
+    PLAID_SECRET = process.env.PLAID_SANDBOX_SECRET_KEY;
+  }
+
+  // Check environment variables
   const envCheck = {
-    PLAID_ENV: process.env.PLAID_ENV || 'sandbox',
-    PLAID_CLIENT_ID_EXISTS: !!process.env.PLAID_CLIENT_ID,
+    PLAID_ENV: PLAID_ENV,
+    PLAID_CLIENT_ID_EXISTS: !!PLAID_CLIENT_ID,
     PLAID_SANDBOX_SECRET_EXISTS: !!process.env.PLAID_SANDBOX_SECRET_KEY,
     PLAID_DEV_SECRET_EXISTS: !!process.env.PLAID_DEV_SECRET_KEY,
     PLAID_PROD_SECRET_EXISTS: !!process.env.PLAID_PROD_SECRET_KEY,
-    PLAID_SECRET_EXISTS: !!process.env.PLAID_SECRET,
+    PLAID_SECRET_EXISTS: !!PLAID_SECRET,
     NEXT_PUBLIC_DOMAIN_EXISTS: !!process.env.NEXT_PUBLIC_DOMAIN,
     NEXT_PUBLIC_DOMAIN_VALUE: isProd ? '[hidden in production]' : process.env.NEXT_PUBLIC_DOMAIN,
     NODE_ENV: process.env.NODE_ENV,
@@ -22,11 +36,42 @@ export default async function handler(
     VERCEL_URL: isProd ? '[hidden in production]' : process.env.VERCEL_URL
   };
 
+  // Check for Plaid session
+  const accessToken = req.cookies.plaid_access_token;
+  const itemId = req.cookies.plaid_item_id;
+  let hasValidSession = false;
+
+  if (accessToken && itemId) {
+    try {
+      // Initialize Plaid client
+      const configuration = new Configuration({
+        basePath: PlaidEnvironments[PLAID_ENV],
+        baseOptions: {
+          headers: {
+            'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
+            'PLAID-SECRET': PLAID_SECRET,
+          },
+        },
+      });
+      const plaidClient = new PlaidApi(configuration);
+
+      // Validate the access token by making a test API call
+      await plaidClient.itemGet({
+        access_token: accessToken
+      });
+
+      hasValidSession = true;
+    } catch (error) {
+      console.error('Error validating Plaid session:', error);
+      hasValidSession = false;
+    }
+  }
+
   // Determine which secret key is active based on the environment
   let activeSecretKey = 'none';
-  if (process.env.PLAID_ENV === 'production' && process.env.PLAID_PROD_SECRET_KEY) {
+  if (PLAID_ENV === 'production' && process.env.PLAID_PROD_SECRET_KEY) {
     activeSecretKey = 'PLAID_PROD_SECRET_KEY';
-  } else if (process.env.PLAID_ENV === 'development' && process.env.PLAID_DEV_SECRET_KEY) {
+  } else if (PLAID_ENV === 'development' && process.env.PLAID_DEV_SECRET_KEY) {
     activeSecretKey = 'PLAID_DEV_SECRET_KEY';
   } else if (process.env.PLAID_SANDBOX_SECRET_KEY) {
     activeSecretKey = 'PLAID_SANDBOX_SECRET_KEY';
@@ -36,6 +81,7 @@ export default async function handler(
 
   res.status(200).json({
     success: true,
+    hasValidSession,
     environment: {
       ...envCheck,
       active_secret_key: activeSecretKey

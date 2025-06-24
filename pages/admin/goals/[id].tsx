@@ -44,6 +44,25 @@ export default function DistributionDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const checkPlaidSession = async () => {
+    try {
+      const response = await fetch('/api/plaid/check-env');
+      const data = await response.json();
+      
+      if (!data.success || !data.hasValidSession) {
+        console.log('No valid Plaid session found, redirecting to login');
+        router.push('/admin/login');
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error checking Plaid session:', err);
+      router.push('/admin/login');
+      return false;
+    }
+  };
+
   const fetchDistributionDetails = async () => {
     if (!id) return;
 
@@ -75,10 +94,15 @@ export default function DistributionDetails() {
   };
 
   useEffect(() => {
-    if (id) {
-      fetchDistributionDetails();
-    }
-  }, [id]);
+    const initializePage = async () => {
+      const hasValidSession = await checkPlaidSession();
+      if (hasValidSession && id) {
+        fetchDistributionDetails();
+      }
+    };
+
+    initializePage();
+  }, [id, router]);
 
   const generateLetterData = (distribution: Distribution) => {
     // Group causes by region

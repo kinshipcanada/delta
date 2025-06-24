@@ -24,19 +24,18 @@ export class NotificationEngine {
         this.postmarkClient = new ServerClient(postmarkApiKey)
     }
 
-    private async sendEmail(toEmail: string, subject: string, emailContent: string) {
+    private async sendEmail(toEmail: string, subject: string, htmlContent: string) {
         try {
             await this.postmarkClient.sendEmail({
                 "From": this.fromEmail,
                 "To": toEmail,
                 "Subject": subject,
-                "TextBody": emailContent
+                "HtmlBody": htmlContent
             })
         } catch (error) {
             throw new Error(`Error sending email to ${toEmail}: ${error}`)
         }
     }
-
 
     // TODO: fix the hardcoded fields
     public async emailDonationReceipt(donation: donation, metadata: any) {
@@ -52,21 +51,27 @@ export class NotificationEngine {
         const postal_code = metadata?.postal_code || donation.postal_code;
         
         const subjectLine = `Your donation of $${centsToDollars(donation.amount_charged_cents)} to Kinship Canada`;
+        const receiptUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}`;
+        
         const emailBody = `
-            Dear ${donor_name},
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <p>Dear ${donor_name},</p>
 
-            Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.
+                <p>Thank you for your donation of $${centsToDollars(donation.amount_charged_cents)}.</p>
 
-            You can access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt of donation here: ${process.env.NEXT_PUBLIC_DOMAIN}/receipts/${donation.id}
+                <p>You can <a href="${receiptUrl}" style="color: #0066cc; text-decoration: underline;">access your ${country == "CA" || country == "Canada" || country == "ca" ? "CRA-eligible " : ""}receipt here</a>.</p>
 
-            Thank you very much,
-            The Team At Kinship Canada
+                <p>Thank you very much,<br>
+                The Team At Kinship Canada</p>
 
-            Invoice ID: ${donation.id}
-            Date Donated: ${parseFrontendDate(donation.date)}
-            Amount Donated: ${centsToDollars(donation.amount_charged_cents)}
-            Receipt Issued To: ${donor_name}
-            Donor Address: ${line_address}, ${city}, ${state}, ${country} (${postal_code})
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="margin: 5px 0;"><strong>Invoice ID:</strong> ${donation.id}</p>
+                    <p style="margin: 5px 0;"><strong>Date Donated:</strong> ${parseFrontendDate(donation.date)}</p>
+                    <p style="margin: 5px 0;"><strong>Amount Donated:</strong> $${centsToDollars(donation.amount_charged_cents)}</p>
+                    <p style="margin: 5px 0;"><strong>Receipt Issued To:</strong> ${donor_name}</p>
+                    <p style="margin: 5px 0;"><strong>Donor Address:</strong> ${line_address}, ${city}, ${state}, ${country} (${postal_code})</p>
+                </div>
+            </div>
         `
         
         console.log(`Sending email to: ${email}`);        

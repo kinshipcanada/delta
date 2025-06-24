@@ -60,7 +60,7 @@ export class DonationEngine {
     }
 
 
-    private async insertDonationObject(donation: donation): Promise<donation> {
+    public async insertDonationObject(donation: donation): Promise<donation> {
         console.log(`[DonationEngine] Inserting donation into database with ID: ${donation.id}`);
         console.log(`[DonationEngine] Donation data:`, JSON.stringify({
             id: donation.id,
@@ -292,8 +292,8 @@ export class DonationEngine {
         }
     }
 
-    async saveDistributionForDonation(donationData: donation, causesArray: any[]) {
-        console.log(`[DonationEngine] Attempting to save distributions for donation ID: ${donationData.id}. Causes Data: ${JSON.stringify(causesArray)}`);
+    public async saveDistributionForDonation(donation: donation, causesArray: any[], prismaTransaction?: any) {
+        console.log(`[DonationEngine] Attempting to save distributions for donation ID: ${donation.id}. Causes Data: ${JSON.stringify(causesArray)}`);
 
         try {
             const { v4: uuidv4 } = require('uuid');
@@ -304,9 +304,12 @@ export class DonationEngine {
             const IRAQ_DISTRIBUTION_ID = '093c62f1-b17b-46ca-ac52-38ff851768b5';
             const AFRICA_DISTRIBUTION_ID = '1fd2bd8a-e8ac-4520-af67-9ed62d418587';
 
+            // Use either the transaction or the regular client
+            const db = prismaTransaction || this.prismaClient;
+
             // Helper function to get total allocated amount for a distribution
             const getTotalAllocatedAmount = async (distributionId: string) => {
-                const allocations = await this.prismaClient.donation_distribution.aggregate({
+                const allocations = await db.donation_distribution.aggregate({
                     where: { distribution_id: distributionId },
                     _sum: { amount_cents: true }
                 });
@@ -315,7 +318,7 @@ export class DonationEngine {
 
             // Helper function to get distribution total amount
             const getDistributionTotalAmount = async (distributionId: string) => {
-                const distribution = await this.prismaClient.distribution.findUnique({
+                const distribution = await db.distribution.findUnique({
                     where: { id: distributionId }
                 });
                 return distribution?.amount_cents || 0;
@@ -380,7 +383,7 @@ export class DonationEngine {
             };
 
             for (const cause of causesArray) {
-                console.log(`\n[DonationEngine] Processing cause: ${cause.cause} for donation ID: ${donationData.id}`);
+                console.log(`\n[DonationEngine] Processing cause: ${cause.cause} for donation ID: ${donation.id}`);
                 console.log(`[DonationEngine] Cause details:`, JSON.stringify(cause, null, 2));
                 
                 const causeLower = cause.cause.toLowerCase();
@@ -431,10 +434,10 @@ export class DonationEngine {
                 if (targetDistributionId) {
                     try {
                         console.log(`[DonationEngine] Creating donation_distribution record for distribution: ${targetDistributionId}`);
-                        const donationDistribution = await this.prismaClient.donation_distribution.create({
+                        const donationDistribution = await db.donation_distribution.create({
                             data: {
                                 id: uuidv4(),
-                                donation_id: donationData.id,
+                                donation_id: donation.id,
                                 distribution_id: targetDistributionId,
                                 cause_id: cause.id,
                                 amount_cents: cause.amountDonatedCents
@@ -452,11 +455,104 @@ export class DonationEngine {
                 }
             }
             
-            console.log(`[DonationEngine] Successfully processed ${savedDistributions.length} distribution records for donation ID: ${donationData.id}`);
+            console.log(`[DonationEngine] Successfully processed ${savedDistributions.length} distribution records for donation ID: ${donation.id}`);
             return savedDistributions;
         } catch (error) {
-            console.error(`[DonationEngine] Error processing distributions for donation ID ${donationData.id}:`, error);
+            console.error(`[DonationEngine] Error processing distributions for donation ID ${donation.id}:`, error);
             throw error;
+        }
+    }
+
+    public async checkDistributionCapacity(donation: donation, causesData: any[]): Promise<{success: boolean, error?: string}> {
+        try {
+            // Constants for distribution IDs
+            const INDIA_DISTRIBUTION_ID = '6e56a45b-d36c-4413-93b8-c9820d16462e';
+            const IRAQ_DISTRIBUTION_ID = '093c62f1-b17b-46ca-ac52-38ff851768b5';
+            const AFRICA_DISTRIBUTION_ID = '1fd2bd8a-e8ac-4520-af67-9ed62d418587';
+
+            // Helper function to get total allocated amount for a distribution
+            const getTotalAllocatedAmount = async (distributionId: string) => {
+                const allocations = await this.prismaClient.donation_distribution.aggregate({
+                    where: { distribution_id: distributionId },
+                    _sum: { amount_cents: true }
+                });
+                return allocations._sum.amount_cents || 0;
+            };
+
+            // Helper function to get distribution total amount
+            const getDistributionTotalAmount = async (distributionId: string) => {
+                const distribution = await this.prismaClient.distribution.findUnique({
+                    where: { id: distributionId }
+                });
+                return distribution?.amount_cents || 0;
+            };
+
+            // Check each cause's distribution capacity
+            for (const cause of causesData) {
+                const causeLower = cause.cause.toLowerCase();
+                const region = cause.region?.toUpperCase();
+                const amount = cause.amountDonatedCents;
+
+                // Determine which distribution this cause would go to
+                let targetDistributionId: string | null = null;
+
+                if (
+                    causeLower === "vision kinship" ||
+                    (causeLower === "orphans" && (region === "INDIA" || region === "ANYWHERE")) ||
+                    causeLower === "medical aid" ||
+                    causeLower === "housing" ||
+                    causeLower === "widows" ||
+                    causeLower === "fidya" ||
+                    causeLower === "quran" ||
+                    causeLower === "sehme sadat"
+                ) {
+                    targetDistributionId = INDIA_DISTRIBUTION_ID;
+                }
+                else if (
+                    region === "IRAQ" ||
+                    (causeLower === "orphans" && region === "IRAQ") ||
+                    causeLower === "sehme imam"
+                ) {
+                    targetDistributionId = IRAQ_DISTRIBUTION_ID;
+                }
+                else if (causeLower === "education" || causeLower === "poverty relief" || causeLower === "where most needed") {
+                    // For shared causes, check both India and Africa distributions
+                    const indiaAllocated = await getTotalAllocatedAmount(INDIA_DISTRIBUTION_ID);
+                    const indiaTotal = await getDistributionTotalAmount(INDIA_DISTRIBUTION_ID);
+                    const africaAllocated = await getTotalAllocatedAmount(AFRICA_DISTRIBUTION_ID);
+                    const africaTotal = await getDistributionTotalAmount(AFRICA_DISTRIBUTION_ID);
+
+                    const canAddToIndia = (indiaAllocated + amount) <= indiaTotal;
+                    const canAddToAfrica = (africaAllocated + amount) <= africaTotal;
+
+                    if (!canAddToIndia && !canAddToAfrica) {
+                        return {
+                            success: false,
+                            error: `No capacity available for ${cause.cause} in either India or Africa distributions`
+                        };
+                    }
+                }
+
+                if (targetDistributionId) {
+                    const allocated = await getTotalAllocatedAmount(targetDistributionId);
+                    const total = await getDistributionTotalAmount(targetDistributionId);
+
+                    if ((allocated + amount) > total) {
+                        return {
+                            success: false,
+                            error: `Distribution capacity exceeded for ${cause.cause}`
+                        };
+                    }
+                }
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error checking distribution capacity:', error);
+            return {
+                success: false,
+                error: 'Failed to check distribution capacity'
+            };
         }
     }
 }

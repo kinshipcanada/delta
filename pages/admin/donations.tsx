@@ -19,41 +19,23 @@ const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey);
 
 interface Donation {
   id: string;
-  date: string;
-  donation_id: string;
-  amount_donated: number;
-  name: string;
+  status: string | null;
+  date: Date;
+  donor_name: string;
   email: string;
-  desc: string;
-  distribution: string;
-  distribution_2: string;
-  distribution_3: string;
-  vision_kinship_1: number;
-  vision_kinship_2: number;
-  vision_kinship_3: number;
-  vision_kinship_4: number;
-  vision_kinship_5: number;
-  vision_kinship_6: number;
-  vision_kinship_2025: number;
-  ramadhan_india: number;
-  ramadhan_iraq: number;
-  ramadhan_africa: number;
-  education_africa: number;
-  poverty_relief_africa: number;
-  orphan_campaign_al_anwar_iraq: number;
-  imam_ridha_khums_iraq: number;
-  orphans_india: number;
-  medical_aid_india: number;
-  housing_india: number;
-  widows_india: number;
-  sadaqah_india: number;
-  education_india: number;
-  fidya_india: number;
-  quran_india: number;
-  khums_sadat_india: number;
-  poverty_relief_india: number;
-  arbaeen_iraq: number;
-  donations_for_admin_payments: number;
+  amount_donated_cents: number;
+  amount_charged_cents: number;
+  line_address: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+  fee_charged_by_processor: number;
+  fees_covered_by_donor: number;
+  stripe_customer_id: string | null;
+  stripe_transfer_id: string | null;
+  stripe_charge_id: string | null;
+  version: number | null;
 }
 
 export default function DonationsPage() {
@@ -93,7 +75,7 @@ export default function DonationsPage() {
       console.log('Fetching donations...');
       
       const { data, error: supabaseError } = await supabase
-        .from('distributions')
+        .from('donation')
         .select('*')
         .order('date', { ascending: false });
 
@@ -173,8 +155,8 @@ export default function DonationsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distribution</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -187,23 +169,17 @@ export default function DonationsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{donation.name}</div>
+                      <div className="text-sm font-medium text-gray-900">{donation.donor_name}</div>
                       <div className="text-sm text-gray-500">{donation.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${donation.amount_donated.toFixed(2)}</div>
+                      <div className="text-sm text-gray-900">${(donation.amount_donated_cents / 100).toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{donation.distribution}</div>
-                      {donation.distribution_2 && (
-                        <div className="text-sm text-gray-500">{donation.distribution_2}</div>
-                      )}
-                      {donation.distribution_3 && (
-                        <div className="text-sm text-gray-500">{donation.distribution_3}</div>
-                      )}
+                      <div className="text-sm text-gray-900">{donation.status}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {donation.desc}
+                      {donation.line_address}, {donation.city}, {donation.state}, {donation.country} {donation.postal_code}
                     </td>
                   </tr>
                 ))}

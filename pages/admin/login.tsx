@@ -452,7 +452,7 @@ export default function AdminPage() {
       
       if (data.success) {
         setIsLinked(true);
-        router.push('/admin/donations');
+        router.push('/admin/distribution_dashboard');
       } else {
         console.error('Failed to link bank account:', data.error);
         setLinkError(data.error || 'Failed to link bank account');
@@ -621,7 +621,7 @@ export default function AdminPage() {
                 style={ButtonStyle.Secondary}
               />
               <Button
-                onClick={() => router.push('/admin/donations-explorer')}
+                onClick={() => router.push('/admin/donations')}
                 text="Go to Donations Explorer"
                 style={ButtonStyle.Primary}
               />

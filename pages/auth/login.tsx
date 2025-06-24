@@ -22,6 +22,7 @@ export default function Register() {
 	const login = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		setLoading(true)
+		setError(undefined) // Clear any previous errors
 
 		const { error } = await supabase.auth.signInWithPassword({
 			email: email,
@@ -33,9 +34,13 @@ export default function Register() {
 		} else {
 			triggerAuthReload(!authReloadStatus)
 			router.push('/dashboard')
-		}
 
-		setLoading(false)
+		} catch (err) {
+			console.error('Login error:', err)
+			setError(err instanceof Error ? err.message : "An unexpected error occurred during login")
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	return (

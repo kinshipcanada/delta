@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import prisma from '../../lib/prisma'
-import { Country, donation, status_enum } from "@prisma/client";
+import { Country, donation, status_enum, cause, donation_distribution, distribution } from "@prisma/client";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { parseFrontendDate, supabase } from "@lib/utils/helpers";
 import Head from "next/head";
@@ -11,9 +11,17 @@ import { Loading, LoadingColors } from "@components/primitives";
 import { useAuth } from "@components/prebuilts/Authentication";
 import { createServerClient } from '@supabase/ssr';
 
+interface DonationWithRelations extends donation {
+  cause: cause[];
+  distribution: (donation_distribution & {
+    distribution: distribution;
+    cause: cause;
+  })[];
+}
+
 type Props = {
     isGenerating: boolean;
-    donation: donation | null;
+    donation: DonationWithRelations | null;
     error?: string;
 }
 
@@ -52,9 +60,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
             return { props: { isGenerating: false, donation: null, error: "Invalid receipt ID" } };
         }
 
-        const isStripeId = id.startsWith("pi_") || id.startsWith("ch_");
-
-        // Fetch the donation from the database
+        // Fetch the donation with its associated causes and distributions
         const donation = await prisma.donation.findFirst({
             where: {
                 OR: [
@@ -64,20 +70,20 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
                 AND: {
                     email: session.user.email // Only allow access to own receipts
                 }
+            },
+            include: {
+                cause: true,
+                distribution: {
+                    include: {
+                        distribution: true,
+                        cause: true
+                    }
+                }
             }
         });
 
-        // Determine if receipt is still generating:
-        // - For Stripe donations: if no donation found or status is PROCESSING
-        // - For e-transfer donations: if donation exists but status is PROCESSING
-        let isGenerating = false;
-        if (isStripeId) {
-            // Stripe donation - could still be processing if not found or status is PROCESSING
-            isGenerating = !donation || donation.status === status_enum.PROCESSING;
-        } else if (donation) {
-            // E-transfer donation - only generating if status is PROCESSING
-            isGenerating = donation.status === status_enum.PROCESSING;
-        }
+        // Determine if receipt is still generating
+        const isGenerating = !donation || donation.status === status_enum.PROCESSING;
 
         return {
             props: {
@@ -251,6 +257,44 @@ const Receipt: React.FC<Props> = ({ isGenerating, donation, error }) => {
                                         <span className="font-bold">Total Amount Eligible: </span>
                                         ${(donation.amount_charged_cents/100).toFixed(2)}
                                     </p>
+                                )}
+
+                                {/* Add causes breakdown */}
+                                {donation.cause && donation.cause.length > 0 && (
+                                    <div className="mt-4">
+                                        <h4 className="text-md font-bold text-gray-900 mb-2">Donation Breakdown</h4>
+                                        <div className="space-y-2">
+                                            {donation.cause.map((cause: any) => (
+                                                <div key={cause.id} className="flex justify-between items-center">
+                                                    <span className="text-gray-800">
+                                                        {cause.cause} {cause.region !== 'ANYWHERE' ? `(${cause.region})` : ''}
+                                                    </span>
+                                                    <span className="font-medium text-gray-800">
+                                                        ${(cause.amount_cents/100).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Add distributions information */}
+                                {donation.distribution && donation.distribution.length > 0 && (
+                                    <div className="mt-4">
+                                        <h4 className="text-md font-bold text-gray-900 mb-2">Distribution Details</h4>
+                                        <div className="space-y-2">
+                                            {donation.distribution.map((dist: any) => (
+                                                <div key={dist.id} className="flex justify-between items-center">
+                                                    <span className="text-gray-800">
+                                                        {dist.distribution.partner_name || 'Distribution Partner'}
+                                                    </span>
+                                                    <span className="font-medium text-gray-800">
+                                                        ${(dist.amount_cents/100).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
