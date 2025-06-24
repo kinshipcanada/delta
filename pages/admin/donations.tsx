@@ -1,50 +1,48 @@
 import { useEffect, useState } from 'react';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Button, ButtonStyle } from '@components/primitives';
 import { useRouter } from 'next/router';
 import { useAuth } from '@components/prebuilts/Authentication';
 
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// Add debug logging
-console.log('Initializing Supabase client...');
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env.local file.');
+interface Transaction {
+  transaction_id: string;
+  date: string;
+  name: string;
+  amount: number;
+  category: string[] | string | null;
+  pending: boolean;
+  merchant_name: string | null;
+  payment_channel: string;
+  authorized_date: string;
+  account_id: string;
 }
 
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey);
-
-interface Donation {
-  id: string;
-  status: string | null;
-  date: Date;
-  donor_name: string;
-  email: string;
-  amount_donated_cents: number;
-  amount_charged_cents: number;
-  line_address: string;
-  city: string;
-  state: string;
-  country: string;
-  postal_code: string;
-  fee_charged_by_processor: number;
-  fees_covered_by_donor: number;
-  stripe_customer_id: string | null;
-  stripe_transfer_id: string | null;
-  stripe_charge_id: string | null;
-  version: number | null;
-}
-
-export default function DonationsPage() {
+export default function TransactionsPage() {
   const router = useRouter();
   const { donor } = useAuth();
-  const [donations, setDonations] = useState<Donation[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isPlaidLinked, setIsPlaidLinked] = useState(false);
+
+  useEffect(() => {
+    const checkPlaidSession = async () => {
+      try {
+        const response = await fetch('/api/plaid/check-env?sessionOnly=true');
+        const data = await response.json();
+        
+        if (!data.success || !data.hasValidSession) {
+          router.push('/admin/login');
+          return;
+        }
+        
+        fetchTransactions();
+      } catch (err) {
+        console.error('Error checking Plaid session:', err);
+        router.push('/admin/login');
+      }
+    };
+
+    checkPlaidSession();
+  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -65,57 +63,29 @@ export default function DonationsPage() {
     }
   };
 
-  useEffect(() => {
-    const checkPlaidSession = async () => {
-      try {
-        const response = await fetch('/api/plaid/check-env?sessionOnly=true');
-        const data = await response.json();
-        
-        if (!data.success || !data.hasValidSession) {
-          router.push('/admin/login');
-          return;
-        }
-        
-        fetchDonations();
-      } catch (err) {
-        console.error('Error checking Plaid session:', err);
-        router.push('/admin/login');
-      }
-    };
-
-    checkPlaidSession();
-  }, [router]);
-
-  const fetchDonations = async () => {
+  const fetchTransactions = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching donations...');
+      console.log('Fetching transactions...');
       
-      const { data, error: supabaseError } = await supabase
-        .from('donation')
-        .select('*')
-        .order('date', { ascending: false });
+      const response = await fetch('/api/plaid/transactions/sync');
+      const data = await response.json();
 
-      if (supabaseError) {
-        console.error('Supabase error:', supabaseError);
-        throw new Error(supabaseError.message);
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch transactions');
       }
 
-      if (!data) {
-        throw new Error('No data received from Supabase');
-      }
-
-      console.log('Fetched donations:', data.length);
-      setDonations(data);
+      console.log('Fetched transactions:', data.transactions?.length);
+      setTransactions(data.transactions || []);
     } catch (err) {
-      console.error('Error fetching donations:', err);
+      console.error('Error fetching transactions:', err);
       setError(
         err instanceof Error 
-          ? `Failed to load donations: ${err.message}` 
-          : 'An unexpected error occurred while fetching donations'
+          ? `Failed to load transactions: ${err.message}` 
+          : 'An unexpected error occurred while fetching transactions'
       );
-      setDonations([]);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -126,7 +96,7 @@ export default function DonationsPage() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-600">Loading donations...</span>
+          <span className="ml-3 text-gray-600">Loading transactions...</span>
         </div>
       </div>
     );
@@ -143,7 +113,7 @@ export default function DonationsPage() {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading donations</h3>
+              <h3 className="text-sm font-medium text-red-800">Error loading transactions</h3>
               <p className="mt-2 text-sm text-red-700">{error}</p>
             </div>
           </div>
@@ -156,10 +126,10 @@ export default function DonationsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Donations</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Bank Transactions</h1>
           <div className="flex gap-4">
             <Button
-              onClick={fetchDonations}
+              onClick={fetchTransactions}
               text="Refresh"
               style={ButtonStyle.Secondary}
             />
@@ -181,35 +151,54 @@ export default function DonationsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {donations.map((donation) => (
-                  <tr key={donation.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{donation.id}</td>
+                {transactions.map((transaction) => (
+                  <tr key={transaction.transaction_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {new Date(donation.date).toLocaleDateString()}
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {new Date(transaction.authorized_date).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{donation.donor_name}</div>
-                      <div className="text-sm text-gray-500">{donation.email}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {transaction.merchant_name || transaction.name}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {transaction.payment_channel}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${(donation.amount_donated_cents / 100).toFixed(2)}</div>
+                      <div className={`text-sm font-medium ${transaction.amount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        ${Math.abs(transaction.amount).toFixed(2)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{donation.status}</div>
+                      <div className="text-sm text-gray-500">
+                        {Array.isArray(transaction.category) 
+                          ? transaction.category.join(', ')
+                          : transaction.category || 'Uncategorized'}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {donation.line_address}, {donation.city}, {donation.state}, {donation.country} {donation.postal_code}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {transaction.pending ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Posted
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -217,9 +206,9 @@ export default function DonationsPage() {
             </table>
           </div>
           
-          {donations.length === 0 && (
+          {transactions.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500 text-sm">No donations found</p>
+              <p className="text-gray-500 text-sm">No transactions found</p>
             </div>
           )}
         </div>

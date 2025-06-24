@@ -70,7 +70,6 @@ export default async function handler(
     }
   }
 
-  // Determine which secret key is active based on the environment
   let activeSecretKey = 'none';
   if (PLAID_ENV === 'production' && process.env.PLAID_PROD_SECRET_KEY) {
     activeSecretKey = 'PLAID_PROD_SECRET_KEY';
@@ -80,7 +79,6 @@ export default async function handler(
     activeSecretKey = 'PLAID_SANDBOX_SECRET_KEY';
   }
 
-  // If the request includes sessionOnly=true, return only session information
   const sessionOnly = req.query.sessionOnly === 'true';
   if (sessionOnly) {
     return res.status(200).json({
