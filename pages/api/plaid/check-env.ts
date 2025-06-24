@@ -20,6 +20,19 @@ export default async function handler(
     PLAID_SECRET = process.env.PLAID_SANDBOX_SECRET_KEY;
   }
 
+  // Initialize Plaid client
+  const configuration = new Configuration({
+    basePath: PlaidEnvironments[PLAID_ENV],
+    baseOptions: {
+      headers: {
+        'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
+        'PLAID-SECRET': PLAID_SECRET,
+        'Plaid-Version': '2020-09-14',
+      },
+    },
+  });
+  const plaidClient = new PlaidApi(configuration);
+
   // Check environment variables
   const envCheck = {
     PLAID_ENV: PLAID_ENV,
@@ -40,30 +53,20 @@ export default async function handler(
   const accessToken = req.cookies.plaid_access_token;
   const itemId = req.cookies.plaid_item_id;
   let hasValidSession = false;
+  let sessionMessage = 'No Plaid session found';
 
   if (accessToken && itemId) {
     try {
-      // Initialize Plaid client
-      const configuration = new Configuration({
-        basePath: PlaidEnvironments[PLAID_ENV],
-        baseOptions: {
-          headers: {
-            'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-            'PLAID-SECRET': PLAID_SECRET,
-          },
-        },
-      });
-      const plaidClient = new PlaidApi(configuration);
-
       // Validate the access token by making a test API call
       await plaidClient.itemGet({
         access_token: accessToken
       });
-
       hasValidSession = true;
+      sessionMessage = 'Valid Plaid session found';
     } catch (error) {
       console.error('Error validating Plaid session:', error);
       hasValidSession = false;
+      sessionMessage = 'Invalid Plaid session';
     }
   }
 
@@ -75,13 +78,23 @@ export default async function handler(
     activeSecretKey = 'PLAID_DEV_SECRET_KEY';
   } else if (process.env.PLAID_SANDBOX_SECRET_KEY) {
     activeSecretKey = 'PLAID_SANDBOX_SECRET_KEY';
-  } else if (process.env.PLAID_SECRET) {
-    activeSecretKey = 'PLAID_SECRET';
   }
 
-  res.status(200).json({
+  // If the request includes sessionOnly=true, return only session information
+  const sessionOnly = req.query.sessionOnly === 'true';
+  if (sessionOnly) {
+    return res.status(200).json({
+      success: true,
+      hasValidSession,
+      message: sessionMessage
+    });
+  }
+
+  // Otherwise return full environment check
+  return res.status(200).json({
     success: true,
     hasValidSession,
+    message: sessionMessage,
     environment: {
       ...envCheck,
       active_secret_key: activeSecretKey

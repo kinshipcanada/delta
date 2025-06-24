@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@components/prebuilts/Authentication';
 import { Button, ButtonStyle } from '@components/primitives';
-import PlaidAuth from '@components/prebuilts/PlaidAuth';
 
 interface Donation {
   id: string;
@@ -77,8 +76,25 @@ export default function DistributionDashboard() {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchData();
-  }, [currentPage]);
+    const checkPlaidSession = async () => {
+      try {
+        const response = await fetch('/api/plaid/check-env?sessionOnly=true');
+        const data = await response.json();
+        
+        if (!data.success || !data.hasValidSession) {
+          router.push('/admin/login');
+          return;
+        }
+        
+        fetchData();
+      } catch (err) {
+        console.error('Error checking Plaid session:', err);
+        router.push('/admin/login');
+      }
+    };
+
+    checkPlaidSession();
+  }, [currentPage, router]);
 
   const fetchData = async (page: number = 1) => {
     setLoading(true);
@@ -177,81 +193,79 @@ export default function DistributionDashboard() {
   }
 
   return (
-    <PlaidAuth>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Distribution Dashboard</h1>
-              <p className="mt-2 text-lg text-gray-600">View and manage distributions</p>
-            </div>
-            <div className="flex gap-4">
-              <Button
-                onClick={() => router.push('/admin/donations')}
-                text="e-Transfers and Wires"
-                style={ButtonStyle.Secondary}
-              />
-              <Button
-                onClick={handleLogout}
-                text="Logout"
-                style={ButtonStyle.Secondary}
-              />
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Distribution Dashboard</h1>
+            <p className="mt-2 text-lg text-gray-600">View and manage distributions</p>
           </div>
-
-          {error && (
-            <div className="mb-8 bg-red-50 border border-red-200 rounded-md p-4">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
-
-          {/* Distribution Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {distributions.map((distribution) => (
-              <div 
-                key={distribution.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
-              >
-                <div className="flex flex-col gap-3 mb-4">
-                  {distribution.tag && (
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 self-start">
-                      {distribution.tag}
-                    </span>
-                  )}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {distribution.partner_name || 'Unnamed Distribution'}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {new Date(distribution.date_of_distribution).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <p className="text-2xl font-bold text-gray-900">
-                    ${(distribution.amount_cents / 100).toLocaleString()}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {distribution.donation_distribution.length} donation{distribution.donation_distribution.length !== 1 ? 's' : ''} allocated
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <Link 
-                      href={`/admin/goals/${distribution.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center"
-                    >
-                      View Details →
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push('/admin/donations')}
+              text="e-Transfers and Wires"
+              style={ButtonStyle.Secondary}
+            />
+            <Button
+              onClick={handleLogout}
+              text="Logout"
+              style={ButtonStyle.Secondary}
+            />
           </div>
         </div>
+
+        {error && (
+          <div className="mb-8 bg-red-50 border border-red-200 rounded-md p-4">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Distribution Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {distributions.map((distribution) => (
+            <div 
+              key={distribution.id}
+              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+            >
+              <div className="flex flex-col gap-3 mb-4">
+                {distribution.tag && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 self-start">
+                    {distribution.tag}
+                  </span>
+                )}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {distribution.partner_name || 'Unnamed Distribution'}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {new Date(distribution.date_of_distribution).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-2xl font-bold text-gray-900">
+                  ${(distribution.amount_cents / 100).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {distribution.donation_distribution.length} donation{distribution.donation_distribution.length !== 1 ? 's' : ''} allocated
+                </p>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <Link 
+                    href={`/admin/goals/${distribution.id}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center"
+                  >
+                    View Details →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </PlaidAuth>
+    </div>
   );
 }

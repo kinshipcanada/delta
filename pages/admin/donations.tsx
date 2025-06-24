@@ -68,7 +68,7 @@ export default function DonationsPage() {
   useEffect(() => {
     const checkPlaidSession = async () => {
       try {
-        const response = await fetch('/api/plaid/check-env');
+        const response = await fetch('/api/plaid/check-env?sessionOnly=true');
         const data = await response.json();
         
         if (!data.success || !data.hasValidSession) {
