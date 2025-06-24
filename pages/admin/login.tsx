@@ -376,6 +376,33 @@ export default function AdminPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
+
+  // Check for existing Plaid session on page load
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        const response = await fetch('/api/plaid/check-env', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (data.success && data.hasValidSession) {
+          console.log('Active Plaid session found, redirecting...');
+          router.replace('/admin/distribution_dashboard');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking Plaid session:', error);
+      } finally {
+        setIsChecking(false);
+      }
+      // Only generate token if no active session was found
+      generateToken();
+    };
+
+    checkExistingSession();
+  }, [router]);
 
   const generateToken = async () => {
     try {
@@ -412,10 +439,6 @@ export default function AdminPage() {
       setLinkError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
-
-  useEffect(() => {
-    generateToken();
-  }, []);
 
   // Function to fetch transactions and account data after successful linking
   const fetchPlaidData = async () => {
@@ -496,7 +519,12 @@ export default function AdminPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold mb-8">Bank Account Integration</h1>
       
-      {!isLinked ? (
+      {isChecking ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-600">Checking session...</span>
+        </div>
+      ) : !isLinked ? (
         <div className="mb-8">
           {linkError && (
             <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">

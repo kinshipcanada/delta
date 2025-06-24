@@ -188,7 +188,7 @@ export default function DistributionDashboard() {
             <div className="flex gap-4">
               <Button
                 onClick={() => router.push('/admin/donations')}
-                text="Back to Account"
+                text="e-Transfers and Wires"
                 style={ButtonStyle.Secondary}
               />
               <Button
