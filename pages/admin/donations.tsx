@@ -46,6 +46,25 @@ export default function DonationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPlaidLinked, setIsPlaidLinked] = useState(false);
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/plaid/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        router.push('/admin/login');
+      } else {
+        console.error('Logout error:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   useEffect(() => {
     const checkPlaidSession = async () => {
       try {
@@ -57,7 +76,6 @@ export default function DonationsPage() {
           return;
         }
         
-        // If we have a valid session, fetch donations
         fetchDonations();
       } catch (err) {
         console.error('Error checking Plaid session:', err);
@@ -139,11 +157,23 @@ export default function DonationsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Donations</h1>
-          <Button
-            onClick={fetchDonations}
-            text="Refresh"
-            style={ButtonStyle.Secondary}
-          />
+          <div className="flex gap-4">
+            <Button
+              onClick={fetchDonations}
+              text="Refresh"
+              style={ButtonStyle.Secondary}
+            />
+            <Button
+              onClick={() => router.push('/admin/distribution_dashboard')}
+              text="Distribution Dashboard"
+              style={ButtonStyle.Secondary}
+            />
+            <Button
+              onClick={handleLogout}
+              text="Logout"
+              style={ButtonStyle.Secondary}
+            />
+          </div>
         </div>
 
         <div className="bg-white shadow-sm rounded-lg overflow-hidden">

@@ -4,7 +4,6 @@ import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
 
-// Select the appropriate secret key based on environment
 let PLAID_SECRET: string | undefined;
 if (PLAID_ENV === 'production') {
   PLAID_SECRET = process.env.PLAID_PROD_SECRET_KEY;
@@ -37,17 +36,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     if (accessToken) {
       try {
-        // Call the Plaid API to revoke the access token
         await plaidClient.itemRemove({
           access_token: accessToken,
         });
       } catch (plaidError) {
         console.error('Error removing Plaid item:', plaidError);
-        // Continue with cookie removal even if Plaid API call fails
       }
     }
 
-    // Clear the Plaid cookies
     res.setHeader(
       'Set-Cookie', 
       [
@@ -59,7 +55,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error logging out from Plaid:', error);
-    // Still try to clear cookies even if there's an error
     res.setHeader(
       'Set-Cookie', 
       [
