@@ -43,6 +43,11 @@ const formatDate = (dateString: string | null): string => {
   }
 };
 
+interface CachedTransactions {
+  transactions: Transaction[];
+  timestamp: number;
+}
+
 export default function TransactionsPage() {
   const router = useRouter();
   const { donor } = useAuth();
@@ -51,6 +56,76 @@ export default function TransactionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [savingTransactions, setSavingTransactions] = useState<Set<string>>(new Set());
   const [savedTransactions, setSavedTransactions] = useState<Set<string>>(new Set());
+  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
+
+  const getCachedTransactions = (): CachedTransactions | null => {
+    try {
+      const cached = sessionStorage.getItem('plaidTransactions');
+      if (!cached) return null;
+      return JSON.parse(cached);
+    } catch (error) {
+      console.error('Error reading from cache:', error);
+      return null;
+    }
+  };
+
+  const setCachedTransactions = (transactions: Transaction[]) => {
+    try {
+      const cacheData: CachedTransactions = {
+        transactions,
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem('plaidTransactions', JSON.stringify(cacheData));
+      setLastFetchTime(cacheData.timestamp);
+    } catch (error) {
+      console.error('Error writing to cache:', error);
+    }
+  };
+
+  const isCacheValid = (timestamp: number): boolean => {
+    return Date.now() - timestamp < parseInt(process.env.NEXT_PUBLIC_TRANSACTION_CACHE_DURATION || '300000');
+  };
+
+  const fetchTransactions = async (forceFetch: boolean = false) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check cache first if not forcing a fresh fetch
+      if (!forceFetch) {
+        const cached = getCachedTransactions();
+        if (cached && isCacheValid(cached.timestamp)) {
+          console.log('Using cached transactions');
+          setTransactions(cached.transactions);
+          setLastFetchTime(cached.timestamp);
+          setLoading(false);
+          return;
+        }
+      }
+
+      console.log('Fetching fresh transactions...');
+      const response = await fetch('/api/plaid/transactions/sync');
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch transactions');
+      }
+
+      console.log('Fetched transactions:', data.transactions?.length);
+      setTransactions(data.transactions || []);
+      setCachedTransactions(data.transactions || []);
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+      setError(
+        err instanceof Error 
+          ? `Failed to load transactions: ${err.message}` 
+          : 'An unexpected error occurred while fetching transactions'
+      );
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const checkPlaidSession = async () => {
@@ -73,6 +148,11 @@ export default function TransactionsPage() {
     checkPlaidSession();
   }, [router]);
 
+  // Add a refresh handler that forces a fresh fetch
+  const handleRefresh = () => {
+    fetchTransactions(true);
+  };
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/plaid/logout', {
@@ -89,34 +169,6 @@ export default function TransactionsPage() {
       }
     } catch (error) {
       console.error('Error logging out:', error);
-    }
-  };
-
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('Fetching transactions...');
-      
-      const response = await fetch('/api/plaid/transactions/sync');
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch transactions');
-      }
-
-      console.log('Fetched transactions:', data.transactions?.length);
-      setTransactions(data.transactions || []);
-    } catch (err) {
-      console.error('Error fetching transactions:', err);
-      setError(
-        err instanceof Error 
-          ? `Failed to load transactions: ${err.message}` 
-          : 'An unexpected error occurred while fetching transactions'
-      );
-      setTransactions([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -220,8 +272,8 @@ export default function TransactionsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Bank Transactions</h1>
           <div className="flex gap-4">
             <Button
-              onClick={fetchTransactions}
-              text="Refresh"
+              onClick={handleRefresh}
+              text={`Refresh${lastFetchTime ? ` (${formatDate(new Date(lastFetchTime).toISOString())})` : ''}`}
               style={ButtonStyle.Secondary}
             />
             <Button
