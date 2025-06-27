@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '@lib/utils/helpers';
 import Link from 'next/link';
 
 interface Distribution {
@@ -8,12 +7,11 @@ interface Distribution {
   amount_cents: number;
   tag: string | null;
   partner_name: string | null;
-  date_of_distribution: string;
+  transaction_date: string;
   donation_distribution: DonationDistribution[];
 }
 
 interface DonationDistribution {
-  id: string;
   donation_id: string;
   distribution_id: string;
   cause_id: string;
@@ -67,24 +65,21 @@ export default function DistributionDetails() {
     if (!id) return;
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('distribution')
-        .select(`
-          *,
-          donation_distribution (
-            id,
-            donation_id,
-            cause_id,
-            amount_cents,
-            donation:donation_id (*),
-            cause:cause_id (*)
-          )
-        `)
-        .eq('id', id)
-        .single();
-
-      if (fetchError) throw fetchError;
-      setDistribution(data);
+      // Use API endpoint instead of direct Supabase query
+      const response = await fetch(`/api/v2/database/distribution/${id}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API returned status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success || !data.data) {
+        throw new Error(data.error || 'Failed to fetch distribution details');
+      }
+      
+      setDistribution(data.data);
     } catch (err) {
       console.error('Error fetching distribution details:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch distribution details');
@@ -131,7 +126,7 @@ export default function DistributionDetails() {
     return {
       institutionName: distribution.partner_name || 'Unnamed Partner',
       recipientName: '', // This can be customized if needed
-      date: new Date(distribution.date_of_distribution).toLocaleDateString(),
+      date: new Date(distribution.transaction_date).toLocaleDateString(),
       reference: distribution.tag || distribution.id,
       totalAmount: (distribution.amount_cents / 100).toFixed(2),
       partnerGroups: Object.values(groupedCauses)
@@ -182,7 +177,7 @@ export default function DistributionDetails() {
                     {distribution.partner_name || 'Unnamed Distribution'}
                   </h1>
                   <p className="text-gray-500">
-                    {new Date(distribution.date_of_distribution).toLocaleDateString()}
+                    {new Date(distribution.transaction_date).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -221,7 +216,7 @@ export default function DistributionDetails() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {distribution.donation_distribution.map((dd) => (
-                      <tr key={dd.id}>
+                      <tr key={`${dd.donation_id}-${dd.cause_id}`}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(dd.donation.date).toLocaleDateString()}
                         </td>

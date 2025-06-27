@@ -26,8 +26,9 @@ interface Distribution {
   amount_cents: number;
   tag: string | null;
   partner_name: string | null;
-  date_of_distribution: string;
+  transaction_date: string;
   donation_distribution: DonationDistribution[];
+  cause?: string;
 }
 
 interface Cause {
@@ -41,7 +42,6 @@ interface Cause {
 }
 
 interface DonationDistribution {
-  id: string;
   donation_id: string;
   distribution_id: string;
   cause_id: string;
@@ -53,9 +53,7 @@ interface DonationDistribution {
 interface ApiResponse {
   success: boolean;
   data?: {
-    donations: Donation[];
     distributions: Distribution[];
-    donationDistributions: DonationDistribution[];
     pagination: {
       total: number;
       page: number;
@@ -74,6 +72,7 @@ export default function DistributionDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     const checkPlaidSession = async () => {
@@ -99,21 +98,38 @@ export default function DistributionDashboard() {
   const fetchData = async (page: number = 1) => {
     setLoading(true);
     setError(null);
+    setDebugInfo(null);
 
     try {
       console.log('Fetching distributions...');
       
-      const response = await fetch(`/api/v2/database/connecting?page=${page}&limit=10`);
-      const result = await response.json() as ApiResponse;
+      const apiUrl = `/api/v2/database/connecting?page=${page}&limit=10`;
+      console.log('API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl);
+      console.log('Response status:', response.status);
+      
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      let result: ApiResponse;
+      try {
+        result = JSON.parse(responseText) as ApiResponse;
+      } catch (parseError) {
+        console.error('Error parsing JSON:', parseError);
+        throw new Error(`Failed to parse API response: ${responseText.substring(0, 100)}...`);
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch data');
+        throw new Error(result.error || `API returned status ${response.status}`);
       }
 
       if (!result.success || !result.data) {
         throw new Error(result.error || 'Failed to fetch data');
       }
 
+      console.log('API response data:', result.data);
+      
       setDistributions(result.data.distributions);
       setTotalPages(result.data.pagination.totalPages);
       setCurrentPage(page);
@@ -123,8 +139,22 @@ export default function DistributionDashboard() {
       console.error('Error fetching data:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
       setError(errorMessage);
+      
+      // Store debug info for troubleshooting
+      setDebugInfo({
+        timestamp: new Date().toISOString(),
+        error: err instanceof Error ? err.toString() : String(err),
+        stack: err instanceof Error ? err.stack : undefined
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchData(newPage);
     }
   };
 
@@ -155,7 +185,7 @@ export default function DistributionDashboard() {
     return {
       institutionName: distribution.partner_name || 'Unnamed Partner',
       recipientName: '', // This can be customized if needed
-      date: new Date(distribution.date_of_distribution).toLocaleDateString(),
+      date: new Date(distribution.transaction_date).toLocaleDateString(),
       reference: distribution.tag || distribution.id,
       totalAmount: (distribution.amount_cents / 100).toFixed(2),
       partnerGroups: Object.values(groupedCauses)
@@ -179,6 +209,10 @@ export default function DistributionDashboard() {
     } catch (error) {
       console.error('Error logging out:', error);
     }
+  };
+
+  const handleRetry = () => {
+    fetchData(currentPage);
   };
 
   if (loading) {
@@ -216,55 +250,119 @@ export default function DistributionDashboard() {
 
         {error && (
           <div className="mb-8 bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-sm text-red-700">{error}</p>
+            <div className="flex justify-between">
+              <p className="text-sm text-red-700">{error}</p>
+              <button 
+                onClick={handleRetry}
+                className="text-sm font-medium text-red-600 hover:text-red-800"
+              >
+                Retry
+              </button>
+            </div>
+            {debugInfo && (
+              <details className="mt-2">
+                <summary className="text-xs text-gray-500 cursor-pointer">Debug Information</summary>
+                <pre className="mt-2 text-xs text-gray-600 overflow-auto max-h-40 p-2 bg-gray-100 rounded">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
+              </details>
+            )}
           </div>
         )}
 
         {/* Distribution Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {distributions.map((distribution) => (
-            <div 
-              key={distribution.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
-            >
-              <div className="flex flex-col gap-3 mb-4">
-                {distribution.tag && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 self-start">
-                    {distribution.tag}
-                  </span>
-                )}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {distribution.partner_name || 'Unnamed Distribution'}
-                  </h3>
+        {distributions.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {distributions.map((distribution) => (
+              <div 
+                key={distribution.id}
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+              >
+                <div className="flex flex-col gap-3 mb-4">
+                  {distribution.tag && (
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 self-start">
+                      {distribution.tag}
+                    </span>
+                  )}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {distribution.cause || distribution.partner_name || 'Unnamed Distribution'}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {distribution.partner_name && distribution.cause ? `Partner: ${distribution.partner_name}` : ''}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(distribution.transaction_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${(distribution.amount_cents / 100).toLocaleString()}
+                  </p>
                   <p className="text-sm text-gray-500">
-                    {new Date(distribution.date_of_distribution).toLocaleDateString()}
+                    {distribution.donation_distribution?.length || 0} donation{(distribution.donation_distribution?.length || 0) !== 1 ? 's' : ''} allocated
                   </p>
                 </div>
-              </div>
-              
-              <div className="mb-4">
-                <p className="text-2xl font-bold text-gray-900">
-                  ${(distribution.amount_cents / 100).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {distribution.donation_distribution.length} donation{distribution.donation_distribution.length !== 1 ? 's' : ''} allocated
-                </p>
-              </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex justify-between items-center">
-                  <Link 
-                    href={`/admin/goals/${distribution.id}`}
-                    className="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center"
-                  >
-                    View Details →
-                  </Link>
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex justify-between items-center">
+                    <Link 
+                      href={`/admin/goals/${distribution.id}`}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm inline-flex items-center"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : !error ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No distributions found</p>
+          </div>
+        ) : null}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <nav className="flex items-center">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md mr-2 bg-white border border-gray-300 text-gray-700 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              
+              <div className="flex space-x-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 rounded-md ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md ml-2 bg-white border border-gray-300 text-gray-700 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

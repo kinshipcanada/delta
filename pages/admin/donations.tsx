@@ -3,6 +3,7 @@ import { Button, ButtonStyle } from '@components/primitives';
 import { useRouter } from 'next/router';
 import { useAuth } from '@components/prebuilts/Authentication';
 import { createClient } from '@supabase/supabase-js';
+import DonationEntryModal from '@components/modals/DonationEntryModal';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -51,177 +52,36 @@ interface CachedTransactions {
   timestamp: number;
 }
 
-interface DonationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  transaction: Transaction;
-  onSubmit: (donationData: any) => void;
-}
-
 const REGIONS = ['INDIA', 'TANZANIA', 'CANADA', 'IRAQ', 'ANYWHERE'] as const;
 
-const DonationModal = ({ isOpen, onClose, transaction, onSubmit }: DonationModalProps) => {
-  const [formData, setFormData] = useState({
-    donor_name: transaction.merchant_name || 'Anonymous',
-    email: '',
-    line_address: '',
-    city: '',
-    state: '',
-    country: 'CA',
-    postal_code: '',
-    cause: '',
-    subcause: '',
-    region: 'ANYWHERE',
-    in_honor_of: ''
-  });
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-[32rem] shadow-lg rounded-md bg-white">
-        <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Generate Receipt</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Donor Name</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.donor_name}
-                onChange={(e) => setFormData({ ...formData, donor_name: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={formData.line_address}
-              onChange={(e) => setFormData({ ...formData, line_address: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">City</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">State/Province</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.postal_code}
-                onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Country</label>
-              <input
-                type="text"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Cause</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={formData.cause}
-              onChange={(e) => setFormData({ ...formData, cause: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Subcause (Optional)</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={formData.subcause}
-              onChange={(e) => setFormData({ ...formData, subcause: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Region</label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={formData.region}
-              onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-            >
-              {REGIONS.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">In Honor Of (Optional)</label>
-            <input
-              type="text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={formData.in_honor_of}
-              onChange={(e) => setFormData({ ...formData, in_honor_of: e.target.value })}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              onClick={() => onSubmit(formData)}
-            >
-              Generate Receipt
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+interface FormattedDonationData {
+  donation: {
+    id: string;
+    donor_name: string;
+    email: string;
+    line_address: string;
+    city: string;
+    state: string;
+    country: string;
+    postal_code: string;
+    amount_charged_cents: number;
+    date: Date;
+    status: string;
+    et_ref_num: string;
+    fee_charged_by_processor: number;
+    fees_covered_by_donor: number;
+    stripe_customer_id: string | null;
+    stripe_transfer_id: string | null;
+    stripe_charge_id: string | null;
+    version: 6;
+  };
+  causes: Array<{
+    id: string;
+    cause: string;
+    region: string;
+    amount_cents: number;
+  }>;
+}
 
 export default function TransactionsPage() {
   const router = useRouter();
@@ -411,7 +271,6 @@ export default function TransactionsPage() {
   };
 
   const handleGenerateReceipt = async (transaction: Transaction) => {
-    // Check Plaid session before showing modal
     try {
       const response = await fetch('/api/plaid/check-env?sessionOnly=true');
       const data = await response.json();
@@ -429,54 +288,34 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleModalSubmit = async (formData: any) => {
-    if (!selectedTransaction) return;
-
+  const handleModalSubmit = async (formData: FormattedDonationData) => {
     try {
-      const donationData = {
-        id: selectedTransaction.transaction_id,
-        status: 'PROCESSING',
-        date: new Date(selectedTransaction.date).toISOString(),
-        donor_name: formData.donor_name,
-        email: formData.email,
-        amount_donated_cents: Math.abs(selectedTransaction.amount) * 100,
-        amount_charged_cents: Math.abs(selectedTransaction.amount) * 100,
-        line_address: formData.line_address,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        postal_code: formData.postal_code,
-        fee_charged_by_processor: 0,
-        fees_covered_by_donor: 0,
-        cause: [{
-          id: `${selectedTransaction.transaction_id}-cause`,
-          donation_id: selectedTransaction.transaction_id,
-          region: formData.region,
-          amount_cents: Math.abs(selectedTransaction.amount) * 100,
-          in_honor_of: formData.in_honor_of || null,
-          cause: formData.cause,
-          subcause: formData.subcause || null
-        }]
-      };
-
-      const response = await fetch('/api/donations/create', {
+      const response = await fetch('/api/donations/e-transfer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(donationData),
+        body: JSON.stringify({
+          donationData: formData.donation,
+          causesData: formData.causes
+        }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create donation');
+        if (data.code === 'AUTH_SESSION_EXPIRED' || data.code === 'PLAID_SESSION_EXPIRED') {
+          router.push('/admin/login');
+          return;
+        }
+        throw new Error(data.error || 'Failed to create donation');
       }
 
       setIsModalOpen(false);
-      // Optionally refresh the transactions to show updated status
       fetchTransactions(true);
     } catch (error) {
       console.error('Error creating donation:', error);
-      alert('Failed to generate receipt. Please try again.');
+      alert(`Failed to save donation: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -609,11 +448,17 @@ export default function TransactionsPage() {
         </div>
 
         {selectedTransaction && (
-          <DonationModal
+          <DonationEntryModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            transaction={selectedTransaction}
             onSubmit={handleModalSubmit}
+            transaction={{
+              id: selectedTransaction.transaction_id,
+              date: selectedTransaction.date,
+              amount: selectedTransaction.amount,
+              name: selectedTransaction.name,
+              description: selectedTransaction.payment_channel
+            }}
           />
         )}
       </div>

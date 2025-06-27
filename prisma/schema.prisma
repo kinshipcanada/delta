@@ -22,59 +22,64 @@ model donor {
 }
 
 model cause {
-  id           String       @id @db.VarChar
-  donation_id  String       @db.VarChar
-  region       region_enum? @default(ANYWHERE)
-  amount_cents Int
-  in_honor_of  String?      @db.VarChar
-  cause        String       @db.VarChar
-  subcause     String?      @db.VarChar
-  donation     donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                    String                  @id @db.VarChar
+  donation_id           String                  @db.VarChar
+  region                region_enum?            @default(ANYWHERE)
+  amount_cents          Int
+  in_honor_of           String?                 @db.VarChar
+  cause                 String                  @db.VarChar
+  subcause              String?                 @db.VarChar
+  donation              donation                @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   donation_distribution donation_distribution[]
 }
 
 model donation {
-  id                       String          @id @db.VarChar
+  id                       String                  @id @db.VarChar
   status                   status_enum?
-  date                     DateTime        @db.Timestamp(6)
-  donor_name               String          @db.VarChar
-  email                    String          @db.VarChar
+  date                     DateTime                @db.Timestamp(6)
+  donor_name               String                  @db.VarChar
+  email                    String                  @db.VarChar
   amount_donated_cents     Int
   amount_charged_cents     Int
-  line_address             String          @db.VarChar
-  city                     String          @db.VarChar
-  state                    String          @db.VarChar
-  country                  String          @db.VarChar
-  postal_code              String          @db.VarChar
+  line_address             String                  @db.VarChar
+  city                     String                  @db.VarChar
+  state                    String                  @db.VarChar
+  country                  String                  @db.VarChar
+  postal_code              String                  @db.VarChar
   fee_charged_by_processor Int
   fees_covered_by_donor    Int
-  stripe_customer_id       String?         @db.VarChar
-  stripe_transfer_id       String?         @db.VarChar
-  stripe_charge_id         String?         @db.VarChar
+  stripe_customer_id       String?                 @db.VarChar
+  stripe_transfer_id       String?                 @db.VarChar
+  stripe_charge_id         String?                 @db.VarChar
   version                  Float?
+  et_ref_num               String?                 @db.VarChar
   cause                    cause[]
-  distribution            donation_distribution[]
-  distribution_backfill   distribution_backfill[]
+  distribution_backfill    distribution_backfill[]
+  distribution             donation_distribution[]
 }
 
 model distribution {
-  id                    String @id
+  id                    String                  @id
   amount_cents          Int
-  tag                   String? @db.VarChar
-  partner_name          String? @db.VarChar
-  date_of_distribution  DateTime @db.Timestamp(6)
+  tag                   String?                 @db.VarChar
+  region                region_enum?
+  partner               String?                 @db.VarChar
+  cause                 String?                 @db.VarChar
+  sub_cause             String?                 @db.VarChar
+  transaction_date      DateTime                @db.Timestamp(6)
   donation_distribution donation_distribution[]
 }
 
 model donation_distribution {
-  id              String @id
-  donation_id     String @db.VarChar
-  distribution_id String @db.VarChar
-  cause_id        String @db.VarChar
-  amount_cents    Int?
-  donation        donation @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  donation_id     String       @default("") @db.VarChar
+  distribution_id String       @default("")
+  amount_cents    BigInt
+  cause_id        String       @db.VarChar
+  cause           cause        @relation(fields: [cause_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   distribution    distribution @relation(fields: [distribution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cause           cause @relation(fields: [cause_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  donation        donation     @relation(fields: [donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([donation_id, distribution_id, cause_id])
 }
 
 model distribution_backfill {

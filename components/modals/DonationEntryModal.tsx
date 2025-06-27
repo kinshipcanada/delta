@@ -53,7 +53,7 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
     id: crypto.randomUUID(),
     cause: '',
     region: 'ANYWHERE',
-    amountDonatedCents: 0
+    amount_cents: 0
   }]);
 
   const [totalAmountCents, setTotalAmountCents] = useState(0);
@@ -61,7 +61,6 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
 
   useEffect(() => {
     if (donor && !authContextLoading) {
-      // Pre-fill form with donor data if available
       setDonorName(donor.donor_first_name + ' ' + donor.donor_last_name);
       setEmail(donor.donor_email);
       setAddress(donor.donor_address_line_address);
@@ -84,7 +83,7 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
     setTotalAmountCents(totalAmount);
     setCauses(prevCauses => [{
       ...prevCauses[0],
-      amountDonatedCents: totalAmount
+      amount_cents: totalAmount
     }]);
   }, [transaction.amount]);
 
@@ -119,7 +118,7 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
   };
 
   const validateTotalAmount = (causes: any[]): boolean => {
-    const total = causes.reduce((sum, cause) => sum + cause.amountDonatedCents, 0);
+    const total = causes.reduce((sum, cause) => sum + cause.amount_cents, 0);
     if (total > totalAmountCents) {
       setAmountError(`Total amount cannot exceed ${(totalAmountCents/100).toFixed(2)} CAD`);
       return false;
@@ -134,11 +133,11 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
 
   const handleCauseChange = (index: number, field: string, value: string) => {
     const newCauses = [...causes];
-    if (field === 'amountDonatedCents') {
+    if (field === 'amount_cents') {
       const newAmount = parseFloat(value) * 100;
       // Don't update if it would make the total exceed the limit
       const otherCausesTotal = causes.reduce((sum, cause, i) => 
-        i === index ? sum : sum + cause.amountDonatedCents, 0);
+        i === index ? sum : sum + cause.amount_cents, 0);
       if (otherCausesTotal + newAmount > totalAmountCents) {
         setAmountError(`Total amount cannot exceed ${(totalAmountCents/100).toFixed(2)} CAD`);
         return;
@@ -204,7 +203,7 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
   const addCause = () => {
     try {
       // Calculate remaining amount
-      const usedAmount = causes.reduce((sum, cause) => sum + cause.amountDonatedCents, 0);
+      const usedAmount = causes.reduce((sum, cause) => sum + cause.amount_cents, 0);
       const remainingAmount = totalAmountCents - usedAmount;
       
       if (remainingAmount <= 0) {
@@ -217,7 +216,7 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
         id: crypto.randomUUID(),
         cause: '',
         region: 'ANYWHERE',
-        amountDonatedCents: 0
+        amount_cents: 0
       };
 
       setCauses(prevCauses => [...prevCauses, newCause]);
@@ -232,6 +231,19 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
     setCauses(causes.filter((_, i) => i !== index));
   };
 
+  const formatPostalCode = (value: string) => {
+    // Remove any existing spaces and convert to uppercase
+    let formatted = value.replace(/\s+/g, '').toUpperCase();
+    
+    // If we have more than 3 characters, add a space after the first 3
+    if (formatted.length > 3) {
+      formatted = formatted.slice(0, 3) + ' ' + formatted.slice(3);
+    }
+    
+    // Limit to 7 characters (3 + space + 3)
+    return formatted.slice(0, 7);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -241,66 +253,55 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
         return;
       }
 
-      // Check both Plaid and Auth sessions in parallel for efficiency
-      const [plaidResponse, authResponse] = await Promise.all([
-        fetch('/api/plaid/check-env', {
-          credentials: 'include'
-        }),
-        supabase.auth.getSession()
-      ]);
-
-      const plaidData = await plaidResponse.json();
-      const { data: { session }, error: sessionError } = authResponse;
-
-      // Check both sessions before proceeding
-      if (!plaidData.success || !plaidData.hasValidSession) {
-        console.error('No valid Plaid session found');
-        // Use window.location for a full page reload
-        window.location.href = '/admin/login';
-        return;
-      }
-
-      if (sessionError || !session) {
-        console.error('No valid auth session found:', sessionError);
-        // Use window.location for a full page reload
-        window.location.href = '/admin/login';
-        return;
-      }
-
-      const donationData = {
-        id: crypto.randomUUID(),
-        donor_name: donorName,
-        email,
-        line_address: address,
-        city,
-        state,
-        country,
-        postal_code: postalCode,
-        amount_charged_cents: totalAmountCents,
-        date: new Date(transaction.date),
-        status: 'PROCESSING',
-        et_ref_num: transaction.id,
-        fee_charged_by_processor: 0,
-        fees_covered_by_donor: 0,
-        stripe_customer_id: null,
-        stripe_transfer_id: null,
-        stripe_charge_id: null,
-        version: 2
+      const formattedData = {
+        donationData: {
+          id: crypto.randomUUID(),
+          donor_name: donorName,
+          email,
+          line_address: address,
+          city,
+          state,
+          country,
+          postal_code: postalCode,
+          amount_donated_cents: totalAmountCents,
+          amount_charged_cents: totalAmountCents,
+          date: new Date(transaction.date),
+          status: 'PROCESSING',
+          et_ref_num: transaction.id,
+          fee_charged_by_processor: 0,
+          fees_covered_by_donor: 0,
+          stripe_customer_id: null,
+          stripe_transfer_id: null,
+          stripe_charge_id: null,
+          version: 2
+        },
+        causesData: causes.map(cause => ({
+          id: cause.id,
+          cause: cause.cause,
+          region: cause.region,
+          amount_cents: cause.amount_cents
+        }))
       };
 
-      await onSubmit(donationData, causes);
+      const response = await fetch('/api/v2/donations/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to process donation');
+      }
+
+      const result = await response.json();
+      onSubmit(result.data, result.data.causes || []);
       onClose();
     } catch (error) {
-      console.error('Error submitting donation:', error);
-      if (error instanceof Error && 
-          (error.message.includes('session') || 
-           error.message.includes('auth') || 
-           error.message.includes('unauthorized'))) {
-        // Use window.location for a full page reload
-        window.location.href = '/admin/login';
-        return;
-      }
-      alert(`Failed to submit donation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error processing donation:', error);
+      alert('Failed to process donation. Please check your inputs and try again.');
     }
   };
 
@@ -396,8 +397,10 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
                       type="text"
                       required
                       value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
+                      onChange={(e) => setPostalCode(formatPostalCode(e.target.value))}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      maxLength={7}
+                      placeholder="A1A 1A1"
                     />
                   </div>
                 </div>
@@ -493,14 +496,14 @@ export default function DonationEntryModal({ isOpen, onClose, onSubmit, transact
 
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-gray-700">
-                          Amount (CAD) - Remaining: ${((totalAmountCents - causes.reduce((sum, c) => sum + c.amountDonatedCents, 0))/100).toFixed(2)}
+                          Amount (CAD) - Remaining: ${((totalAmountCents - causes.reduce((sum, c) => sum + c.amount_cents, 0))/100).toFixed(2)}
                         </label>
                         <input
                           type="number"
                           required
                           placeholder="Enter amount"
-                          value={cause.amountDonatedCents === 0 ? '' : (cause.amountDonatedCents / 100)}
-                          onChange={(e) => handleCauseChange(index, 'amountDonatedCents', e.target.value)}
+                          value={cause.amount_cents === 0 ? '' : (cause.amount_cents / 100)}
+                          onChange={(e) => handleCauseChange(index, 'amount_cents', e.target.value)}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         />
                       </div>
