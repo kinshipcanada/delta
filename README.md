@@ -1,4 +1,5 @@
-# Kinship Canada
+# Kinship Canada.
+
 
 This folder contains Kinship Canada's internal code, including it's API, report generation, and processing systems. Kinship Canada is a CRA-registered charity, and therefore has obligations to maintain reporting standards, generate CRA-eligible tax receipts, etc. This codebase is where the majority of the backend code lies, including the internal API.
 
