@@ -118,6 +118,9 @@ export default function Donate() {
     const [confirmationType, setConfirmationType] = useState<ConfirmationType>(ConfirmationType.Unconfirmed);
     
     
+    return (
+        <div className="w-full text-center content-center h-40">Please donate on our <Link href={"https://www.kinshipcanada.com"} className="text-underline underline text-blue-600"><span className="text-underline underline text-blue-600">new website</span></Link></div>
+    )
     const [donorInfo, setDonorInfo] = useState({
         firstName: '',
         lastName: '',
